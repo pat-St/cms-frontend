@@ -1,0 +1,125 @@
+<mat-toolbar color="primary">
+    <span>Bearbeiten und hinzufügen</span>
+    <span class="bar-spacer"></span>
+    <button mat-button class="material-icons" aria-hidden="false" aria-label="refresh" matTooltip="Neu laden" color="black" >cached</button>
+    <button mat-button class="material-icons" aria-hidden="false" aria-label="shrink" matTooltip="Alles zuklappen" matTooltipPosition="below">unfold_less</button>
+    <button mat-button class="material-icons" aria-hidden="false" aria-label="save" matTooltip="Alles speichern" color="accent">save</button>
+  </mat-toolbar>
+<mat-accordion multi="true">
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Kacheln
+        </mat-panel-title>
+        <mat-panel-description>
+          Füge eine neue Kachel hinzu
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <div *ngIf="kachelExpansionList && kachelExpansionList.length > 0">
+      <ng-template ngFor let-kachelExp [ngForOf]="kachelExpansionList" matExpansionPanelContent>
+          <mat-form-field>
+              <input matInput placeholder="Name" [(value)]="kachelExp.titleName">
+            </mat-form-field>
+            <mat-form-field>
+              <input matInput placeholder="Beschreibung" [(value)]="kachelExp.description">
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Kachel Typ</mat-label>
+              <mat-select [(value)]="kachelExp.kachelType">
+                <mat-option *ngFor="let kachelType of listOfKachelType" [value]="kachelType.desc">
+                  {{kachelType.value}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Kachel Größe</mat-label>
+                <mat-select [(value)]="kachelExp.kachelSize">
+                  <mat-option *ngFor="let kachelType of listOfKachelSize" [value]="kachelType.desc">
+                    {{kachelType.value}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            <mat-form-field>
+              <mat-label>Modal Typ</mat-label>
+              <mat-select [(value)]="kachelExp.modalType">
+                <mat-option *ngFor="let kachelType of listOfModalType" [value]="kachelType.desc">
+                  {{kachelType.value}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+        </ng-template>
+      </div>
+      </mat-expansion-panel>
+    <mat-expansion-panel >
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Info-Text
+        </mat-panel-title>
+        <mat-panel-description>
+          Füge eine neuen Info-Text hinzu
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <mat-form-field>
+        <input matInput placeholder="Überschrift">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Inhalt">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Bilder">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Link">
+      </mat-form-field>
+    </mat-expansion-panel>
+    <mat-expansion-panel >
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Ferienwohnung
+        </mat-panel-title>
+        <mat-panel-description>
+          Füge eine neue Ferienwohnung hinzu
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <mat-form-field>
+        <input matInput placeholder="Name">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Kachel">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Bilder">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Link">
+      </mat-form-field>
+    </mat-expansion-panel>
+    <mat-expansion-panel >
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Bild
+        </mat-panel-title>
+        <mat-panel-description>
+          Füge eine neues Bild hinzu
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <mat-form-field>
+        <input matInput placeholder="Name">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Beschreibung">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Ferienwohnung">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Info-Text">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Kachel">
+      </mat-form-field>
+      <button mat-stroked-button (click)="fileInput.click()">Hintergrundbild</button>
+      <input hidden (change)="onFileSelected()" #fileInput type="file" id="file">
+    </mat-expansion-panel>
+  </mat-accordion>
+  
