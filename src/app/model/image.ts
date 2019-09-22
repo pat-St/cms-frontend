@@ -1,5 +1,5 @@
 export class Image {
-  id: number;
+  ID: number;
   image: Array<number>;
   description: string;
   fk_apartment: number;
@@ -7,14 +7,14 @@ export class Image {
   fk_tile: number;
 
   constructor(
-    id: number,
+    ID: number,
     image: Array<number>,
     description: string,
     fk_apartment: number,
     fk_info: number,
     fk_tile: number
   ) {
-    this.id = id;
+    this.ID = ID;
     this.image = image;
     this.description = description;
     this.fk_apartment = fk_apartment;

@@ -1,49 +1,49 @@
 export class ApartmentContent {
-  id: number;
+  ID: number;
   fk_tile: number;
-  constructor(id: number, fk_tile: number) {
-    this.id = id;
+  constructor(ID: number, fk_tile: number) {
+    this.ID = ID;
     this.fk_tile = fk_tile;
   }
 }
 export class ApartmentDescription {
-  id: number;
+  ID: number;
   description: string;
   info: string;
   fk_apartment: number;
   constructor(
-    id: number,
+    ID: number,
     description: string,
     info: string,
     fk_apartment: number
   ) {
-    this.id = id;
+    this.ID = ID;
     this.description = description;
     this.info = info;
     this.fk_apartment = fk_apartment;
   }
 }
 export class ApartmentDetails {
-  id: number;
+  ID: number;
   identifier: string;
-  constructor(id: number, identifier: string) {
-    this.id = id;
+  constructor(ID: number, identifier: string) {
+    this.ID = ID;
     this.identifier = identifier;
   }
 }
 
 export class DetailsToApartment {
-  id: number;
+  ID: number;
   info: string;
   fk_apartment: number;
   fk_details: number;
   constructor(
-    id: number,
+    ID: number,
     info: string,
     fk_apartment: number,
     fk_details: number
   ) {
-    this.id = id;
+    this.ID = ID;
     this.info = info;
     this.fk_apartment = fk_apartment;
     this.fk_details = fk_details;
@@ -51,19 +51,19 @@ export class DetailsToApartment {
 }
 
 export class ApartmentPrice {
-  id: number;
+  ID: number;
   personCount: string;
   peakSeason: string;
   offSeason: string;
   fk_apartment;
   constructor(
-    id: number,
+    ID: number,
     personCount: string,
     peakSeason: string,
     offSeason: string,
     fk_apartment
   ) {
-    this.id = id;
+    this.ID = ID;
     this.personCount = personCount;
     this.peakSeason = peakSeason;
     this.fk_apartment = fk_apartment;

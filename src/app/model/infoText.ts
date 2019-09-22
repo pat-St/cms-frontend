@@ -1,26 +1,26 @@
 export class InfoText {
-  id: number;
+  ID: number;
   headerText: string;
   contentText: string;
   link: string;
   constructor(
-    id: number,
-    headerText: string,
-    contentText: string,
-    link: string
+    ID: number = null,
+    headerText: string = null,
+    contentText: string = null,
+    link: string = null
   ) {
-    this.id = id;
+    this.ID = ID;
     this.headerText = headerText;
     this.contentText = contentText;
     this.link = link;
   }
 }
 export class InfoTextToTile {
-  id: number;
+  ID: number;
   fk_info: number;
   fk_tile: number;
-  constructor(id: number, fk_info: number, fk_tile: number) {
-    this.id = id;
+  constructor(ID: number, fk_info: number, fk_tile: number) {
+    this.ID = ID;
     this.fk_info = fk_info;
     this.fk_tile = fk_tile;
   }

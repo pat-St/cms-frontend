@@ -4,7 +4,7 @@
         [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
         [mode]="(isHandset$ | async) ? 'over' : 'side'"
         [opened]="(isHandset$ | async) === false">
-      <mat-toolbar color="accent">Menu</mat-toolbar>
+      <mat-toolbar color="primary">Menu</mat-toolbar>
       <mat-nav-list>
         <a mat-list-item [routerLink]="[{ outlets: { nav: ['dashboard'] } }]" routerLinkActive="active">DashBoard</a>
         <a mat-list-item [routerLink]="[{ outlets: { nav: ['tile'] } }]" routerLinkActive="active">Bearbeiten</a>

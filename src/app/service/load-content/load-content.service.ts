@@ -27,57 +27,30 @@ export class LoadContentService {
 
   constructor(private backend: BackendRequestService) {}
 
+  async resetAllCached() {
+    this.tile = null;
+    this.infoText = null;
+    this.infoTextToTile = null;
+    this.apartmentContent = null;
+    this.apartmentDescription = null;
+    this.detailsToApartment = null;
+    this.apartmentPrice = null;
+    this.imageObject = null;
+  }
+
   async loadAll() {
     this.finishCounter = 0;
-    this.backend.getFromBackend("tile").subscribe((payload: Tile[]) => {
-      this.tile = new Array().concat(payload);
-      this.incrementCounter();
-    });
-    this.backend
-      .getFromBackend("info_text")
-      .subscribe((payload: InfoText[]) => {
-        this.infoText = new Array().concat(payload);
-        this.incrementCounter();
-      });
-    this.backend
-      .getFromBackend("info_text_to_tile")
-      .subscribe((payload: InfoTextToTile[]) => {
-        this.infoTextToTile = new Array().concat(payload);
-        this.incrementCounter();
-      });
-    this.backend
-      .getFromBackend("apartment")
-      .subscribe((payload: ApartmentContent[]) => {
-        this.apartmentContent = new Array().concat(payload);
-        this.incrementCounter();
-      });
-    this.backend
-      .getFromBackend("apartment_desc")
-      .subscribe((payload: ApartmentDescription[]) => {
-        this.apartmentDescription = new Array().concat(payload);
-        this.incrementCounter();
-      });
-    this.backend
-      .getFromBackend("details_to_apartment")
-      .subscribe((payload: DetailsToApartment[]) => {
-        this.detailsToApartment = new Array().concat(payload);
-        this.incrementCounter();
-      });
-    this.backend
-      .getFromBackend("apartment_price")
-      .subscribe((payload: ApartmentPrice[]) => {
-        this.apartmentPrice = new Array().concat(payload);
-        this.incrementCounter();
-      });
-    this.backend.getFromBackend("image/id").subscribe((payloadList: number[]) => {
-      payloadList.forEach( id => {
-        this.backend.getFromBackend("image/id/"+id).subscribe((payloadList: Image) => {
-          this.imageObject = new Array().concat(payloadList);
-        });
-      });
-      this.incrementCounter();
-    });
+    this.resetAllCached();
+    this.loadTile();
+    this.loadInfoText();
+    this.loadTextToTile();
+    this.loadApartmentContent();
+    this.loadApartmentDesc();
+    this.loadDetailsToApartment();
+    this.loadApartmentPrice();
+    this.loadImage();
   }
+
   private incrementCounter() {
     this.finishCounter += 1;
   }
@@ -86,32 +59,105 @@ export class LoadContentService {
     return this.finishCounter >= 8;
   }
 
+  async loadTile() {
+    this.backend.getFromBackend("tile").subscribe((payload: Tile[]) => {
+      this.tile = payload;
+      this.incrementCounter();
+    });
+  }
+
   getTile(): Tile[] {
     return this.tile;
+  }
+
+  async loadInfoText() {
+    this.backend
+      .getFromBackend("info_text")
+      .subscribe((payload: InfoText[]) => {
+        this.infoText = payload;
+        this.incrementCounter();
+      });
   }
 
   getInfoText(): InfoText[] {
     return this.infoText;
   }
 
+  async loadTextToTile() {
+    this.backend
+      .getFromBackend("info_text_to_tile")
+      .subscribe((payload: InfoTextToTile[]) => {
+        this.infoTextToTile = payload;
+        this.incrementCounter();
+      });
+  }
+
   getInfoTextToTile(): InfoTextToTile[] {
     return this.infoTextToTile;
+  }
+
+  async loadApartmentContent() {
+    this.backend
+      .getFromBackend("apartment")
+      .subscribe((payload: ApartmentContent[]) => {
+        this.apartmentContent = payload;
+        this.incrementCounter();
+      });
   }
 
   getApartmentContent(): ApartmentContent[] {
     return this.apartmentContent;
   }
 
+  async loadApartmentDesc() {
+    this.backend
+      .getFromBackend("apartment_desc")
+      .subscribe((payload: ApartmentDescription[]) => {
+        this.apartmentDescription = payload;
+        this.incrementCounter();
+      });
+  }
+
   getApartmentDescription(): ApartmentDescription[] {
     return this.apartmentDescription;
+  }
+
+  async loadDetailsToApartment() {
+    this.backend
+      .getFromBackend("details_to_apartment")
+      .subscribe((payload: DetailsToApartment[]) => {
+        this.detailsToApartment = payload;
+        this.incrementCounter();
+      });
   }
 
   getDetailsToApartment(): DetailsToApartment[] {
     return this.detailsToApartment;
   }
 
+  async loadApartmentPrice() {
+    this.backend
+      .getFromBackend("apartment_price")
+      .subscribe((payload: ApartmentPrice[]) => {
+        this.apartmentPrice = payload;
+        this.incrementCounter();
+      });
+  }
+
   getApartmentPrice(): ApartmentPrice[] {
     return this.apartmentPrice;
+  }
+
+  async loadImage() {
+    this.backend.getFromBackend("image/id").subscribe((payloadList: number[]) => {
+      payloadList.forEach( id => {
+        this.imageObject = new Array();
+        this.backend.getFromBackend("image/id/"+id).subscribe((payloadList: Image) => {
+          this.imageObject.push(payloadList);
+        });
+      });
+      this.incrementCounter();
+    });
   }
 
   getImages(): Image[] {

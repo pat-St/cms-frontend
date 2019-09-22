@@ -1,25 +1,35 @@
 export class Tile {
-  id: number;
+  ID: number;
   titleName: string;
   description: string;
-  kachelType: string;
-  modalType: string;
-  kachelSize: string;
+  kachelType: number;
+  modalType: number;
+  kachelSize: number;
+  
   constructor(
-    id: number,
-    titleName: string,
-    description: string,
-    kachelType: string,
-    modalType: string,
-    kachelSize: string
+    ID: number = null,
+    titleName: string = null,
+    description: string = null,
+    kachelType: number = 0,
+    modalType: number = 2,
+    kachelSize: number = 20
   ) {
-    this.id = id;
+    this.ID = ID;
     this.titleName = titleName;
     this.description = description;
     this.kachelType = kachelType;
     this.modalType = modalType;
     this.kachelSize = kachelSize;
   }
+
+  // constructor() {
+  //   this.id = null;
+  //   this.titleName = null;
+  //   this.description = null;
+  //   this.kachelType = 0;
+  //   this.modalType = 2;
+  //   this.kachelSize = 20;
+  // }
 }
 
 export enum KachelSize {

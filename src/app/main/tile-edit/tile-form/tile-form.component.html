@@ -1,15 +1,27 @@
-<div class="example-container">
-    <mat-form-field>
-      <input matInput placeholder="Input">
-    </mat-form-field>
-  
-    <mat-form-field>
-      <textarea matInput placeholder="Textarea"></textarea>
-    </mat-form-field>
-  
-    <mat-form-field>
-      <mat-select placeholder="Select">
-        <mat-option value="option">Option</mat-option>
-      </mat-select>
-    </mat-form-field>
-  </div>
+<mat-accordion multi="true">
+    <mat-expansion-panel >
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Info-Text
+        </mat-panel-title>
+        <mat-panel-description>
+          Füge eine neuen Info-Text hinzu
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <ng-template ngFor let-infoTextExp [ngForOf]="infoTextExpansionList">
+        <mat-divider class="tile-div"></mat-divider>
+        <mat-form-field>
+          <input matInput placeholder="Überschrift" [(value)]="infoTextExp.headerText">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Inhalt" [(value)]="infoTextExp.contentText">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Bilder">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Link" [(value)]="infoTextExp.link">
+        </mat-form-field>
+      </ng-template>
+    </mat-expansion-panel>
+  </mat-accordion>

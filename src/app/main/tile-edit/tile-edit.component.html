@@ -1,7 +1,7 @@
 <mat-toolbar color="primary">
     <span>Bearbeiten und hinzufügen</span>
     <span class="bar-spacer"></span>
-    <button mat-button class="material-icons" aria-hidden="false" aria-label="refresh" matTooltip="Neu laden" color="black" >cached</button>
+    <button mat-button class="material-icons" aria-hidden="false" aria-label="refresh" matTooltip="Neu laden" color="black" (click)="trigger_refresh()">cached</button>
     <button mat-button class="material-icons" aria-hidden="false" aria-label="shrink" matTooltip="Alles zuklappen" matTooltipPosition="below">unfold_less</button>
     <button mat-button class="material-icons" aria-hidden="false" aria-label="save" matTooltip="Alles speichern" color="accent">save</button>
   </mat-toolbar>
@@ -12,11 +12,12 @@
           Kacheln
         </mat-panel-title>
         <mat-panel-description>
-          Füge eine neue Kachel hinzu
+        Verändere und füge neue Kacheln hinzu
         </mat-panel-description>
       </mat-expansion-panel-header>
-      <div *ngIf="kachelExpansionList && kachelExpansionList.length > 0">
+      <div *ngIf="kachelExpansionList.length > 0">
       <ng-template ngFor let-kachelExp [ngForOf]="kachelExpansionList" matExpansionPanelContent>
+          <mat-divider class="tile-div"></mat-divider>
           <mat-form-field>
               <input matInput placeholder="Name" [(value)]="kachelExp.titleName">
             </mat-form-field>
@@ -26,7 +27,7 @@
             <mat-form-field>
               <mat-label>Kachel Typ</mat-label>
               <mat-select [(value)]="kachelExp.kachelType">
-                <mat-option *ngFor="let kachelType of listOfKachelType" [value]="kachelType.desc">
+                <mat-option *ngFor="let kachelType of kachelTypeSelected" [value]="kachelType.desc">
                   {{kachelType.value}}
                 </mat-option>
               </mat-select>
@@ -34,7 +35,7 @@
             <mat-form-field>
                 <mat-label>Kachel Größe</mat-label>
                 <mat-select [(value)]="kachelExp.kachelSize">
-                  <mat-option *ngFor="let kachelType of listOfKachelSize" [value]="kachelType.desc">
+                  <mat-option *ngFor="let kachelType of kachelSizeSelected" [value]="kachelType.desc">
                     {{kachelType.value}}
                   </mat-option>
                 </mat-select>
@@ -42,12 +43,19 @@
             <mat-form-field>
               <mat-label>Modal Typ</mat-label>
               <mat-select [(value)]="kachelExp.modalType">
-                <mat-option *ngFor="let kachelType of listOfModalType" [value]="kachelType.desc">
+                <mat-option *ngFor="let kachelType of modalTypeSelected" [value]="kachelType.desc">
                   {{kachelType.value}}
                 </mat-option>
               </mat-select>
             </mat-form-field>
-        </ng-template>
+            <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" >save</button>
+            <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="removeEntry(kachelExp)">remove_circle</button>
+            <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="showTileDetails(kachelExp.ID)">
+              {{isTileDetailsActive(kachelExp.ID)? 'expand_less':'expand_more'}}</button>
+            <app-tile-form *ngIf="kachelExp.modalType==2 && isTileDetailsActive(kachelExp.ID)" [tileID]="kachelExp.ID"></app-tile-form>
+        </ng-template>        
+        <mat-divider class="tile-div"></mat-divider>
+        <button class="add-button" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Neuer Eintrag" color="primary" (click)="addNewEntry()">Neuer Eintrag</button>
       </div>
       </mat-expansion-panel>
     <mat-expansion-panel >
