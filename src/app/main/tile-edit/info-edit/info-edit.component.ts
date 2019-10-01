@@ -1,18 +1,19 @@
 import { LoadContentService } from './../../../service/load-content/load-content.service';
-import { KachelType, KachelSize } from './../../../model/tile';
-import { Component, OnInit, NgZone, ViewChild, AfterViewInit, Input } from '@angular/core';
+import { Component, OnInit, AfterViewInit, NgZone, ViewChild, Input } from '@angular/core';
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
 import { InfoText, InfoTextToTile } from 'src/app/model/infoText';
 
 @Component({
-  selector: 'app-tile-form',
-  templateUrl: './tile-form.component.html',
-  styleUrls: ['./tile-form.component.styl']
+  selector: 'app-info-edit',
+  templateUrl: './info-edit.component.html',
+  styleUrls: ['./info-edit.component.styl']
 })
-export class TileFormComponent implements OnInit, AfterViewInit {
+export class InfoEditComponent implements OnInit, AfterViewInit {
 
   infoTextExpansionList: Array<InfoText> = new Array();
+
+  showImageDetailsStack: Set<number> = new Set();
 
   @ViewChild('autosize', {static: false}) autosize: CdkTextareaAutosize;
 
@@ -88,9 +89,26 @@ export class TileFormComponent implements OnInit, AfterViewInit {
     }
     this.infoTextExpansionList.push(entryObject);
   }
+
+  showImageDetails(id: number) {
+    if(this.showImageDetailsStack.has(id)) {
+      this.showImageDetailsStack.delete(id);
+    } else {
+      this.showImageDetailsStack.add(id);
+    }
+  }
+
+  isImageDetailsActive(id: number) {
+    return this.showImageDetailsStack.has(id);
+  }
+  
   trigger_refresh() {
     this.content.loadAll();
     this.loadContent();
+  }
+
+  hasImage(id: number) {
+    return this.content.hasImageByFkId(null, id, null);
   }
 
 

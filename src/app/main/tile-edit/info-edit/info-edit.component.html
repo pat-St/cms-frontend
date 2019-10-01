@@ -1,0 +1,31 @@
+<mat-accordion multi="true">
+    <mat-expansion-panel >
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Info-Text
+        </mat-panel-title>
+        <mat-panel-description>
+          Füge eine neuen Info-Text hinzu
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <ng-template ngFor let-infoTextExp [ngForOf]="infoTextExpansionList">
+        <mat-divider class="tile-div"></mat-divider>
+        <mat-form-field>
+          <input matInput placeholder="Überschrift" [(value)]="infoTextExp.headerText">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Link" [(value)]="infoTextExp.link">
+        </mat-form-field>
+        <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" >save</button>
+        <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="removeEntry(infoTextExp)">remove_circle</button>
+        <button *ngIf="hasImage(infoTextExp.ID)" class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="showImageDetails(infoTextExp.ID)">
+            {{isImageDetailsActive(infoTextExp.ID)? 'expand_less':'expand_more'}}</button>
+        <mat-form-field class="info-content-area">
+                <textarea matInput placeholder="Inhalt" [(value)]="infoTextExp.contentText"></textarea>
+        </mat-form-field>
+        <app-image-edit *ngIf="hasImage(infoTextExp.ID) && isImageDetailsActive(infoTextExp.ID)" [infoID]="infoTextExp.ID"></app-image-edit>
+      </ng-template>
+      <mat-divider class="tile-div"></mat-divider>
+    <button class="add-button" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Neuer Eintrag" color="primary" (click)="addNewEntry()">Neuer Eintrag</button>
+    </mat-expansion-panel>
+  </mat-accordion>

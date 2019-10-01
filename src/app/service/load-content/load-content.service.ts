@@ -149,15 +149,44 @@ export class LoadContentService {
   }
 
   async loadImage() {
-    this.backend.getFromBackend("image/id").subscribe((payloadList: number[]) => {
-      payloadList.forEach( id => {
-        this.imageObject = new Array();
-        this.backend.getFromBackend("image/id/"+id).subscribe((payloadList: Image) => {
-          this.imageObject.push(payloadList);
+    this.backend.getFromBackend("image/id").subscribe(
+      (payloadList: number[]) => {
+        payloadList.forEach( id => {
+          this.imageObject = new Array();
+          this.backend.getFromBackend("image/id/"+id).subscribe(
+            (imageObj: Image) => {
+              this.backend.loadImage(imageObj.description, imageObj.ID);
+              this.imageObject.push(imageObj);
+          });
         });
-      });
-      this.incrementCounter();
+        this.incrementCounter();
     });
+  }
+
+  getImageByFkId(apartmentId: number = null, infoId: number = null, tileId: number = null): Image[] {
+    if (apartmentId) {
+      return this.imageObject.filter( eachObject => eachObject.fk_apartment === apartmentId);
+    }
+    if (infoId) {
+      return this.imageObject.filter( eachObject => eachObject.fk_info === infoId);
+    }
+    if (tileId) {
+      return this.imageObject.filter( eachObject => eachObject.fk_tile === tileId);
+    }
+    return null;
+  }
+  
+  hasImageByFkId(apartmentId: number = null, infoId: number = null, tileId: number = null): boolean {
+    if (apartmentId) {
+      return this.imageObject.map(element => element.fk_apartment).includes(apartmentId);
+    }
+    if (infoId) {
+      return this.imageObject.map(element => element.fk_info).includes(infoId);
+    }
+    if (tileId) {
+      return this.imageObject.map(element => element.fk_tile).includes(tileId);
+    }
+    return false;
   }
 
   getImages(): Image[] {

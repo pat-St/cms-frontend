@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TileFormComponent } from './tile-form.component';
+import { ApartmentEditComponent } from './apartment-edit.component';
 
-describe('TileFormComponent', () => {
-  let component: TileFormComponent;
-  let fixture: ComponentFixture<TileFormComponent>;
+describe('ApartmentEditComponent', () => {
+  let component: ApartmentEditComponent;
+  let fixture: ComponentFixture<ApartmentEditComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TileFormComponent ]
+      declarations: [ ApartmentEditComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TileFormComponent);
+    fixture = TestBed.createComponent(ApartmentEditComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -52,7 +52,10 @@
             <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="removeEntry(kachelExp)">remove_circle</button>
             <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="showTileDetails(kachelExp.ID)">
               {{isTileDetailsActive(kachelExp.ID)? 'expand_less':'expand_more'}}</button>
-            <app-tile-form *ngIf="kachelExp.modalType==2 && isTileDetailsActive(kachelExp.ID)" [tileID]="kachelExp.ID"></app-tile-form>
+            <app-image-edit *ngIf="hasImage(kachelExp.ID) && isTileDetailsActive(kachelExp.ID)" [tileID]="kachelExp.ID"></app-image-edit>
+            <div *ngIf="isTileDetailsActive(kachelExp.ID)" class="tile-div"></div>
+            <app-info-edit *ngIf="kachelExp.modalType==2 && isTileDetailsActive(kachelExp.ID)" [tileID]="kachelExp.ID"></app-info-edit>
+            <div *ngIf="kachelExp.modalType==2 && isTileDetailsActive(kachelExp.ID)" class="tile-div"></div>
         </ng-template>        
         <mat-divider class="tile-div"></mat-divider>
         <button class="add-button" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Neuer Eintrag" color="primary" (click)="addNewEntry()">Neuer Eintrag</button>

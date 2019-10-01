@@ -14,10 +14,22 @@ import { TileEditComponent } from './tile-edit/tile-edit.component';
 import { MainRoutingModule } from './main-routing.module';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
 import { MaterialDependencieModule } from '../material.module';
-import { TileFormComponent } from './tile-edit/tile-form/tile-form.component';
+import { ImageEditComponent, ImagePreviewModal } from './tile-edit/image-edit/image-edit.component';
+import { InfoEditComponent } from './tile-edit/info-edit/info-edit.component';
+import { ApartmentEditComponent } from './tile-edit/apartment-edit/apartment-edit.component';
 
 @NgModule({
-  declarations: [MainComponent, NavbarComponent, DashboardComponent, DragDropComponent, TileEditComponent, TileFormComponent],
+  declarations: [
+    MainComponent,
+    NavbarComponent,
+    DashboardComponent,
+    DragDropComponent,
+    TileEditComponent,
+    ImageEditComponent,
+    InfoEditComponent,
+    ApartmentEditComponent,
+    ImagePreviewModal
+  ],
   imports: [
     CommonModule,
     LayoutModule,
@@ -32,6 +44,9 @@ import { TileFormComponent } from './tile-edit/tile-form/tile-form.component';
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'outline' } },
     BackendRequestService, LoadContentService
   ],
-  schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+  schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
+  entryComponents: [
+    ImagePreviewModal
+  ]
 })
 export class MainModule { }

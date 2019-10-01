@@ -158,5 +158,8 @@ export class TileEditComponent implements OnInit, AfterViewInit {
   isTileDetailsActive(tileId: number) {
     return this.showTileDetailsStack.has(tileId);
   }
+  hasImage(id: number) {
+    return this.content.hasImageByFkId(null,null, id);
+  }
 
 }
