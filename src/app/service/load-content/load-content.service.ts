@@ -1,14 +1,16 @@
 import {
   ApartmentDescription,
   DetailsToApartment,
-  ApartmentPrice
+  ApartmentPrice,
+  ApartmentContent,
+  ApartmentDetails
 } from "./../../model/apartment";
 import { BackendRequestService } from "./../backend-request/backend-request.service";
 import { Injectable } from "@angular/core";
 import { Tile } from "src/app/model/tile";
 import { InfoText, InfoTextToTile } from "src/app/model/infoText";
-import { ApartmentContent } from "src/app/model/apartment";
 import { Image } from "src/app/model/image";
+import { platform } from 'os';
 
 @Injectable({
   providedIn: "root"
@@ -20,10 +22,13 @@ export class LoadContentService {
   apartmentContent: ApartmentContent[];
   apartmentDescription: ApartmentDescription[];
   detailsToApartment: DetailsToApartment[];
+  apartmentDetails: ApartmentDetails[];
   apartmentPrice: ApartmentPrice[];
   imageObject: Image[];
+  imageCounter: number = 0;
 
   finishCounter: number = 0;
+  maxCounter = 9;
 
   constructor(private backend: BackendRequestService) {}
 
@@ -34,8 +39,10 @@ export class LoadContentService {
     this.apartmentContent = null;
     this.apartmentDescription = null;
     this.detailsToApartment = null;
+    this.apartmentDetails = null;
     this.apartmentPrice = null;
     this.imageObject = null;
+    this.imageCounter = 0;
   }
 
   async loadAll() {
@@ -47,6 +54,7 @@ export class LoadContentService {
     this.loadApartmentContent();
     this.loadApartmentDesc();
     this.loadDetailsToApartment();
+    this.loadApartmentDetails();
     this.loadApartmentPrice();
     this.loadImage();
   }
@@ -56,7 +64,7 @@ export class LoadContentService {
   }
 
   isFinished() {
-    return this.finishCounter >= 8;
+    return this.finishCounter >= this.maxCounter;
   }
 
   async loadTile() {
@@ -135,6 +143,19 @@ export class LoadContentService {
     return this.detailsToApartment;
   }
 
+  async loadApartmentDetails() {
+    this.backend
+      .getFromBackend("apartment_details")
+      .subscribe((payload: ApartmentDetails[]) => {
+        this.apartmentDetails = payload;
+        this.incrementCounter();
+      });
+  }
+
+  getApartmentDetails(): ApartmentDetails[] {
+    return this.apartmentDetails;
+  }
+
   async loadApartmentPrice() {
     this.backend
       .getFromBackend("apartment_price")
@@ -151,16 +172,27 @@ export class LoadContentService {
   async loadImage() {
     this.backend.getFromBackend("image/id").subscribe(
       (payloadList: number[]) => {
+        this.imageCounter = payloadList.length;
+        let currentCounter = 0;
         payloadList.forEach( id => {
           this.imageObject = new Array();
-          this.backend.getFromBackend("image/id/"+id).subscribe(
+          this.backend.getFromBackend("image/id/" + id).subscribe(
             (imageObj: Image) => {
               this.backend.loadImage(imageObj.description, imageObj.ID);
               this.imageObject.push(imageObj);
+              currentCounter += 1;
+              this.hasAllImageLoaded(currentCounter);
+
           });
         });
-        this.incrementCounter();
+        //this.incrementCounter();
     });
+  }
+
+  hasAllImageLoaded(refCounter: number) {
+    if (refCounter === this.imageCounter) {
+      this.incrementCounter();
+    }
   }
 
   getImageByFkId(apartmentId: number = null, infoId: number = null, tileId: number = null): Image[] {
@@ -191,5 +223,9 @@ export class LoadContentService {
 
   getImages(): Image[] {
     return this.imageObject;
+  }
+
+  getCounter() {
+    return this.finishCounter;
   }
 }

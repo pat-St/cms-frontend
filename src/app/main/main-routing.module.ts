@@ -1,8 +1,8 @@
+import { EditContentComponent } from './edit-content/edit-content.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { MainComponent } from './main.component';
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
-import { TileEditComponent } from './tile-edit/tile-edit.component';
 
 const routes: Routes = [
   {
@@ -10,7 +10,7 @@ const routes: Routes = [
     component: MainComponent,
     children: [
         { path: 'dashboard', component: DashboardComponent, outlet: 'nav' },
-        { path: 'tile', component: TileEditComponent, outlet: 'nav', },
+        { path: 'tile', component: EditContentComponent, outlet: 'nav', },
         // { path: '', redirectTo: 'dashboard', pathMatch: 'full'}
     ]
   },

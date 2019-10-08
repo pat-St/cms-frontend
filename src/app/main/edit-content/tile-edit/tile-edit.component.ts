@@ -1,7 +1,7 @@
-import { FormSelectModel } from './../../model/tileEdit/tileEdit';
+import { FormSelectModel } from '../../../model/tileEdit/tileEdit';
 import { Tile } from 'src/app/model/tile';
-import { KachelSize, KachelType, ModalType } from './../../model/tile';
-import { LoadContentService } from './../../service/load-content/load-content.service';
+import { KachelSize, KachelType, ModalType } from '../../../model/tile';
+import { LoadContentService } from '../../../service/load-content/load-content.service';
 import { Component, OnInit, NgZone, ViewChild, AfterViewInit } from '@angular/core';
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
@@ -22,28 +22,24 @@ export class TileEditComponent implements OnInit, AfterViewInit {
   kachelTypeSelected: FormSelectModel[];
   modalTypeSelected: FormSelectModel[];
   kachelSizeSelected: FormSelectModel[];
-  imageSelected: FormSelectModel[];
   srcResult: any;
 
   showTileDetailsStack: Set<number> = new Set();
 
   constructor(private content: LoadContentService, private _ngZone: NgZone) { }
 
-  ngOnInit() {
-    if (!this.content.isFinished()) {
-      this.content.loadAll();
-    }
-  }
+  ngOnInit() { }
   ngAfterViewInit(): void {
     this.loadContent();
     this.kachelTypeSelected = this.getKachelType();
     this.modalTypeSelected = this.getModalType();
     this.kachelSizeSelected = this.getKachelSize();
-    this.imageSelected = this.getImageSelected();
   }
+
   isFinished() {
     return this.content.isFinished();
   }
+  
   triggerResize() {
     // Wait for changes to be applied, then trigger textarea resize.
     this._ngZone.onStable.pipe(take(1))
@@ -76,29 +72,20 @@ export class TileEditComponent implements OnInit, AfterViewInit {
     }
     return kachelTypeList;
   }
-  getImageSelected() {
-    let kachelTypeList: FormSelectModel[] = [];
-    // for (const i in KachelType) {
-    //   if (typeof KachelType[i] === 'number') {
-    //     kachelTypeList.push({value: i, desc: <any>KachelType[i]});
-    //   }
-    // }
-    return kachelTypeList;
-  }
   async loadContent(count= 5) {
     if (count < 0) {
       console.warn("could not load content from backend");
       return;
     }
     const responseContent = this.content.getTile();
-    if (responseContent) {
+    if (responseContent && this.content.isFinished()) {
       this.addListInTile(responseContent);
       // responseContent.forEach(e => {
       //   this.addEntryInTile(e);
       // });
     } else {
       console.log("await for tile");
-      setTimeout( () => { this.loadContent(count - 1) }, 1000 );
+      setTimeout( () => { this.loadContent(count - 1) }, count*500 );
     }
   }
 
@@ -143,10 +130,6 @@ export class TileEditComponent implements OnInit, AfterViewInit {
     }
     this.kachelExpansionList.push(entryObject);
   }
-  trigger_refresh() {
-    this.content.loadAll();
-    this.loadContent();
-  }
 
   showTileDetails(tileId: number) {
     if (this.showTileDetailsStack.has(tileId)) {
@@ -159,7 +142,7 @@ export class TileEditComponent implements OnInit, AfterViewInit {
     return this.showTileDetailsStack.has(tileId);
   }
   hasImage(id: number) {
-    return this.content.hasImageByFkId(null,null, id);
+    return this.content.hasImageByFkId(null, null, id);
   }
 
 }

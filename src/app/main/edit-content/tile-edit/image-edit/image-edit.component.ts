@@ -1,15 +1,14 @@
-import { BackendRequestService } from './../../../service/backend-request/backend-request.service';
-import { Image } from './../../../model/image';
-import { LoadContentService } from './../../../service/load-content/load-content.service';
+import { ImagePreviewModalComponent } from '../../../image-preview-modal/image-preview-modal.component';
+import { BackendRequestService } from '../../../../service/backend-request/backend-request.service';
+import { Image } from '../../../../model/image';
+import { LoadContentService } from '../../../../service/load-content/load-content.service';
 import { Component, OnInit, ViewChild, Input, NgZone, AfterViewInit, Inject } from '@angular/core';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog } from '@angular/material';
 
 
-export interface PreviewImage {
-  image: Image;
-}
+
 
 @Component({
   selector: 'app-image-edit',
@@ -25,11 +24,12 @@ export class ImageEditComponent implements OnInit, AfterViewInit {
   @Input() tileID: number = null;
   @Input() apartmentID: number = null;
   @Input() infoID: number = null;
+  @Input() panelTitle: string = "Bild";
 
   constructor(private content: LoadContentService, private _ngZone: NgZone, public dialog: MatDialog) { }
 
   openDialog(imageObj: Image): void {
-    const dialogRef = this.dialog.open(ImagePreviewModal, {
+    const dialogRef = this.dialog.open(ImagePreviewModalComponent, {
       maxWidth: '97vw',
       maxHeight: '97vh',
       data: {image: imageObj}
@@ -61,9 +61,7 @@ export class ImageEditComponent implements OnInit, AfterViewInit {
     }
     const responseContent = this.content.getImageByFkId(this.apartmentID, this.infoID, this.tileID);
     if (responseContent ) {
-      responseContent.forEach( element => {
-        this.imageExpansionList.push(element);
-      });
+      this.addListInTile(responseContent);
     } else {
       console.log("await for image");
       setTimeout( () => this.loadContent(count - 1), 1000 );
@@ -77,6 +75,16 @@ export class ImageEditComponent implements OnInit, AfterViewInit {
     }
   }
 
+  addListInTile(entryObject: Image[]) {
+    entryObject.forEach((element: Image) => {
+      const indexElement = this.imageExpansionList.findIndex((compE: Image) => compE.ID === element.ID)
+      if (indexElement >= 0) {
+        this.imageExpansionList.splice(indexElement, 1);
+      }
+      this.imageExpansionList.push(element);
+    });
+  }
+
   removeEntry(entryObject: Image) {
     if (this.imageExpansionList.includes(entryObject)) {
       const indexOf = this.imageExpansionList.indexOf(entryObject);
@@ -86,38 +94,38 @@ export class ImageEditComponent implements OnInit, AfterViewInit {
 
 }
 
-@Component({
-  selector: 'image-preview-modal',
-  template: `
-  <h1 mat-dialog-title>Picture Preview</h1>
-  <div mat-dialog-content>
-    <img [src]="getImage()">
-  </div>
-  <div mat-dialog-actions>
-    <button mat-button (click)="onNoClick()" cdkFocusInitial>Close</button>
-  </div>
-  `,
-  styles: [
-    `img {
-      width: 100%;
-    }`,
-    `.mat-dialog-content {
-      max-height: 79vh;
-    }`
-  ]
-})
-export class ImagePreviewModal {
+// @Component({
+//   selector: 'image-preview-modal',
+//   template: `
+//   <h1 mat-dialog-title>Picture Preview</h1>
+//   <div mat-dialog-content>
+//     <img [src]="getImage()">
+//   </div>
+//   <div mat-dialog-actions>
+//     <button mat-button (click)="onNoClick()" cdkFocusInitial>Close</button>
+//   </div>
+//   `,
+//   styles: [
+//     `img {
+//       width: 100%;
+//     }`,
+//     `.mat-dialog-content {
+//       max-height: 79vh;
+//     }`
+//   ]
+// })
+// export class ImagePreviewModal {
 
-  constructor(
-    private backend: BackendRequestService,
-    public dialogRef: MatDialogRef<ImagePreviewModal>,
-    @Inject(MAT_DIALOG_DATA) public data: PreviewImage) {}
+//   constructor(
+//     private backend: BackendRequestService,
+//     public dialogRef: MatDialogRef<ImagePreviewModal>,
+//     @Inject(MAT_DIALOG_DATA) public data: PreviewImage) {}
 
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-  getImage() {
-    return this.backend.showImage(this.data.image.ID);
-  }
+//   onNoClick(): void {
+//     this.dialogRef.close();
+//   }
+//   getImage() {
+//     return this.backend.showImage(this.data.image.ID);
+//   }
 
-}
+// }

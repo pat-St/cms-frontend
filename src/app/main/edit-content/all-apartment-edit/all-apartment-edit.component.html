@@ -1,0 +1,28 @@
+<mat-expansion-panel>
+    <mat-expansion-panel-header>
+    <mat-panel-title>
+        Ferienwohnung
+    </mat-panel-title>
+    <mat-panel-description>
+        Bearbeite Ferienwohnungen
+    </mat-panel-description>
+    </mat-expansion-panel-header>
+    <ng-template ngFor let-apartExp [ngForOf]="apartmentExpansionList">
+        <mat-accordion multi="true">
+            <mat-expansion-panel >
+                <mat-expansion-panel-header>
+                <mat-panel-title>
+                    {{getTileName(apartExp)}}
+                </mat-panel-title>
+                <mat-panel-description>
+                    Bearbeite {{getTileName(apartExp)}}
+                </mat-panel-description>
+                </mat-expansion-panel-header>
+                <app-apartment-details-edit [tileID]="apartExp.fk_tile"></app-apartment-details-edit>
+            </mat-expansion-panel>
+        </mat-accordion>
+        <div class="tile-div"></div>
+    </ng-template>
+    <mat-divider class="tile-div"></mat-divider>
+    <button class="add-button" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Neuer Eintrag" color="primary" (click)="addNewEntry()">Neuer Eintrag</button>
+</mat-expansion-panel>
