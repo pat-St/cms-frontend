@@ -2,6 +2,7 @@ import { LoadContentService } from './../../service/load-content/load-content.se
 import { Component, OnInit, ViewChild, NgZone, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
+import { UpdateContentService } from 'src/app/service/update-content/update-content.service';
 
 @Component({
   selector: 'app-edit-content',
@@ -14,7 +15,11 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
 
   spinnerValue = 0;
 
-  constructor(private content: LoadContentService, private _ngZone: NgZone, private cdRef : ChangeDetectorRef) { }
+  constructor(
+    private content: LoadContentService,
+    private _ngZone: NgZone,
+    private cdRef: ChangeDetectorRef,
+    private updateContent: UpdateContentService) { }
 
   ngOnInit() {
     if (!this.content.isFinished()) {
@@ -38,6 +43,10 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
 
   trigger_refresh() {
     this.content.loadAll();
+  }
+
+  trigger_save() {
+    this.updateContent.sendUpdateToBackend();
   }
 
   getSpinnerValue() {

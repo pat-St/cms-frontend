@@ -3,7 +3,7 @@
 <span class="bar-spacer"></span>
 <button mat-button class="material-icons" aria-hidden="false" aria-label="refresh" matTooltip="Neu laden" color="black" (click)="trigger_refresh()">cached</button>
 <button mat-button class="material-icons" aria-hidden="false" aria-label="shrink" matTooltip="Alles zuklappen" matTooltipPosition="below">unfold_less</button>
-<button mat-button class="material-icons" aria-hidden="false" aria-label="save" matTooltip="Alles speichern" color="accent">save</button>
+<button mat-button class="material-icons" aria-hidden="false" aria-label="save" matTooltip="Alles speichern" color="accent" (click)="trigger_save()">save</button>
 </mat-toolbar>
 <div class="spinner-container" *ngIf="!isFinished()">
     <mat-progress-spinner class="spinner-view" mode="determinate" [value]="getSpinnerValue()"></mat-progress-spinner>

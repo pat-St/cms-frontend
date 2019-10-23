@@ -25,9 +25,8 @@ export class LoadContentService {
   apartmentDetails: ApartmentDetails[];
   apartmentPrice: ApartmentPrice[];
   imageObject: Image[];
-  imageCounter: number = 0;
-
-  finishCounter: number = 0;
+  imageCounter = 0;
+  finishCounter = 0;
   maxCounter = 9;
 
   constructor(private backend: BackendRequestService) {}
@@ -185,7 +184,6 @@ export class LoadContentService {
 
           });
         });
-        //this.incrementCounter();
     });
   }
 
@@ -207,7 +205,7 @@ export class LoadContentService {
     }
     return null;
   }
-  
+
   hasImageByFkId(apartmentId: number = null, infoId: number = null, tileId: number = null): boolean {
     if (apartmentId) {
       return this.imageObject.map(element => element.fk_apartment).includes(apartmentId);

@@ -1,3 +1,5 @@
+import { NewEntryModalComponent } from './image-preview-modal/new-entry-modal.component';
+import { UpdateContentService } from './../service/update-content/update-content.service';
 import { AllImageEditComponent } from './edit-content/image-edit/all-image-edit.component';
 import { BackendRequestService } from './../service/backend-request/backend-request.service';
 import { LoadContentService } from './../service/load-content/load-content.service';
@@ -37,6 +39,7 @@ import { ApartmentDetailsEditComponent } from './edit-content/all-apartment-edit
     AllImageEditComponent,
     EditContentComponent,
     ImagePreviewModalComponent,
+    NewEntryModalComponent,
     AllInfoTextEditComponent,
     AllApartmentEditComponent,
     ApartmentDetailsEditComponent
@@ -53,11 +56,12 @@ import { ApartmentDetailsEditComponent } from './edit-content/all-apartment-edit
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'outline' } },
-    BackendRequestService, LoadContentService
+    BackendRequestService, LoadContentService, UpdateContentService
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
   entryComponents: [
-    ImagePreviewModalComponent
+    ImagePreviewModalComponent,
+    NewEntryModalComponent
   ]
 })
 export class MainModule { }

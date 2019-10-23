@@ -1,8 +1,13 @@
+import { NewEntryModalComponent } from './../../image-preview-modal/new-entry-modal.component';
 import { LoadContentService } from '../../../service/load-content/load-content.service';
 import { Component, OnInit, AfterViewInit, NgZone, ViewChild, Input } from '@angular/core';
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
-import { InfoText, InfoTextToTile } from 'src/app/model/infoText';
+import { InfoText, InfoTextToTile, NewEntryObject, NewInfoTextToTile } from 'src/app/model/infoText';
+import { Tile } from 'src/app/model/tile';
+import { UpdateContentService } from 'src/app/service/update-content/update-content.service';
+import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { resolve } from 'path';
 
 @Component({
   selector: 'app-all-info-text-edit',
@@ -10,13 +15,17 @@ import { InfoText, InfoTextToTile } from 'src/app/model/infoText';
   styleUrls: ['./all-info-text-edit.component.styl']
 })
 export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
-  infoTextExpansionList: Array<InfoText> = new Array();
-  infoTextToTileList: Array<InfoTextToTile> = new Array();
+  tileExpantionList: Array<Tile> = new Array();
   showImageDetailsStack: Set<number> = new Set();
+  newInfoTextList: Array<NewInfoTextToTile>;
 
   @ViewChild('autosize', {static: false}) autosize: CdkTextareaAutosize;
 
-  constructor(private content: LoadContentService, private _ngZone: NgZone) { }
+  constructor(
+    private content: LoadContentService,
+    private _ngZone: NgZone,
+    private updateContent: UpdateContentService,
+    private entryDialog: MatDialog) { }
 
   triggerResize() {
     // Wait for changes to be applied, then trigger textarea resize.
@@ -24,7 +33,9 @@ export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
         .subscribe(() => this.autosize.resizeToFitContent(true));
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.newInfoTextList = this.updateContent.newInfoText;
+  }
   ngAfterViewInit(): void {
     this.loadContent();
   }
@@ -36,57 +47,64 @@ export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
     if (this.content.isFinished()) {
       const responseContent = this.content.getInfoText();
       const infoTextToTile = this.content.getInfoTextToTile();
-      this.addInfoTextListFromTile(responseContent);
-      this.addInfoTextToTileList(infoTextToTile);
+      this.tileExpantionList = this.content.getTile();
+      this.addCurrentInfoTextToTile(responseContent, infoTextToTile);
     } else {
       console.log("await for info text");
       setTimeout( () => this.loadContent(count - 1), count * 500 );
     }
   }
 
-  addNewEntry() {
-    const newEntry: InfoText = new InfoText();
-    if (!this.infoTextExpansionList.some((element: InfoText) => element.ID === newEntry.ID)) {
-      this.infoTextExpansionList.push(newEntry);
-    }
-  }
-  addNewInfoTextToTileEntry() {
-    const newEntry: InfoTextToTile = new InfoTextToTile(null,null,null);
-    if (!this.infoTextToTileList.some((element: InfoTextToTile) => element.ID === newEntry.ID)) {
-      this.infoTextToTileList.push(newEntry);
-    }
+  addNewEntry(currEntry: NewInfoTextToTile = null) {
+    const tileRef = this.content.getTile().filter(el => el.modalType === 2).map(el => new NewEntryObject(el.ID, el.titleName));
+    const dialogRef = this.entryDialog.open(NewEntryModalComponent, {
+      maxWidth: '50vw',
+      maxHeight: '50vh',
+      data:  {metaInfo: 'Kachel Nummer', listOfEntrys: tileRef}
+    });
+
+    dialogRef.afterClosed().subscribe((result: number) => {
+      console.log('The dialog was closed');
+      if (!result) {
+        return;
+      }
+      if (currEntry) {
+        const indexElement = this.newInfoTextList.findIndex(compE => compE === currEntry);
+        if (indexElement >= 0) {
+          const newEntry = this.newInfoTextList[indexElement];
+          newEntry.relation.fk_tile = result;
+          this.newInfoTextList[indexElement] = newEntry;
+        }
+      } else {
+        this.addNewInfoTextToTile(result);
+      }
+    });
   }
 
-  removeEntry(entryObject: InfoText) {
-    if (this.infoTextExpansionList.includes(entryObject)) {
-      const indexOf = this.infoTextExpansionList.indexOf(entryObject);
-      this.infoTextExpansionList.splice(indexOf, 1);
-    }
+  removeEntry(entryObject: NewInfoTextToTile) {
+    this.updateContent.deleteNextInfoTile(entryObject);
   }
-  addInfoTextListFromTile(entryObject: InfoText[]) {
-    entryObject.forEach((element: InfoText) => {
-      const indexElement = this.infoTextExpansionList.findIndex((compE: InfoText) => compE.ID === element.ID)
-      if (indexElement >= 0) {
-        this.infoTextExpansionList.splice(indexElement, 1);
+
+  addCurrentInfoTextToTile(entryInfo: InfoText[], relation: InfoTextToTile[]) {
+    relation.forEach(el => {
+      const infoTileEntry = entryInfo.find(obj => obj.ID === el.ID);
+      if (infoTileEntry) {
+        const newInftoTile = new NewInfoTextToTile(infoTileEntry, el);
+        this.updateContent.updateNextInfoTile(newInftoTile);
       }
-      this.infoTextExpansionList.push(element);
     });
   }
-  addInfoTextToTileList(entryObject: InfoTextToTile[]) {
-    entryObject.forEach((element: InfoTextToTile) => {
-      const indexElement = this.infoTextToTileList.findIndex((compE: InfoTextToTile) => compE.ID === element.ID)
-      if (indexElement >= 0) {
-        this.infoTextToTileList.splice(indexElement, 1);
-      }
-      this.infoTextToTileList.push(element);
-    });
+
+  addNewInfoTextToTile(tileId: number) {
+    this.updateContent.getNextInfoTile(tileId);
   }
-  getTileId(entryObject: InfoText) {
-    return this.infoTextToTileList.filter(element => element.fk_info === entryObject.ID)[0];
+
+  getTileName(entryObject: NewInfoTextToTile) {
+    return this.content.getTile().filter(el => el.ID === entryObject.relation.fk_tile)[0];
   }
 
   showImageDetails(id: number) {
-    if(this.showImageDetailsStack.has(id)) {
+    if (this.showImageDetailsStack.has(id)) {
       this.showImageDetailsStack.delete(id);
     } else {
       this.showImageDetailsStack.add(id);
@@ -104,6 +122,11 @@ export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
 
   hasImage(id: number) {
     return this.content.hasImageByFkId(null, id, null);
+  }
+
+  saveCurrentChanges(objs: NewInfoTextToTile) {
+    console.log("save current changes");
+    this.updateContent.sendSpecificNextInfoTextTileChangesToBackend(objs);
   }
 }
 
