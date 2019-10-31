@@ -24,6 +24,7 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
   ngOnInit() {
     if (!this.content.isFinished()) {
       this.content.loadAll();
+      this.updateContent.loadNewContent();
     }
   }
   triggerResize() {
@@ -43,6 +44,7 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
 
   trigger_refresh() {
     this.content.loadAll();
+    this.updateContent.loadNewContent();
   }
 
   trigger_save() {

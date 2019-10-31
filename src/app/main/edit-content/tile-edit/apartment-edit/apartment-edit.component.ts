@@ -4,6 +4,7 @@ import { Component, OnInit, AfterViewInit, NgZone, ViewChild, Input, ChangeDetec
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
 
+//TODO: Change to update-Content service
 @Component({
   selector: 'app-apartment-edit',
   templateUrl: './apartment-edit.component.html',

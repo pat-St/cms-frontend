@@ -1,3 +1,4 @@
+import { UpdateContentService } from 'src/app/service/update-content/update-content.service';
 import { ImagePreviewModalComponent } from '../../../image-preview-modal/image-preview-modal.component';
 import { BackendRequestService } from '../../../../service/backend-request/backend-request.service';
 import { Image } from '../../../../model/image';
@@ -26,7 +27,7 @@ export class ImageEditComponent implements OnInit, AfterViewInit {
   @Input() infoID: number = null;
   @Input() panelTitle: string = "Bild";
 
-  constructor(private content: LoadContentService, private _ngZone: NgZone, public dialog: MatDialog) { }
+  constructor(private updateContent: UpdateContentService, private _ngZone: NgZone, public dialog: MatDialog) { }
 
   openDialog(imageObj: Image): void {
     const dialogRef = this.dialog.open(ImagePreviewModalComponent, {
@@ -45,51 +46,19 @@ export class ImageEditComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    if (!this.content.getImages()) {
-      this.content.loadImage();
-    }
+    this.imageExpansionList = this.updateContent.newImage;
   }
   ngAfterViewInit(): void {
-    if (this.tileID || this.infoID || this.apartmentID) {
-      this.loadContent();
-    }
-  }
-  async loadContent(count= 5) {
-    if (count < 0) {
-      console.warn("could not load content from backend");
-      return;
-    }
-    const responseContent = this.content.getImageByFkId(this.apartmentID, this.infoID, this.tileID);
-    if (responseContent ) {
-      this.addListInTile(responseContent);
-    } else {
-      console.log("await for image");
-      setTimeout( () => this.loadContent(count - 1), 1000 );
-    }
   }
 
   addNewEntry() {
-    const newEntry: Image = new Image(null, null, null, this.apartmentID, this.infoID, this.tileID);
-    if (!this.imageExpansionList.some((element: Image) => element.ID === newEntry.ID)) {
-      this.imageExpansionList.push(newEntry);
-    }
+    this.updateContent.getNextNewImage(this.tileID,this.apartmentID,this.infoID)
   }
 
-  addListInTile(entryObject: Image[]) {
-    entryObject.forEach((element: Image) => {
-      const indexElement = this.imageExpansionList.findIndex((compE: Image) => compE.ID === element.ID)
-      if (indexElement >= 0) {
-        this.imageExpansionList.splice(indexElement, 1);
-      }
-      this.imageExpansionList.push(element);
-    });
-  }
+  
 
   removeEntry(entryObject: Image) {
-    if (this.imageExpansionList.includes(entryObject)) {
-      const indexOf = this.imageExpansionList.indexOf(entryObject);
-      this.imageExpansionList.splice(indexOf, 1);
-    }
+    this.updateContent.deleteNewImage(entryObject)
   }
 
 }

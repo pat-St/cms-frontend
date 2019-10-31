@@ -1,10 +1,14 @@
-import { ApartmentContent } from './../../../model/apartment';
+import { NewEntryObject } from 'src/app/model/infoText';
+import { NewEntryModalComponent } from './../../image-preview-modal/new-entry-modal.component';
+import { NewApartmentObject, ApartmentDetails } from 'src/app/model/apartment';
+import { ApartmentContent, ApartmentDescription, ApartmentPrice, DetailsToApartment } from './../../../model/apartment';
 import { LoadContentService } from '../../../service/load-content/load-content.service';
 import { Component, OnInit, AfterViewInit, NgZone, ViewChild, Input } from '@angular/core';
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
 import { Tile } from 'src/app/model/tile';
-
+import { UpdateContentService } from 'src/app/service/update-content/update-content.service';
+import { MatDialog } from '@angular/material';
 
 @Component({
   selector: 'app-all-apartment-edit',
@@ -12,13 +16,17 @@ import { Tile } from 'src/app/model/tile';
   styleUrls: ['./all-apartment-edit.component.styl']
 })
 export class AllApartmentEditComponent implements OnInit, AfterViewInit {
-  apartmentExpansionList: Array<ApartmentContent> = new Array();
-  tileExpantionList: Array<Tile> = new Array();
+  apartmentExpansionList: Array<NewApartmentObject> ;
+  tileExpantionList: Array<Tile>;
+  apartmentDetailsList: Array<ApartmentDetails>;
   showImageDetailsStack: Set<number> = new Set();
 
   @ViewChild('autosize', {static: false}) autosize: CdkTextareaAutosize;
 
-  constructor(private content: LoadContentService, private _ngZone: NgZone) { }
+  constructor(
+    private _ngZone: NgZone,
+    private updateContent: UpdateContentService,
+    private entryDialog: MatDialog) { }
 
   triggerResize() {
     // Wait for changes to be applied, then trigger textarea resize.
@@ -26,56 +34,43 @@ export class AllApartmentEditComponent implements OnInit, AfterViewInit {
         .subscribe(() => this.autosize.resizeToFitContent(true));
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.apartmentExpansionList = this.updateContent.newApartment;
+    this.tileExpantionList = this.updateContent.newTile;
+    this.apartmentDetailsList = this.updateContent.newApartmentDetails;
+  }
+
   ngAfterViewInit(): void {
-    this.loadContent();
-  }
-  async loadContent(count= 5) {
-    if (count < 0) {
-      console.warn("could not load content from backend");
-      return;
-    }
-    if (this.content.isFinished()) {
-      const responseContent = this.content.getApartmentContent();
-      const tileContent = this.content.getTile();
-      this.addApartmentEntry(responseContent);
-      this.addTileEntry(tileContent);
-    } else {
-      console.log("await for info text");
-      setTimeout( () => this.loadContent(count - 1), count * 500 );
-    }
   }
 
-  addNewEntry() {
-    const newEntry: ApartmentContent = new ApartmentContent();
-    if (!this.apartmentExpansionList.some((element: ApartmentContent) => element.ID === newEntry.ID)) {
-      this.apartmentExpansionList.push(newEntry);
-    }
+  addNewEntry(currEntry: NewApartmentObject = null) {
+    const tileRef = this.updateContent.newTile.filter(el => el.modalType === 0).map(el => new NewEntryObject(el.ID, el.titleName));
+    const dialogRef = this.entryDialog.open(NewEntryModalComponent, {
+      maxWidth: '50vw',
+      maxHeight: '50vh',
+      data:  {metaInfo: 'Kachel Nummer', listOfEntrys: tileRef}
+    });
+
+    dialogRef.afterClosed().subscribe((result: number) => {
+      console.log('The dialog was closed');
+      if (!result) {
+        return;
+      }
+      if (currEntry) {
+        const indexElement = this.apartmentExpansionList.findIndex(compE => compE === currEntry);
+        if (indexElement >= 0) {
+          const newEntry = this.apartmentExpansionList[indexElement];
+          newEntry.content.fk_tile = result;
+          this.apartmentExpansionList[indexElement] = newEntry;
+        }
+      } else {
+        this.updateContent.createNextApartment(result);
+      }
+    });
   }
 
-  removeEntry(entryObject: ApartmentContent) {
-    if (this.apartmentExpansionList.includes(entryObject)) {
-      const indexOf = this.apartmentExpansionList.indexOf(entryObject);
-      this.apartmentExpansionList.splice(indexOf, 1);
-    }
-  }
-  addApartmentEntry(entryObject: ApartmentContent[]) {
-    entryObject.forEach((element: ApartmentContent) => {
-      const indexElement = this.apartmentExpansionList.findIndex((compE: ApartmentContent) => compE.ID === element.ID)
-      if (indexElement >= 0) {
-        this.apartmentExpansionList.splice(indexElement, 1);
-      }
-      this.apartmentExpansionList.push(element);
-    });
-  }
-  addTileEntry(entryObject: Tile[]) {
-    entryObject.forEach((element: Tile) => {
-      const indexElement = this.tileExpantionList.findIndex((compE: Tile) => compE.ID === element.ID)
-      if (indexElement >= 0) {
-        this.tileExpantionList.splice(indexElement, 1);
-      }
-      this.tileExpantionList.push(element);
-    });
+  removeEntry(entryObject: NewApartmentObject) {
+    this.updateContent.deleteNextApartment(entryObject);
   }
 
   getTileName(entryObject: ApartmentContent) {
@@ -94,13 +89,9 @@ export class AllApartmentEditComponent implements OnInit, AfterViewInit {
     return this.showImageDetailsStack.has(id);
   }
 
-  trigger_refresh() {
-    this.content.loadAll();
-    this.loadContent();
-  }
 
   hasImage(id: number) {
-    return this.content.hasImageByFkId(null, id, null);
+    return this.updateContent.hasImageByFkId(null, id, null);
   }
 }
 

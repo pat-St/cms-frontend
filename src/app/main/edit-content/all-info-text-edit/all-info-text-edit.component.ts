@@ -15,14 +15,13 @@ import { resolve } from 'path';
   styleUrls: ['./all-info-text-edit.component.styl']
 })
 export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
-  tileExpantionList: Array<Tile> = new Array();
-  showImageDetailsStack: Set<number> = new Set();
+  tileExpantionList: Array<Tile>;
   newInfoTextList: Array<NewInfoTextToTile>;
+  showImageDetailsStack: Set<number> = new Set();
 
   @ViewChild('autosize', {static: false}) autosize: CdkTextareaAutosize;
 
   constructor(
-    private content: LoadContentService,
     private _ngZone: NgZone,
     private updateContent: UpdateContentService,
     private entryDialog: MatDialog) { }
@@ -35,28 +34,12 @@ export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.newInfoTextList = this.updateContent.newInfoText;
+    this.tileExpantionList = this.updateContent.newTile;
   }
-  ngAfterViewInit(): void {
-    this.loadContent();
-  }
-  async loadContent(count= 5) {
-    if (count < 0) {
-      console.warn("could not load content from backend");
-      return;
-    }
-    if (this.content.isFinished()) {
-      const responseContent = this.content.getInfoText();
-      const infoTextToTile = this.content.getInfoTextToTile();
-      this.tileExpantionList = this.content.getTile();
-      this.addCurrentInfoTextToTile(responseContent, infoTextToTile);
-    } else {
-      console.log("await for info text");
-      setTimeout( () => this.loadContent(count - 1), count * 500 );
-    }
-  }
+  ngAfterViewInit(): void { }
 
   addNewEntry(currEntry: NewInfoTextToTile = null) {
-    const tileRef = this.content.getTile().filter(el => el.modalType === 2).map(el => new NewEntryObject(el.ID, el.titleName));
+    const tileRef = this.updateContent.newTile.filter(el => el.modalType === 2).map(el => new NewEntryObject(el.ID, el.titleName));
     const dialogRef = this.entryDialog.open(NewEntryModalComponent, {
       maxWidth: '50vw',
       maxHeight: '50vh',
@@ -85,22 +68,12 @@ export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
     this.updateContent.deleteNextInfoTile(entryObject);
   }
 
-  addCurrentInfoTextToTile(entryInfo: InfoText[], relation: InfoTextToTile[]) {
-    relation.forEach(el => {
-      const infoTileEntry = entryInfo.find(obj => obj.ID === el.ID);
-      if (infoTileEntry) {
-        const newInftoTile = new NewInfoTextToTile(infoTileEntry, el);
-        this.updateContent.updateNextInfoTile(newInftoTile);
-      }
-    });
-  }
-
   addNewInfoTextToTile(tileId: number) {
     this.updateContent.getNextInfoTile(tileId);
   }
 
   getTileName(entryObject: NewInfoTextToTile) {
-    return this.content.getTile().filter(el => el.ID === entryObject.relation.fk_tile)[0];
+    return this.updateContent.newTile.filter(el => el.ID === entryObject.relation.fk_tile)[0];
   }
 
   showImageDetails(id: number) {
@@ -115,13 +88,8 @@ export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
     return this.showImageDetailsStack.has(id);
   }
 
-  trigger_refresh() {
-    this.content.loadAll();
-    this.loadContent();
-  }
-
   hasImage(id: number) {
-    return this.content.hasImageByFkId(null, id, null);
+    return this.updateContent.hasImageByFkId(null, id, null);
   }
 
   saveCurrentChanges(objs: NewInfoTextToTile) {

@@ -193,32 +193,6 @@ export class LoadContentService {
     }
   }
 
-  getImageByFkId(apartmentId: number = null, infoId: number = null, tileId: number = null): Image[] {
-    if (apartmentId) {
-      return this.imageObject.filter( eachObject => eachObject.fk_apartment === apartmentId);
-    }
-    if (infoId) {
-      return this.imageObject.filter( eachObject => eachObject.fk_info === infoId);
-    }
-    if (tileId) {
-      return this.imageObject.filter( eachObject => eachObject.fk_tile === tileId);
-    }
-    return null;
-  }
-
-  hasImageByFkId(apartmentId: number = null, infoId: number = null, tileId: number = null): boolean {
-    if (apartmentId) {
-      return this.imageObject.map(element => element.fk_apartment).includes(apartmentId);
-    }
-    if (infoId) {
-      return this.imageObject.map(element => element.fk_info).includes(infoId);
-    }
-    if (tileId) {
-      return this.imageObject.map(element => element.fk_tile).includes(tileId);
-    }
-    return false;
-  }
-
   getImages(): Image[] {
     return this.imageObject;
   }

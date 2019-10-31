@@ -9,6 +9,7 @@
       </mat-panel-description>
     </mat-expansion-panel-header>
     <ng-template ngFor let-imageExp [ngForOf]="imageExpansionList">
+      <div *ngIf="imageExp.fk_tile === tileID">
         <mat-divider class="tile-div"></mat-divider>
         <mat-form-field class="desc-form-field">
         <textarea matInput placeholder="Beschreibung" [(value)]="imageExp.description"></textarea>
@@ -19,6 +20,7 @@
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Save Picture" color="primary" >save</button>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Delete Picture" color="warn" (click)="removeEntry(imageExp)">remove_circle</button>
         <div class="tile-div"></div>
+      </div>
     </ng-template>
     <mat-divider class="tile-div"></mat-divider>
     <button class="add-button" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Neuer Eintrag" color="primary" (click)="addNewEntry()">Neuer Eintrag</button>

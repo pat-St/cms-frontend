@@ -5,14 +5,18 @@ export class Tile {
   kachelType: number;
   modalType: number;
   kachelSize: number;
-  
+  deleteEntry: boolean = false;
+  changed: boolean = false;
+
   constructor(
     ID: number = null,
     titleName: string = null,
     description: string = null,
     kachelType: number = 0,
     modalType: number = 2,
-    kachelSize: number = 20
+    kachelSize: number = 20,
+    deleteEntry: boolean = false,
+    changed: boolean = false
   ) {
     this.ID = ID;
     this.titleName = titleName;
@@ -20,16 +24,18 @@ export class Tile {
     this.kachelType = kachelType;
     this.modalType = modalType;
     this.kachelSize = kachelSize;
+    this.changed = changed;
+    this.deleteEntry = deleteEntry;
+  }
+  setDelete(): Tile {
+    this.deleteEntry = true;
+    return this;
   }
 
-  // constructor() {
-  //   this.id = null;
-  //   this.titleName = null;
-  //   this.description = null;
-  //   this.kachelType = 0;
-  //   this.modalType = 2;
-  //   this.kachelSize = 20;
-  // }
+  setChanged(): Tile {
+    this.changed = true;
+    return this;
+  }
 }
 
 export enum KachelSize {

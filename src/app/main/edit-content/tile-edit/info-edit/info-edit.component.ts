@@ -2,7 +2,8 @@ import { LoadContentService } from '../../../../service/load-content/load-conten
 import { Component, OnInit, AfterViewInit, NgZone, ViewChild, Input } from '@angular/core';
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
-import { InfoText, InfoTextToTile } from 'src/app/model/infoText';
+import { InfoText, InfoTextToTile, NewInfoTextToTile } from 'src/app/model/infoText';
+import { UpdateContentService } from 'src/app/service/update-content/update-content.service';
 
 @Component({
   selector: 'app-info-edit',
@@ -11,7 +12,7 @@ import { InfoText, InfoTextToTile } from 'src/app/model/infoText';
 })
 export class InfoEditComponent implements OnInit, AfterViewInit {
 
-  infoTextExpansionList: Array<InfoText> = new Array();
+  infoTextExpansionList: Array<NewInfoTextToTile> = new Array();
 
   showImageDetailsStack: Set<number> = new Set();
 
@@ -19,7 +20,7 @@ export class InfoEditComponent implements OnInit, AfterViewInit {
 
   @Input() tileID: number;
 
-  constructor(private content: LoadContentService, private _ngZone: NgZone) { }
+  constructor(private updateContent: UpdateContentService, private _ngZone: NgZone) { }
 
   triggerResize() {
     // Wait for changes to be applied, then trigger textarea resize.
@@ -28,67 +29,20 @@ export class InfoEditComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    if (!this.content.getInfoText()) {
-      this.content.loadInfoText();
-    }
-    if (!this.content.getInfoTextToTile()) {
-      this.content.loadTextToTile();
-    }
+    this.infoTextExpansionList = this.updateContent.newInfoText;
   }
   ngAfterViewInit(): void {
-    if (this.tileID) {
-      this.loadContent();
-    }
   }
-  async loadContent(count= 5) {
-    if (count < 0) {
-      console.warn("could not load content from backend");
-      return;
-    }
-    const responseContent = this.content.getInfoText();
-    const infoTextToTile = this.content.getInfoTextToTile();
-    if (responseContent && infoTextToTile) {
-      const listOfRefObjects: number[] = infoTextToTile.filter(element => element.fk_tile === this.tileID).map(element => element.fk_info);
-      this.addInfoTextListFromTile(responseContent, listOfRefObjects);
-    } else {
-      console.log("await for info text");
-      setTimeout( () => this.loadContent(count - 1), 1000 );
-    }
-  }
+
 
   addNewEntry() {
-    const newEntry: InfoText = new InfoText();
-    if (!this.infoTextExpansionList.some((element: InfoText) => element.ID === newEntry.ID)) {
-      this.infoTextExpansionList.push(newEntry);
-    }
+    this.updateContent.getNextInfoTile(this.tileID)
   }
 
-  removeEntry(entryObject: InfoText) {
-    if (this.infoTextExpansionList.includes(entryObject)) {
-      const indexOf = this.infoTextExpansionList.indexOf(entryObject);
-      this.infoTextExpansionList.splice(indexOf, 1);
-    }
-  }
-  addInfoTextListFromTile(entryObject: InfoText[], refObject: number[]) {
-    entryObject.filter(element => refObject.includes(element.ID) ).forEach((element: InfoText) => {
-      const indexElement = this.infoTextExpansionList.findIndex((compE: InfoText) => compE.ID === element.ID)
-      if (indexElement >= 0) {
-        this.infoTextExpansionList.splice(indexElement, 1);
-      }
-      this.infoTextExpansionList.push(element);
-    });
+  removeEntry(entryObject: NewInfoTextToTile) {
+    this.updateContent.deleteNextInfoTile(entryObject);
   }
 
-  addEntryInTile(entryObject: InfoText, refObject: number[]) {
-    if (!refObject.includes(entryObject.ID)) {
-      return;
-    }
-    const indexElement = this.infoTextExpansionList.findIndex((compE: InfoText) => compE.ID === entryObject.ID)
-    if (indexElement >= 0) {
-      this.infoTextExpansionList.splice(indexElement, 1);
-    }
-    this.infoTextExpansionList.push(entryObject);
-  }
 
   showImageDetails(id: number) {
     if(this.showImageDetailsStack.has(id)) {
@@ -101,14 +55,10 @@ export class InfoEditComponent implements OnInit, AfterViewInit {
   isImageDetailsActive(id: number) {
     return this.showImageDetailsStack.has(id);
   }
-  
-  trigger_refresh() {
-    this.content.loadAll();
-    this.loadContent();
-  }
+
 
   hasImage(id: number) {
-    return this.content.hasImageByFkId(null, id, null);
+    return this.updateContent.hasImageByFkId(null, id, null);
   }
 
 

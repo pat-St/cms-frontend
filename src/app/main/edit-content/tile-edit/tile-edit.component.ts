@@ -5,6 +5,7 @@ import { LoadContentService } from '../../../service/load-content/load-content.s
 import { Component, OnInit, NgZone, ViewChild, AfterViewInit } from '@angular/core';
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
+import { UpdateContentService } from 'src/app/service/update-content/update-content.service';
 
 @Component({
   selector: 'app-tile-edit',
@@ -26,18 +27,14 @@ export class TileEditComponent implements OnInit, AfterViewInit {
 
   showTileDetailsStack: Set<number> = new Set();
 
-  constructor(private content: LoadContentService, private _ngZone: NgZone) { }
+  constructor(private updateContent: UpdateContentService, private _ngZone: NgZone) { }
 
   ngOnInit() { }
   ngAfterViewInit(): void {
-    this.loadContent();
+    this.kachelExpansionList = this.updateContent.newTile;
     this.kachelTypeSelected = this.getKachelType();
     this.modalTypeSelected = this.getModalType();
     this.kachelSizeSelected = this.getKachelSize();
-  }
-
-  isFinished() {
-    return this.content.isFinished();
   }
   
   triggerResize() {
@@ -72,22 +69,6 @@ export class TileEditComponent implements OnInit, AfterViewInit {
     }
     return kachelTypeList;
   }
-  async loadContent(count= 5) {
-    if (count < 0) {
-      console.warn("could not load content from backend");
-      return;
-    }
-    const responseContent = this.content.getTile();
-    if (responseContent && this.content.isFinished()) {
-      this.addListInTile(responseContent);
-      // responseContent.forEach(e => {
-      //   this.addEntryInTile(e);
-      // });
-    } else {
-      console.log("await for tile");
-      setTimeout( () => { this.loadContent(count - 1) }, count*500 );
-    }
-  }
 
   onFileSelected() {
     const inputNode: any = document.querySelector('#file');
@@ -101,34 +82,11 @@ export class TileEditComponent implements OnInit, AfterViewInit {
   }
 
   addNewEntry() {
-    const newEntry: Tile = new Tile();
-    if (!this.kachelExpansionList.some((element: Tile) => element.ID === newEntry.ID)) {
-      this.kachelExpansionList.push(newEntry);
-    }
+    this.updateContent.getNextNewTile();
   }
 
   removeEntry(entryObject: Tile) {
-    if (this.kachelExpansionList.includes(entryObject)) {
-      const indexOf = this.kachelExpansionList.indexOf(entryObject);
-      this.kachelExpansionList.splice(indexOf, 1);
-    }
-  }
-  addListInTile(entryObject: Tile[]) {
-    entryObject.forEach((element: Tile) => {
-      const indexElement = this.kachelExpansionList.findIndex((compE: Tile) => compE.ID === element.ID)
-      if (indexElement >= 0) {
-        this.kachelExpansionList.splice(indexElement, 1);
-      }
-      this.kachelExpansionList.push(element);
-    });
-  }
-
-  addEntryInTile(entryObject: Tile) {
-    const indexElement = this.kachelExpansionList.findIndex((compE: Tile) => compE.ID === entryObject.ID)
-    if (indexElement >= 0) {
-      this.kachelExpansionList.splice(indexElement, 1);
-    }
-    this.kachelExpansionList.push(entryObject);
+    this.updateContent.deleteNewTile(entryObject)
   }
 
   showTileDetails(tileId: number) {
@@ -138,11 +96,13 @@ export class TileEditComponent implements OnInit, AfterViewInit {
       this.showTileDetailsStack.add(tileId);
     }
   }
+
   isTileDetailsActive(tileId: number) {
     return this.showTileDetailsStack.has(tileId);
   }
+
   hasImage(id: number) {
-    return this.content.hasImageByFkId(null, null, id);
+    return this.updateContent.hasImageByFkId(null, null, id);
   }
 
 }
