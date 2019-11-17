@@ -53,7 +53,7 @@ export class ApartmentDetailsEditComponent implements OnInit, AfterViewInit, Aft
 
   addNewDescEntry() {
     const newID = this.updateApartment.nextIdOf(this.updateApartment.getAllApartmentDescriptionID());
-    const newEntry: ApartmentDescription = new ApartmentDescription(newID, null, null, this.apartmentID);
+    const newEntry: ApartmentDescription = new ApartmentDescription(newID, "", "", this.apartmentID);
     this.apartmentDescList.push(newEntry);
   }
 
@@ -79,14 +79,14 @@ export class ApartmentDetailsEditComponent implements OnInit, AfterViewInit, Aft
 
   addNewDetailsRelationEntry() {
     const newID = this.updateApartment.nextIdOf(this.updateApartment.getAllDetailsRelationID());
-    const newEntry: DetailsToApartment = new DetailsToApartment(newID, null, this.apartmentID, null);
+    const newEntry: DetailsToApartment = new DetailsToApartment(newID, "", this.apartmentID, this.tileID);
     this.detailsRelation.push(newEntry);
   }
 
   removeDetailsRelationEntry(entryObject: DetailsToApartment) {
     const indexOf = this.detailsRelation.indexOf(entryObject);
     if (indexOf >= 0) {
-      this.detailsRelation[indexOf].deleteEntry= true;
+      this.detailsRelation[indexOf].deleteEntry = true;
     }
   }
 

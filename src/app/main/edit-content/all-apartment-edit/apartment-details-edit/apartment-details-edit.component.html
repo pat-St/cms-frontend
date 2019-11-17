@@ -12,10 +12,10 @@
       <div *ngIf="!descExp.deleteEntry">
         <mat-divider class="tile-div"></mat-divider>
         <mat-form-field>
-          <input matInput placeholder="Beschreibung" [(value)]="descExp.description">
+          <input matInput placeholder="Beschreibung" [(ngModel)]="descExp.description">
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Bedeutung" [(value)]="descExp.info">
+          <input matInput placeholder="Bedeutung" [(ngModel)]="descExp.info">
         </mat-form-field>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" >save</button>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="removeDescEntry(descExp)">remove_circle</button>
@@ -41,7 +41,7 @@
         <mat-divider class="tile-div"></mat-divider>
         <mat-form-field>
           <mat-label>Ausstattungen</mat-label>
-          <mat-select [(value)]="detailsExp.fk_details">
+          <mat-select [(ngModel)]="detailsExp.fk_details">
             <mat-option *ngFor="let detailsList of apartmentDetailsList" [value]="detailsList.ID">
               {{detailsList.identifier}}
             </mat-option>
@@ -70,13 +70,13 @@
       <div *ngIf="!priceExp.deleteEntry">
         <mat-divider class="tile-div"></mat-divider>
         <mat-form-field>
-          <input matInput placeholder="Personen" [(value)]="priceExp.personCount">
+          <input matInput placeholder="Personen" [(ngModel)]="priceExp.personCount">
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Haupt-Saison" [(value)]="priceExp.peakSeason">
+          <input matInput placeholder="Haupt-Saison" [(ngModel)]="priceExp.peakSeason">
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Neben-Saison" [(value)]="priceExp.offSeason">
+          <input matInput placeholder="Neben-Saison" [(ngModel)]="priceExp.offSeason">
         </mat-form-field>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" >save</button>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="removePriceEntry(priceExp)">remove_circle</button>
@@ -87,9 +87,6 @@
   </mat-expansion-panel>
 </mat-accordion>
 <div class="tile-div"></div>
-<div *ngIf="isInputSet(apartmentID)" >
-  <app-image-edit [apartmentID]="apartmentID" [panelTitle]="'Ferienwohnung Bilder'"></app-image-edit>
-</div>
       
       
       

@@ -92,6 +92,9 @@ export class TileEditComponent implements OnInit, AfterViewInit {
   removeEntry(entryObject: Tile) {
     this.updateContent.deleteNewTile(entryObject)
   }
+  saveEntry(entryObject: Tile) {
+    this.updateContent.sendSpecificNewTileChangesToBackend(entryObject);
+  }
 
   showTileDetails(tileId: number) {
     if (this.showTileDetailsStack.has(tileId)) {

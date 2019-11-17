@@ -12,7 +12,7 @@
       <div *ngIf="imageExp.fk_apartment === apartmentID">
         <mat-divider class="tile-div"></mat-divider>
         <mat-form-field class="desc-form-field">
-        <textarea matInput placeholder="Beschreibung" [(value)]="imageExp.description"></textarea>
+        <textarea matInput placeholder="Beschreibung" [(ngModel)]="imageExp.description"></textarea>
         </mat-form-field>
         <button class="click-button" mat-stroked-button (click)="fileInput.click()">Hintergrundbild</button>
         <input hidden (change)="onFileSelected()" #fileInput type="file" id="file">

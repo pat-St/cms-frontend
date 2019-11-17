@@ -12,14 +12,14 @@
     <div *ngIf="!kachelExp.deleteEntry">
       <mat-divider class="tile-div"></mat-divider>
       <mat-form-field>
-          <input matInput placeholder="Name" [(value)]="kachelExp.titleName">
+          <input matInput placeholder="Name" [(ngModel)]="kachelExp.titleName">
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Beschreibung" [(value)]="kachelExp.description">
+          <input matInput placeholder="Beschreibung" [(ngModel)]="kachelExp.description">
         </mat-form-field>
         <mat-form-field>
           <mat-label>Kachel Typ</mat-label>
-          <mat-select [(value)]="kachelExp.kachelType">
+          <mat-select [(ngModel)]="kachelExp.kachelType">
             <mat-option *ngFor="let kachelType of kachelTypeSelected" [value]="kachelType.desc">
               {{kachelType.value}}
             </mat-option>
@@ -27,7 +27,7 @@
         </mat-form-field>
         <mat-form-field>
             <mat-label>Kachel Größe</mat-label>
-            <mat-select [(value)]="kachelExp.kachelSize">
+            <mat-select [(ngModel)]="kachelExp.kachelSize">
               <mat-option *ngFor="let kachelType of kachelSizeSelected" [value]="kachelType.desc">
                 {{kachelType.value}}
               </mat-option>
@@ -35,13 +35,13 @@
           </mat-form-field>
         <mat-form-field>
           <mat-label>Modal Typ</mat-label>
-          <mat-select [(value)]="kachelExp.modalType">
+          <mat-select [(ngModel)]="kachelExp.modalType">
             <mat-option *ngFor="let kachelType of modalTypeSelected" [value]="kachelType.desc">
               {{kachelType.value}}
             </mat-option>
           </mat-select>
         </mat-form-field>
-        <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" >save</button>
+        <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" (click)="saveEntry(kachelExp)">save</button>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="removeEntry(kachelExp)">remove_circle</button>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="showTileDetails(kachelExp.ID)">
           {{isTileDetailsActive(kachelExp.ID)? 'expand_less':'expand_more'}}</button>

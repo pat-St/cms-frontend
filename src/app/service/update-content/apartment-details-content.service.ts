@@ -30,7 +30,7 @@ export class ApartmentDetailsContentService {
       this.addDetailsListEntry(apartmentDetails);
     } else {
       console.log("await for apartment");
-      setTimeout( () => this.loadNewContent(count - 1), count * 800 );
+      setTimeout( () => this.loadNewContent(count - 1), count * 1000 );
     }
   }
 
@@ -48,8 +48,8 @@ export class ApartmentDetailsContentService {
   }
   public deleteNextDetails(obj: ApartmentDetails): boolean {
     const index = this.newApartmentDetails.findIndex(el => el.ID === obj.ID)
-    if (index > 0) {
-      this.newApartmentDetails[index] = obj.setDelete();
+    if (index >= 0) {
+      this.newApartmentDetails[index].deleteEntry = true;
       return true;
     } else {
       return false;
@@ -59,8 +59,8 @@ export class ApartmentDetailsContentService {
 
   public updateNextApartment(obj: ApartmentDetails): boolean {
     const index = this.newApartmentDetails.findIndex(el => el.ID === obj.ID)
-    if (index > 0) {
-      this.newApartmentDetails[index] = obj.setChanged();
+    if (index >= 0) {
+      this.newApartmentDetails[index].changed = true;
       return true;
     } else {
       return false;

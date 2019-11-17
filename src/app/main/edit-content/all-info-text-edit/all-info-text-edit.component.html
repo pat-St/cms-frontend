@@ -16,7 +16,7 @@
             <mat-form-field>
                 <input matInput placeholder="Link" [(ngModel)]="infoTextExp.infoText.link">
             </mat-form-field>
-            <button class="click-button" mat-stroked-button (click)="addNewEntry(infoTextExp)">{{getTileName(infoTextExp).titleName}}</button>
+            <button class="click-button" mat-stroked-button (click)="addNewEntry(infoTextExp)">{{getTileName(infoTextExp)}}</button>
             <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" (click)="saveCurrentChanges(infoTextExp)">save</button>
             <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="removeEntry(infoTextExp)">remove_circle</button>
             <button *ngIf="hasImage(infoTextExp.infoText.ID)" class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="showImageDetails(infoTextExp.infoText.ID)">

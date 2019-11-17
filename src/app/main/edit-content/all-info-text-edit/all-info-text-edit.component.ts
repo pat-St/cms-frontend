@@ -77,7 +77,7 @@ export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
   }
 
   getTileName(entryObject: NewInfoTextToTile) {
-    return this.updateContent.newTile.filter(el => el.ID === entryObject.relation.fk_tile)[0];
+    return this.tileExpantionList.filter(el => el.ID === entryObject.relation.fk_tile).map(el => el.titleName)[0];
   }
 
   showImageDetails(id: number) {

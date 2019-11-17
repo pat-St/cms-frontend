@@ -32,7 +32,7 @@ export class InfoTextService {
 
     } else {
       console.log("await for info text");
-      setTimeout( () => this.loadNewContent(count - 1), count * 500 );
+      setTimeout( () => this.loadNewContent(count - 1), count * 1000 );
     }
   }
   reset() {
@@ -58,7 +58,7 @@ export class InfoTextService {
         this.loadContent.getInfoText().map(el => el.ID).concat(this.newInfoText.map(el => el.infoText.ID))
         );
       const newInfoTextToTile = new InfoTextToTile(nextInfoTextToTileID, nextInfoTextID, tileId);
-      const newInfoText = new InfoText(nextInfoTextID, null, null, null);
+      const newInfoText = new InfoText(nextInfoTextID, "", "", "");
       const newInfoTextToTileEntry = new NewInfoTextToTile(newInfoText, newInfoTextToTile);
       this.newInfoText.push(newInfoTextToTileEntry);
       return true;
@@ -70,17 +70,14 @@ export class InfoTextService {
   public deleteNextInfoTile(entryObj: NewInfoTextToTile) {
     const foundIndex = this.newInfoText.findIndex(el => el === entryObj);
     if (foundIndex >= 0) {
-      this.newInfoText[foundIndex] = this.newInfoText[foundIndex].setDelete();
-    }
-    if (foundIndex >= 0 && entryObj.infoText.ID === null && entryObj.relation.ID === null) {
-      this.newInfoText.splice(foundIndex, 1);
+      this.newInfoText[foundIndex].deleteEntry = true;
     }
   }
 
   public updateNextInfoTile(entryObj: NewInfoTextToTile) {
     const foundIndex = this.newInfoText.findIndex(el => el === entryObj);
     if (foundIndex >= 0) {
-      this.newInfoText[foundIndex] = entryObj.setChanged();
+      this.newInfoText[foundIndex].changed = true;
     } else {
       this.newInfoText.push(entryObj.setChanged());
     }
@@ -89,15 +86,15 @@ export class InfoTextService {
   private sendDelete() {
     Promise.resolve(this.newInfoText.filter(el => el.deleteEntry))
     .then((res) => {
-      res.map(el => el.infoText).forEach((el, i) => {
-        this.backend.deleteToBackend("info_text", el.ID).subscribe((response: boolean) => {});
+      res.map(el => el.relation).forEach((el, i) => {
+        this.backend.deleteToBackend("info_text_to_tile", el.ID).subscribe((response: boolean) => {
+        });
       });
       return res;
     })
     .then((res) => {
-      res.map(el => el.relation).forEach((el, i) => {
-        this.backend.deleteToBackend("info_text_to_tile", el.ID).subscribe((response: boolean) => {
-        });
+      res.map(el => el.infoText).forEach((el, i) => {
+        this.backend.deleteToBackend("info_text", el.ID).subscribe((response: boolean) => {});
       });
       return res;
     })
@@ -176,8 +173,8 @@ export class InfoTextService {
     };
     if (checkObjExists(objs) && objs.deleteEntry) {
       console.log("delete objs" + JSON.stringify(objs))
-      this.backend.deleteToBackend("info_text", objs.infoText.ID).subscribe((response: boolean) => {});
       this.backend.deleteToBackend("info_text_to_tile", objs.relation.ID).subscribe((response: boolean) => {});
+      this.backend.deleteToBackend("info_text", objs.infoText.ID).subscribe((response: boolean) => {});      
     } else if (checkObjExists(objs) && !objs.deleteEntry) {
       console.log("update objs" + JSON.stringify(objs))
       this.backend.updateToBackend("info_text", new Array<InfoText>(objs.infoText)).subscribe((response: boolean) => {});

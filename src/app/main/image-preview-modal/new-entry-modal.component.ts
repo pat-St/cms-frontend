@@ -45,7 +45,6 @@ export class NewEntryModalComponent {
 choosenEntry: number;
 
   constructor(
-    private backend: BackendRequestService,
     public dialogRef: MatDialogRef<NewEntryModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: NewEntryModal) {
         this.choosenEntry = data.listOfEntrys[0].id;

@@ -73,8 +73,6 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
   }
 
   trigger_save() {
-    // update tiles
-    this.updateContent.sendUpdateToBackend();
     // update info text
     this.updateInfoText.sendChangesToBackend();
     // update apartment content
@@ -83,6 +81,8 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
     this.updateDetails.sendChangesToBackend();
     // update images
     //this.updateImage.sendChangesToBackend();
+    // update tiles
+    this.updateContent.sendUpdateToBackend();
   }
 
   getSpinnerValue() {

@@ -12,17 +12,17 @@
         <div *ngIf="infoTextExp.relation.fk_tile === tileID">
           <mat-divider class="tile-div"></mat-divider>
           <mat-form-field>
-            <input matInput placeholder="Überschrift" [(value)]="infoTextExp.infoText.headerText">
+            <input matInput placeholder="Überschrift" [(ngModel)]="infoTextExp.infoText.headerText">
           </mat-form-field>
           <mat-form-field>
-            <input matInput placeholder="Link" [(value)]="infoTextExp.infoText.link">
+            <input matInput placeholder="Link" [(ngModel)]="infoTextExp.infoText.link">
           </mat-form-field>
           <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" >save</button>
           <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="removeEntry(infoTextExp)">remove_circle</button>
           <button *ngIf="hasImage(infoTextExp.infoText.ID)" class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="showImageDetails(infoTextExp.infoText.ID)">
               {{isImageDetailsActive(infoTextExp.ID)? 'expand_less':'expand_more'}}</button>
           <mat-form-field class="info-content-area">
-                  <textarea matInput placeholder="Inhalt" [(value)]="infoTextExp.infoText.contentText"></textarea>
+                  <textarea matInput placeholder="Inhalt" [(ngModel)]="infoTextExp.infoText.contentText"></textarea>
           </mat-form-field>
           <app-image-edit *ngIf="hasImage(infoTextExp.infoText.ID) && isImageDetailsActive(infoTextExp.infoText.ID)" [infoID]="infoTextExp.infoText.ID"></app-image-edit>
       </div>

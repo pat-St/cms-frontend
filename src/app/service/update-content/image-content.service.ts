@@ -24,7 +24,7 @@ export class ImageContentService {
       this.addImageEntry(images);
     } else {
       console.log("await for info text");
-      setTimeout( () => this.loadNewContent(count - 1), count * 500 );
+      setTimeout( () => this.loadNewContent(count - 1), count * 1000 );
     }
   }
   reset() {

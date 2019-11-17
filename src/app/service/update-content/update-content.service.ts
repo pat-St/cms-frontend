@@ -1,3 +1,4 @@
+import { InfoTextService } from './info-text.service';
 import { ApartmentContent, ApartmentDescription, ApartmentPrice, DetailsToApartment, ApartmentDetails } from './../../model/apartment';
 import { NewApartmentObject } from 'src/app/model/apartment';
 import { InfoTextToTile, InfoText, NewInfoTextToTile } from 'src/app/model/infoText';
@@ -8,6 +9,7 @@ import { element } from 'protractor';
 import { Tile } from 'src/app/model/tile';
 import { Image } from 'src/app/model/image';
 import { filter } from 'minimatch';
+import { ApartmentContentService } from './apartment-content.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +18,11 @@ export class UpdateContentService {
   
   newTile: Array<Tile> = new Array();
 
-  constructor(private backend: BackendRequestService, private loadContent: LoadContentService) { }
+  constructor(
+    private backend: BackendRequestService, 
+    private loadContent: LoadContentService,
+    private updateApartment: ApartmentContentService,
+    private updateInfoText: InfoTextService) { }
 
   public nextIdOf(itemColl: Array<number>): number { return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1; }
 
@@ -30,8 +36,8 @@ export class UpdateContentService {
       this.addTileEntry(tileContent);
 
     } else {
-      console.log("await for info text");
-      setTimeout( () => this.loadNewContent(count - 1), count * 500 );
+      console.log("await for tile");
+      setTimeout( () => this.loadNewContent(count - 1), count * 1000 );
     }
   }
   reset() {
@@ -55,7 +61,7 @@ export class UpdateContentService {
   public getNextNewTile(): boolean {
     if (this.loadContent.isFinished()) {
       const nextID = this.nextIdOf(this.newTile.map(el => el.ID))
-      this.newTile.push(new Tile(nextID));
+      this.newTile.push(new Tile(nextID,"",""));
       return true;
     }
     return false;
@@ -64,7 +70,7 @@ export class UpdateContentService {
   public updateNewTile(obj: Tile): boolean {
     const index = this.newTile.findIndex(el => el.ID === obj.ID);
     if (index > -1) {
-      this.newTile[index] = this.newTile[index].setChanged();
+      this.newTile[index].changed = true;
       return true;
     }
     return false;
@@ -74,94 +80,96 @@ export class UpdateContentService {
     const index = this.newTile.findIndex(el => el.ID === obj.ID);
     if (index > -1) {
       this.newTile[index].deleteEntry = true;
+      const apartObj = this.updateApartment.newApartment.find(el => el.content.fk_tile === obj.ID)
+      if (apartObj) {this.updateApartment.deleteNextApartment(apartObj);}
+      const infoTextObj = this.updateInfoText.newInfoText.find(el => el.relation.fk_tile === obj.ID)
+      if (infoTextObj) {this.updateInfoText.deleteNextInfoTile(infoTextObj);}
       return true;
     }
     return false;
   }
 
-  public sendNewTileChangesToBackend() {
-    // send delete
-    Promise.resolve(this.newTile.filter(el => el.deleteEntry))
+  private sendDelete() {
+    return Promise.resolve(this.newTile.filter(el => el.deleteEntry))
     .then((el) => {
-      el.map(i => {
-        this.backend.deleteToBackend("tile",i.ID).toPromise();
-      })
-    })
-    .then((el) => {
-      this.newTile.filter(i => i.deleteEntry).forEach(i => {
-        const index = this.newTile.findIndex(item => item.ID === i.ID);
-        if (index > -1) {
-          this.newTile.splice(index, 1);
-          return true;
-        }
-      });
+      el.map(i => this.backend.deleteToBackend("tile", i.ID).toPromise())
     })
     .catch((err) => {
-      console.log("error by send tile delete entities: " + JSON.stringify(err));
+      console.log("error by send tile delete: " + JSON.stringify(err));
     });
+  }
 
-    // send update
-    Promise.resolve(
-      this.newTile.filter(el => this.loadContent.getTile().findIndex(i => i.ID === el.ID) > -1)
+  private sendUpdate() {
+    return Promise.resolve(
+      this.newTile.filter(i => !i.deleteEntry).filter(el => this.loadContent.getTile().findIndex(i => i.ID === el.ID) > -1)
     )
     .then((el) => {
       this.backend.updateToBackend("tile", el).toPromise();
     })
     .catch((err) => {
-      console.log("error by send delete images: " + JSON.stringify(err));
+      console.log("error by send update tile: " + JSON.stringify(err));
     });
+  }
 
-    // send update
-    Promise.resolve(
-      this.newTile.filter(el => this.loadContent.getTile().findIndex(i => i.ID === el.ID) < 0)
+  private sendNew() {
+    return Promise.resolve(
+      this.newTile.filter(i => !i.deleteEntry).filter(el => this.loadContent.getTile().findIndex(i => i.ID === el.ID) < 0)
     )
     .then((el) => {
       this.backend.createToBackend("tile", el).toPromise();
     })
     .catch((err) => {
-      console.log("error by send delete images: " + JSON.stringify(err));
+      console.log("error by send new tile: " + JSON.stringify(err));
+    });
+  }
+
+  public sendNewTileChangesToBackend() {
+    // send delete
+    return Promise.resolve(null)
+    .then(e => this.sendDelete())
+    // send update
+    .then(e => this.sendUpdate())
+    // send new
+    .then(e => this.sendNew())
+    .catch((err) => {
+      console.log("error by send tile changes to backend: " + JSON.stringify(err));
     });
   }
 
   public sendSpecificNewTileChangesToBackend(obj: Tile) {
-    // send delete
-    Promise.resolve(obj.deleteEntry ? obj: null)
-    .then((el) => {
-        this.backend.deleteToBackend("tile",el.ID).toPromise();
-    })
-    .then((el) => {
-      const index = this.newTile.findIndex(item => item.ID === obj.ID);
-      if (index > -1) {
-        this.newTile.splice(index, 1);
-      }
-    })
-    .catch((err) => {
-      console.log("error by send tile delete entities: " + JSON.stringify(err));
-    });
-
-    // send update
-    Promise.resolve(
-      this.loadContent.getTile().findIndex(i => i.ID === obj.ID) > -1 ? obj : null
-    )
-    .then((el) => {
-      this.backend.updateToBackend("tile", new Array(el)).toPromise();
-    })
-    .catch((err) => {
-      console.log("error by send delete images: " + JSON.stringify(err));
-    });
-
-    // send update
-    Promise.resolve(
-      this.loadContent.getTile().findIndex(i => i.ID === obj.ID) < 0 ? obj : null
-    )
-    .then((el) => {
-      this.backend.createToBackend("tile", new Array(el)).toPromise();
-    })
-    .catch((err) => {
-      console.log("error by send delete images: " + JSON.stringify(err));
-    });
+    if (obj.deleteEntry) {
+      // send delete
+      return Promise.resolve(obj)
+      .then((el) => {
+          this.backend.deleteToBackend("tile", el.ID).toPromise();
+      })
+      .then((el) => {
+        const index = this.newTile.findIndex(item => item.ID === obj.ID);
+        if (index > -1) {
+          this.newTile.splice(index, 1);
+        }
+      })
+      .catch((err) => {
+        console.log("error by send tile delete entities: " + JSON.stringify(err));
+      });
+    } else if (this.loadContent.getTile().findIndex(i => i.ID === obj.ID) > -1) {
+      // send update
+      return Promise.resolve(obj)
+      .then((el) => {
+        this.backend.updateToBackend("tile", new Array(el)).toPromise();
+      })
+      .catch((err) => {
+        console.log("error by send delete images: " + JSON.stringify(err));
+      });
+    } else {
+      // send update
+      return Promise.resolve(obj)
+      .then((el) => {
+        this.backend.createToBackend("tile", new Array(el)).toPromise();
+      })
+      .catch((err) => {
+        console.log("error by send delete images: " + JSON.stringify(err));
+      });
+    }
   }
-
- 
-
 }

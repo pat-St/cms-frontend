@@ -11,16 +11,16 @@
     <div *ngIf="!imageExp.deleteEntry">
       <mat-divider class="tile-div"></mat-divider>
       <mat-form-field class="desc-form-field">
-      <textarea matInput placeholder="Beschreibung" [(value)]="imageExp.description"></textarea>
+      <textarea matInput placeholder="Beschreibung" [(ngModel)]="imageExp.description"></textarea>
       </mat-form-field>
       <mat-form-field>
-        <input matInput placeholder="Ferienwohnung" [(value)]="imageExp.fk_apartment">
+        <input matInput placeholder="Ferienwohnung" [(ngModel)]="imageExp.fk_apartment">
       </mat-form-field>
       <mat-form-field>
-        <input matInput placeholder="Info" [(value)]="imageExp.fk_info">
+        <input matInput placeholder="Info" [(ngModel)]="imageExp.fk_info">
       </mat-form-field>
       <mat-form-field>
-        <input matInput placeholder="Kachel" [(value)]="imageExp.fk_tile">
+        <input matInput placeholder="Kachel" [(ngModel)]="imageExp.fk_tile">
       </mat-form-field>
       <button class="click-button" mat-stroked-button (click)="fileInput.click()">Hintergrundbild</button>
       <input hidden (change)="onFileSelected()" #fileInput type="file" id="file">

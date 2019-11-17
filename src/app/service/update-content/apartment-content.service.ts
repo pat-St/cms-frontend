@@ -33,7 +33,7 @@ export class ApartmentContentService {
       this.addApartmentEntry(apartmentContent, apartmentDescription, apartmentPrice, detailsToApartment);
     } else {
       console.log("await for apartment");
-      setTimeout( () => this.loadNewContent(count - 1), count * 800 );
+      setTimeout( () => this.loadNewContent(count - 1), count * 1000 );
     }
   }
   reset() {
@@ -66,9 +66,9 @@ export class ApartmentContentService {
       const nextApartmentID = this.nextIdOf(this.loadContent.apartmentContent.map(el => el.ID));
       const apartment = new ApartmentContent(nextApartmentID, tileId);
       const nextDesc = this.nextIdOf(this.getAllApartmentDescriptionID());
-      const desc = new Array(new ApartmentDescription(nextDesc, null, null, nextApartmentID));
+      const desc = new Array(new ApartmentDescription(nextDesc, "", "", nextApartmentID));
       const nextPrice = this.nextIdOf(this.getAllPriceID());
-      const price = new Array(new ApartmentPrice(nextPrice,null,null,null,nextApartmentID));
+      const price = new Array(new ApartmentPrice(nextPrice,"","","",nextApartmentID));
       this.newApartment.push(new NewApartmentObject(apartment,desc,price, new Array()));
       return true;
     } else {
@@ -78,10 +78,10 @@ export class ApartmentContentService {
 
   public deleteNextApartment(obj: NewApartmentObject): boolean {
     const index = this.newApartment.findIndex(el => el.content.ID === obj.content.ID)
-    if (index > 0) {
-      obj.description.forEach(element => element = element.setDelete());
-      obj.price.forEach(element => element = element.setDelete());
-      obj.detailsToApartment.forEach(element => element = element.setDelete());
+    if (index >= 0) {
+      obj.description.forEach(element => element.deleteEntry = true);
+      obj.price.forEach(element => element.deleteEntry = true);
+      obj.detailsToApartment.forEach(element => element.deleteEntry = true);
       this.newApartment[index] = obj.setDelete();
       return true;
     } else {
@@ -90,7 +90,7 @@ export class ApartmentContentService {
   }
   public updateNextApartment(obj: NewApartmentObject): boolean {
     const index = this.newApartment.findIndex(el => el.content.ID === obj.content.ID)
-    if (index > 0) {
+    if (index >= 0) {
       this.newApartment[index] = obj.setChanged();
       return true;
     } else {
@@ -128,16 +128,16 @@ export class ApartmentContentService {
 
   private sendUpdate() {
     const updateDescEntities: ApartmentDescription[] = this.newApartment
-    .map(el => el.description.filter(i => this.loadContent.getApartmentDescription().findIndex(el => el.ID === i.ID) > -1))
+    .map(el => el.description.filter(i => this.loadContent.getApartmentDescription().findIndex(n => n.ID === i.ID) > -1))
     .reduce((prevColl, currColl) => currColl.concat(prevColl));
     const updatePriceEntities: ApartmentPrice[] = this.newApartment
-      .map(el => el.price.filter(i => this.loadContent.getApartmentPrice().findIndex(el => el.ID === i.ID) > -1))
+      .map(el => el.price.filter(i => this.loadContent.getApartmentPrice().findIndex(n => n.ID === i.ID) > -1))
       .reduce((prevColl, currColl) => currColl.concat(prevColl));
     const updateDetailsRelation: DetailsToApartment[] = this.newApartment
-      .map(el => el.detailsToApartment.filter(i => this.loadContent.getDetailsToApartment().findIndex(el => el.ID === i.ID) > -1))
+      .map(el => el.detailsToApartment.filter(i => this.loadContent.getDetailsToApartment().findIndex(n => n.ID === i.ID) > -1))
       .reduce((prevColl, currColl) => currColl.concat(prevColl));
     const updateApartmentEntitites: ApartmentContent[] = this.newApartment
-      .filter(i => this.loadContent.getApartmentContent().findIndex(el => el.ID === i.content.ID) > -1)
+      .filter(i => this.loadContent.getApartmentContent().findIndex(n => n.ID === i.content.ID) > -1)
       .map(i => i.content);
 
     this.backend.updateToBackend("apartment_desc", updateDescEntities).subscribe((response: boolean) => {});
@@ -148,22 +148,22 @@ export class ApartmentContentService {
 
   private sendNew() {
     const newDescEntities: ApartmentDescription[] = this.newApartment
-    .map(el => el.description.filter(i => this.loadContent.getApartmentDescription().findIndex(el => el.ID === i.ID) < 0))
+    .map(el => el.description.filter(i => this.loadContent.getApartmentDescription().findIndex(n => n.ID === i.ID) < 0))
     .reduce((prevColl, currColl) => currColl.concat(prevColl));
     const newPriceEntities: ApartmentPrice[] = this.newApartment
-      .map(el => el.price.filter(i => this.loadContent.getApartmentPrice().findIndex(el => el.ID === i.ID) < 0))
+      .map(el => el.price.filter(i => this.loadContent.getApartmentPrice().findIndex(n => n.ID === i.ID) < 0))
       .reduce((prevColl, currColl) => currColl.concat(prevColl));
     const newDetailsRelation: DetailsToApartment[] = this.newApartment
-      .map(el => el.detailsToApartment.filter(i => this.loadContent.getDetailsToApartment().findIndex(el => el.ID === i.ID) < 0))
+      .map(el => el.detailsToApartment.filter(i => this.loadContent.getDetailsToApartment().findIndex(n => n.ID === i.ID) < 0))
       .reduce((prevColl, currColl) => currColl.concat(prevColl));
     const newApartmentEntitites: ApartmentContent[] = this.newApartment
-      .filter(i => this.loadContent.getApartmentContent().findIndex(el => el.ID === i.content.ID) < 0)
+      .filter(i => this.loadContent.getApartmentContent().findIndex(n => n.ID === i.content.ID) < 0)
       .map(i => i.content);
 
     this.backend.createToBackend("apartment", newApartmentEntitites).subscribe((response: boolean) => {});
     this.backend.createToBackend("apartment_desc", newDescEntities).subscribe((response: boolean) => {});
-    this.backend.createToBackend("apartment_price", newPriceEntities).subscribe((response: boolean) => {});
     this.backend.createToBackend("details_to_apartment", newDetailsRelation).subscribe((response: boolean) => {});
+    this.backend.createToBackend("apartment_price", newPriceEntities).subscribe((response: boolean) => {});
   }
 
   public sendChangesToBackend() {
