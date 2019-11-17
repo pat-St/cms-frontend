@@ -9,6 +9,7 @@
   </mat-expansion-panel-header>
   <div *ngIf="kachelExpansionList.length > 0">
   <ng-template ngFor let-kachelExp [ngForOf]="kachelExpansionList" matExpansionPanelContent>
+    <div *ngIf="!kachelExp.deleteEntry">
       <mat-divider class="tile-div"></mat-divider>
       <mat-form-field>
           <input matInput placeholder="Name" [(value)]="kachelExp.titleName">
@@ -50,6 +51,7 @@
         <div *ngIf="kachelExp.modalType==2 && isTileDetailsActive(kachelExp.ID)" class="tile-div"></div>
         <app-apartment-edit *ngIf="kachelExp.modalType==0 && isTileDetailsActive(kachelExp.ID)" [tileID]="kachelExp.ID"></app-apartment-edit>
         <div *ngIf="kachelExp.modalType==0 && isTileDetailsActive(kachelExp.ID)" class="tile-div"></div>
+      </div>
     </ng-template>        
     <mat-divider class="tile-div"></mat-divider>
     <button class="add-button" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Neuer Eintrag" color="primary" (click)="addNewEntry()">Neuer Eintrag</button>

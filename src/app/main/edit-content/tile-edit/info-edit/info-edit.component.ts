@@ -1,3 +1,5 @@
+import { ImageContentService } from './../../../../service/update-content/image-content.service';
+import { InfoTextService } from './../../../../service/update-content/info-text.service';
 import { LoadContentService } from '../../../../service/load-content/load-content.service';
 import { Component, OnInit, AfterViewInit, NgZone, ViewChild, Input } from '@angular/core';
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
@@ -20,7 +22,11 @@ export class InfoEditComponent implements OnInit, AfterViewInit {
 
   @Input() tileID: number;
 
-  constructor(private updateContent: UpdateContentService, private _ngZone: NgZone) { }
+  constructor(
+    private updateContent: UpdateContentService,
+    private updateInfoText: InfoTextService,
+    private updateImage: ImageContentService,
+    private _ngZone: NgZone) { }
 
   triggerResize() {
     // Wait for changes to be applied, then trigger textarea resize.
@@ -29,18 +35,18 @@ export class InfoEditComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.infoTextExpansionList = this.updateContent.newInfoText;
+    this.infoTextExpansionList = this.updateInfoText.newInfoText;
   }
   ngAfterViewInit(): void {
   }
 
 
   addNewEntry() {
-    this.updateContent.getNextInfoTile(this.tileID)
+    this.updateInfoText.getNextInfoTile(this.tileID)
   }
 
   removeEntry(entryObject: NewInfoTextToTile) {
-    this.updateContent.deleteNextInfoTile(entryObject);
+    this.updateInfoText.deleteNextInfoTile(entryObject);
   }
 
 
@@ -58,7 +64,7 @@ export class InfoEditComponent implements OnInit, AfterViewInit {
 
 
   hasImage(id: number) {
-    return this.updateContent.hasImageByFkId(null, id, null);
+    return this.updateImage.hasImageByFkId(null, id, null);
   }
 
 

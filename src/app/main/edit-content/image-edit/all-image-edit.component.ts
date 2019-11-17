@@ -1,3 +1,4 @@
+import { ImageContentService } from './../../../service/update-content/image-content.service';
 import { ImagePreviewModalComponent } from '../../image-preview-modal/image-preview-modal.component';
 import { LoadContentService } from '../../../service/load-content/load-content.service';
 import { Image } from '../../../model/image';
@@ -7,6 +8,7 @@ import {take} from 'rxjs/operators';
 import { MatDialog } from '@angular/material';
 import { element } from 'protractor';
 import { UpdateContentService } from 'src/app/service/update-content/update-content.service';
+import { TouchSequence } from 'selenium-webdriver';
 
 @Component({
   selector: 'app-all-image-edit',
@@ -19,7 +21,9 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
 
   @ViewChild('autosize', {static: false}) autosize: CdkTextareaAutosize;
 
-  constructor(private updateContent: UpdateContentService, private _ngZone: NgZone, public dialog: MatDialog) { }
+  constructor(
+    private updateImage: ImageContentService,
+    private _ngZone: NgZone, public dialog: MatDialog) { }
 
   openDialog(imageObj: Image): void {
     const dialogRef = this.dialog.open(ImagePreviewModalComponent, {
@@ -38,16 +42,19 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.imageExpansionList = this.updateContent.newImage;
+    this.imageExpansionList = this.updateImage.newImage;
   }
 
   ngAfterViewInit(): void {
   }
 
   addNewEntry() {
+    const newEntry: Image = new Image();
+    this.updateImage.updateNewImage(newEntry)
   }
 
   removeEntry(entryObject: Image) {
+    this.updateImage.deleteNewImage(entryObject);
   }
 
 }

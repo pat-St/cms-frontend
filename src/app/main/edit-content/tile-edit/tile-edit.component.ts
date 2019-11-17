@@ -1,3 +1,4 @@
+import { ImageContentService } from './../../../service/update-content/image-content.service';
 import { FormSelectModel } from '../../../model/tileEdit/tileEdit';
 import { Tile } from 'src/app/model/tile';
 import { KachelSize, KachelType, ModalType } from '../../../model/tile';
@@ -27,15 +28,18 @@ export class TileEditComponent implements OnInit, AfterViewInit {
 
   showTileDetailsStack: Set<number> = new Set();
 
-  constructor(private updateContent: UpdateContentService, private _ngZone: NgZone) { }
+  constructor(
+    private updateContent: UpdateContentService,
+    private updateImage: ImageContentService,
+    private _ngZone: NgZone) { }
 
-  ngOnInit() { }
-  ngAfterViewInit(): void {
+  ngOnInit() {
     this.kachelExpansionList = this.updateContent.newTile;
     this.kachelTypeSelected = this.getKachelType();
     this.modalTypeSelected = this.getModalType();
     this.kachelSizeSelected = this.getKachelSize();
-  }
+   }
+  ngAfterViewInit(): void { }
   
   triggerResize() {
     // Wait for changes to be applied, then trigger textarea resize.
@@ -102,7 +106,7 @@ export class TileEditComponent implements OnInit, AfterViewInit {
   }
 
   hasImage(id: number) {
-    return this.updateContent.hasImageByFkId(null, null, id);
+    return this.updateImage.hasImageByFkId(null, null, id);
   }
 
 }

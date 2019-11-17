@@ -1,9 +1,10 @@
+import { ApartmentDetailsContentService } from './../../../../service/update-content/apartment-details-content.service';
+import { ApartmentContentService } from './../../../../service/update-content/apartment-content.service';
 import { ApartmentContent, ApartmentDescription, ApartmentDetails, ApartmentPrice, DetailsToApartment } from '../../../../model/apartment';
 import { LoadContentService } from '../../../../service/load-content/load-content.service';
 import { Component, OnInit, AfterViewInit, NgZone, ViewChild, Input, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
-import { UpdateContentService } from 'src/app/service/update-content/update-content.service';
 
 @Component({
   selector: 'app-apartment-details-edit',
@@ -29,7 +30,8 @@ export class ApartmentDetailsEditComponent implements OnInit, AfterViewInit, Aft
   constructor(
     private _ngZone: NgZone,
     private cdRef: ChangeDetectorRef,
-    private updateContent: UpdateContentService
+    private updateApartment: ApartmentContentService,
+    private updateDetails: ApartmentDetailsContentService,
     ) { }
 
   triggerResize() {
@@ -39,7 +41,7 @@ export class ApartmentDetailsEditComponent implements OnInit, AfterViewInit, Aft
   }
 
   ngOnInit() {
-    this.apartmentDetailsList = this.updateContent.newApartmentDetails;
+    this.apartmentDetailsList = this.updateDetails.newApartmentDetails;
   }
   ngAfterViewInit(): void { }
 
@@ -50,7 +52,7 @@ export class ApartmentDetailsEditComponent implements OnInit, AfterViewInit, Aft
   }
 
   addNewDescEntry() {
-    const newID = this.updateContent.nextIdOf(this.updateContent.getAllApartmentDescriptionID());
+    const newID = this.updateApartment.nextIdOf(this.updateApartment.getAllApartmentDescriptionID());
     const newEntry: ApartmentDescription = new ApartmentDescription(newID, null, null, this.apartmentID);
     this.apartmentDescList.push(newEntry);
   }
@@ -63,7 +65,7 @@ export class ApartmentDetailsEditComponent implements OnInit, AfterViewInit, Aft
   }
 
   addNewPriceEntry() {
-    const newID = this.updateContent.nextIdOf(this.updateContent.getAllPriceID());
+    const newID = this.updateApartment.nextIdOf(this.updateApartment.getAllPriceID());
     const newEntry: ApartmentPrice = new ApartmentPrice(newID, "", "", "", this.apartmentID);
     this.apartmentPriceList.push(newEntry);
   }
@@ -76,7 +78,7 @@ export class ApartmentDetailsEditComponent implements OnInit, AfterViewInit, Aft
   }
 
   addNewDetailsRelationEntry() {
-    const newID = this.updateContent.nextIdOf(this.updateContent.getAllDetailsRelationID());
+    const newID = this.updateApartment.nextIdOf(this.updateApartment.getAllDetailsRelationID());
     const newEntry: DetailsToApartment = new DetailsToApartment(newID, null, this.apartmentID, null);
     this.detailsRelation.push(newEntry);
   }

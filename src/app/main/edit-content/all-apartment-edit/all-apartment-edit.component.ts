@@ -1,3 +1,6 @@
+import { ApartmentDetailsContentService } from './../../../service/update-content/apartment-details-content.service';
+import { ImageContentService } from './../../../service/update-content/image-content.service';
+import { ApartmentContentService } from './../../../service/update-content/apartment-content.service';
 import { NewEntryObject } from 'src/app/model/infoText';
 import { NewEntryModalComponent } from './../../image-preview-modal/new-entry-modal.component';
 import { NewApartmentObject, ApartmentDetails } from 'src/app/model/apartment';
@@ -26,6 +29,9 @@ export class AllApartmentEditComponent implements OnInit, AfterViewInit {
   constructor(
     private _ngZone: NgZone,
     private updateContent: UpdateContentService,
+    private updateApartment: ApartmentContentService,
+    private updateDetails: ApartmentDetailsContentService,
+    private updateImage: ImageContentService,
     private entryDialog: MatDialog) { }
 
   triggerResize() {
@@ -35,16 +41,15 @@ export class AllApartmentEditComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.apartmentExpansionList = this.updateContent.newApartment;
+    this.apartmentExpansionList = this.updateApartment.newApartment;
     this.tileExpantionList = this.updateContent.newTile;
-    this.apartmentDetailsList = this.updateContent.newApartmentDetails;
+    this.apartmentDetailsList = this.updateDetails.newApartmentDetails;
   }
 
-  ngAfterViewInit(): void {
-  }
+  ngAfterViewInit(): void { }
 
   addNewEntry(currEntry: NewApartmentObject = null) {
-    const tileRef = this.updateContent.newTile.filter(el => el.modalType === 0).map(el => new NewEntryObject(el.ID, el.titleName));
+    const tileRef = this.tileExpantionList.filter(el => el.modalType === 0).map(el => new NewEntryObject(el.ID, el.titleName));
     const dialogRef = this.entryDialog.open(NewEntryModalComponent, {
       maxWidth: '50vw',
       maxHeight: '50vh',
@@ -64,13 +69,13 @@ export class AllApartmentEditComponent implements OnInit, AfterViewInit {
           this.apartmentExpansionList[indexElement] = newEntry;
         }
       } else {
-        this.updateContent.createNextApartment(result);
+        this.updateApartment.getNextApartmentTile(result);
       }
     });
   }
 
   removeEntry(entryObject: NewApartmentObject) {
-    this.updateContent.deleteNextApartment(entryObject);
+    this.updateApartment.deleteNextApartment(entryObject);
   }
 
   getTileName(entryObject: ApartmentContent) {
@@ -78,7 +83,7 @@ export class AllApartmentEditComponent implements OnInit, AfterViewInit {
   }
 
   showImageDetails(id: number) {
-    if(this.showImageDetailsStack.has(id)) {
+    if (this.showImageDetailsStack.has(id)) {
       this.showImageDetailsStack.delete(id);
     } else {
       this.showImageDetailsStack.add(id);
@@ -91,7 +96,7 @@ export class AllApartmentEditComponent implements OnInit, AfterViewInit {
 
 
   hasImage(id: number) {
-    return this.updateContent.hasImageByFkId(null, id, null);
+    return this.updateImage.hasImageByFkId(null, id, null);
   }
 }
 

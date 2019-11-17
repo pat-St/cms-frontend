@@ -1,3 +1,5 @@
+import { ImageContentService } from './../../../service/update-content/image-content.service';
+import { InfoTextService } from './../../../service/update-content/info-text.service';
 import { NewEntryModalComponent } from './../../image-preview-modal/new-entry-modal.component';
 import { LoadContentService } from '../../../service/load-content/load-content.service';
 import { Component, OnInit, AfterViewInit, NgZone, ViewChild, Input } from '@angular/core';
@@ -23,7 +25,9 @@ export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
 
   constructor(
     private _ngZone: NgZone,
+    private updateInfoText: InfoTextService,
     private updateContent: UpdateContentService,
+    private updateImage: ImageContentService,
     private entryDialog: MatDialog) { }
 
   triggerResize() {
@@ -33,7 +37,7 @@ export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.newInfoTextList = this.updateContent.newInfoText;
+    this.newInfoTextList = this.updateInfoText.newInfoText;
     this.tileExpantionList = this.updateContent.newTile;
   }
   ngAfterViewInit(): void { }
@@ -65,11 +69,11 @@ export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
   }
 
   removeEntry(entryObject: NewInfoTextToTile) {
-    this.updateContent.deleteNextInfoTile(entryObject);
+    this.updateInfoText.deleteNextInfoTile(entryObject);
   }
 
   addNewInfoTextToTile(tileId: number) {
-    this.updateContent.getNextInfoTile(tileId);
+    this.updateInfoText.getNextInfoTile(tileId);
   }
 
   getTileName(entryObject: NewInfoTextToTile) {
@@ -89,12 +93,12 @@ export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
   }
 
   hasImage(id: number) {
-    return this.updateContent.hasImageByFkId(null, id, null);
+    return this.updateImage.hasImageByFkId(null, id, null);
   }
 
   saveCurrentChanges(objs: NewInfoTextToTile) {
     console.log("save current changes");
-    this.updateContent.sendSpecificNextInfoTextTileChangesToBackend(objs);
+    this.updateInfoText.sendSpecificChangesToBackend(objs);
   }
 }
 

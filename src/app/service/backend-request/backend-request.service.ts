@@ -57,7 +57,7 @@ export class BackendRequestService {
 
   public async loadImage(desc: string, id: number) {
     this.getBinaryFromBackend("image/desc/" + desc).subscribe(
-      (val) => {
+      (val: Blob) => {
         this.createImageFromBlob(id, val);
       },
       response => {

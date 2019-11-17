@@ -1,9 +1,14 @@
+import { RefreshModalComponent } from './../image-preview-modal/refresh-information-modal.component';
+import { ApartmentDetailsContentService } from './../../service/update-content/apartment-details-content.service';
+import { ImageContentService } from './../../service/update-content/image-content.service';
+import { ApartmentContentService } from './../../service/update-content/apartment-content.service';
+import { InfoTextService } from './../../service/update-content/info-text.service';
 import { LoadContentService } from './../../service/load-content/load-content.service';
 import { Component, OnInit, ViewChild, NgZone, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
 import { UpdateContentService } from 'src/app/service/update-content/update-content.service';
-
+import { MatDialog } from '@angular/material';
 @Component({
   selector: 'app-edit-content',
   templateUrl: './edit-content.component.html',
@@ -19,12 +24,21 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
     private content: LoadContentService,
     private _ngZone: NgZone,
     private cdRef: ChangeDetectorRef,
-    private updateContent: UpdateContentService) { }
+    public dialog: MatDialog,
+    private updateContent: UpdateContentService,
+    private updateInfoText: InfoTextService,
+    private updateApartment: ApartmentContentService,
+    private updateDetails: ApartmentDetailsContentService,
+    private updateImage: ImageContentService) { }
 
   ngOnInit() {
     if (!this.content.isFinished()) {
       this.content.loadAll();
       this.updateContent.loadNewContent();
+      this.updateInfoText.loadNewContent();
+      this.updateApartment.loadNewContent();
+      this.updateDetails.loadNewContent();
+      this.updateImage.loadNewContent();
     }
   }
   triggerResize() {
@@ -43,16 +57,63 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
   }
 
   trigger_refresh() {
+    // reset
+    this.updateContent.reset();
+    this.updateInfoText.reset();
+    this.updateApartment.reset();
+    this.updateDetails.reset();
+    this.updateImage.reset();
+    // load new
     this.content.loadAll();
     this.updateContent.loadNewContent();
+    this.updateInfoText.loadNewContent();
+    this.updateApartment.loadNewContent();
+    this.updateDetails.loadNewContent();
+    this.updateImage.loadNewContent();
   }
 
   trigger_save() {
+    // update tiles
     this.updateContent.sendUpdateToBackend();
+    // update info text
+    this.updateInfoText.sendChangesToBackend();
+    // update apartment content
+    this.updateApartment.sendChangesToBackend();
+    // update apartment details
+    this.updateDetails.sendChangesToBackend();
+    // update images
+    //this.updateImage.sendChangesToBackend();
   }
 
   getSpinnerValue() {
     return Math.round((this.content.getCounter() / this.content.maxCounter) * 100);
+  }
+
+  askRefresh(): void {
+    const dialogRef = this.dialog.open(RefreshModalComponent, {
+      maxWidth: '97vw',
+      maxHeight: '97vh',
+      data : { header: 'Inhalt neu laden', listOfEntrys: ['Alle Änderungen gehen verloren.', 'Wirklich neu laden?']}
+    });
+
+    dialogRef.afterClosed().subscribe((result:boolean) => { 
+      if (result) {
+        this.trigger_refresh();
+      }
+     });
+  }
+  askSave(): void {
+    const dialogRef = this.dialog.open(RefreshModalComponent, {
+      maxWidth: '97vw',
+      maxHeight: '97vh',
+      data : { header: 'Änderungen speichern', listOfEntrys: ['Alle Änderungen werden überschrieben.', 'Wirklich speichern?']}
+    });
+
+    dialogRef.afterClosed().subscribe((result:boolean) => { 
+      if (result) {
+        this.trigger_save();
+      }
+     });
   }
 
 }

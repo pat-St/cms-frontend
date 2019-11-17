@@ -1,3 +1,8 @@
+import { RefreshModalComponent } from './image-preview-modal/refresh-information-modal.component';
+import { ApartmentDetailsContentService } from './../service/update-content/apartment-details-content.service';
+import { ImageEditComponentApartment } from './edit-content/all-apartment-edit/image-edit/image-edit.component';
+import { ImageContentService } from './../service/update-content/image-content.service';
+import { InfoTextService } from './../service/update-content/info-text.service';
 import { NewEntryModalComponent } from './image-preview-modal/new-entry-modal.component';
 import { UpdateContentService } from './../service/update-content/update-content.service';
 import { AllImageEditComponent } from './edit-content/image-edit/all-image-edit.component';
@@ -25,6 +30,7 @@ import { ImagePreviewModalComponent } from './image-preview-modal/image-preview-
 import { AllInfoTextEditComponent } from './edit-content/all-info-text-edit/all-info-text-edit.component';
 import { AllApartmentEditComponent } from './edit-content/all-apartment-edit/all-apartment-edit.component';
 import { ApartmentDetailsEditComponent } from './edit-content/all-apartment-edit/apartment-details-edit/apartment-details-edit.component';
+import { ApartmentContentService } from '../service/update-content/apartment-content.service';
 
 @NgModule({
   declarations: [
@@ -40,9 +46,11 @@ import { ApartmentDetailsEditComponent } from './edit-content/all-apartment-edit
     EditContentComponent,
     ImagePreviewModalComponent,
     NewEntryModalComponent,
+    RefreshModalComponent,
     AllInfoTextEditComponent,
     AllApartmentEditComponent,
-    ApartmentDetailsEditComponent
+    ApartmentDetailsEditComponent,
+    ImageEditComponentApartment
   ],
   imports: [
     CommonModule,
@@ -56,12 +64,19 @@ import { ApartmentDetailsEditComponent } from './edit-content/all-apartment-edit
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'outline' } },
-    BackendRequestService, LoadContentService, UpdateContentService
+    BackendRequestService,
+    LoadContentService,
+    UpdateContentService,
+    InfoTextService,
+    ImageContentService,
+    ApartmentDetailsContentService,
+    ApartmentContentService
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
   entryComponents: [
     ImagePreviewModalComponent,
-    NewEntryModalComponent
+    NewEntryModalComponent,
+    RefreshModalComponent
   ]
 })
 export class MainModule { }

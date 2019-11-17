@@ -1,0 +1,28 @@
+<mat-accordion multi="true">
+<mat-expansion-panel >
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        {{panelTitle}}
+      </mat-panel-title>
+      <mat-panel-description>
+        Füge eine neues Bild hinzu
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <ng-template ngFor let-imageExp [ngForOf]="imageExpansionList">
+      <div *ngIf="imageExp.fk_apartment === apartmentID">
+        <mat-divider class="tile-div"></mat-divider>
+        <mat-form-field class="desc-form-field">
+        <textarea matInput placeholder="Beschreibung" [(value)]="imageExp.description"></textarea>
+        </mat-form-field>
+        <button class="click-button" mat-stroked-button (click)="fileInput.click()">Hintergrundbild</button>
+        <input hidden (change)="onFileSelected()" #fileInput type="file" id="file">
+        <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="preview" matTooltip="Picture Preview" color="primary" (click)="openDialog(imageExp)">satellite</button>
+        <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Save Picture" color="primary" >save</button>
+        <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Delete Picture" color="warn" (click)="removeEntry(imageExp)">remove_circle</button>
+        <div class="tile-div"></div>
+      </div>
+    </ng-template>
+    <mat-divider class="tile-div"></mat-divider>
+    <button class="add-button" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Neuer Eintrag" color="primary" (click)="addNewEntry()">Neuer Eintrag</button>
+  </mat-expansion-panel>
+</mat-accordion>

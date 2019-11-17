@@ -28,10 +28,11 @@ export class LoadContentService {
   imageCounter = 0;
   finishCounter = 0;
   maxCounter = 9;
+  apartmentCounter = 0;
 
   constructor(private backend: BackendRequestService) {}
 
-  async resetAllCached() {
+  private resetAllCached() {
     this.tile = null;
     this.infoText = null;
     this.infoTextToTile = null;
@@ -42,10 +43,11 @@ export class LoadContentService {
     this.apartmentPrice = null;
     this.imageObject = null;
     this.imageCounter = 0;
+    this.apartmentCounter = 0;
+    this.finishCounter = 0;
   }
 
   async loadAll() {
-    this.finishCounter = 0;
     this.resetAllCached();
     this.loadTile();
     this.loadInfoText();
@@ -64,6 +66,10 @@ export class LoadContentService {
 
   isFinished() {
     return this.finishCounter >= this.maxCounter;
+  }
+
+  isApartmentFinished() {
+    return this.apartmentCounter >= 5;
   }
 
   async loadTile() {
@@ -109,6 +115,7 @@ export class LoadContentService {
       .subscribe((payload: ApartmentContent[]) => {
         this.apartmentContent = payload;
         this.incrementCounter();
+        this.apartmentCounter+=1;
       });
   }
 
@@ -122,6 +129,7 @@ export class LoadContentService {
       .subscribe((payload: ApartmentDescription[]) => {
         this.apartmentDescription = payload;
         this.incrementCounter();
+        this.apartmentCounter+=1;
       });
   }
 
@@ -135,6 +143,7 @@ export class LoadContentService {
       .subscribe((payload: DetailsToApartment[]) => {
         this.detailsToApartment = payload;
         this.incrementCounter();
+        this.apartmentCounter+=1;
       });
   }
 
@@ -148,6 +157,7 @@ export class LoadContentService {
       .subscribe((payload: ApartmentDetails[]) => {
         this.apartmentDetails = payload;
         this.incrementCounter();
+        this.apartmentCounter+=1;
       });
   }
 
@@ -161,6 +171,7 @@ export class LoadContentService {
       .subscribe((payload: ApartmentPrice[]) => {
         this.apartmentPrice = payload;
         this.incrementCounter();
+        this.apartmentCounter+=1;
       });
   }
 

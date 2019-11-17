@@ -24,6 +24,7 @@
                     [(detailsRelation)]="apartExp.detailsToApartment" 
                     [(apartmentPriceList)]="apartExp.price"
                 ></app-apartment-details-edit>
+                <app-image-edit-ap [apartmentID]="apartExp.content.ID" [panelTitle]="getTileName(apartExp.content) + ' Bilder'"></app-image-edit-ap>
             </mat-expansion-panel>
         </mat-accordion>
         <div class="tile-div"></div>

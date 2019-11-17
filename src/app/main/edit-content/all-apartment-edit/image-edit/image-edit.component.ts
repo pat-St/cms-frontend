@@ -9,27 +9,20 @@ import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
 import { MatDialog } from '@angular/material';
 
-
-
-
 @Component({
-  selector: 'app-image-edit',
+  selector: 'app-image-edit-ap',
   templateUrl: './image-edit.component.html',
   styleUrls: ['./image-edit.component.styl']
 })
-export class ImageEditComponent implements OnInit, AfterViewInit {
+export class ImageEditComponentApartment implements OnInit, AfterViewInit {
 
-  imageExpansionList: Array<Image> = new Array();
+  imageExpansionList: Array<Image>;
 
   @ViewChild('autosize', {static: false}) autosize: CdkTextareaAutosize;
-
-  @Input() tileID: number = null;
   @Input() apartmentID: number = null;
-  @Input() infoID: number = null;
-  @Input() panelTitle: string = "Bild";
+  @Input() panelTitle = "Ferienwohnung Biler";
 
   constructor(
-    private updateContent: UpdateContentService,
     private updateImage: ImageContentService,
     private _ngZone: NgZone, public dialog: MatDialog
     ) { }
@@ -53,53 +46,16 @@ export class ImageEditComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.imageExpansionList = this.updateImage.newImage;
   }
+
   ngAfterViewInit(): void {
   }
 
   addNewEntry() {
-    this.updateImage.getNextNewImage(this.tileID,this.apartmentID,this.infoID)
-  }
-
-  
+    this.updateImage.getNextNewImage(null,this.apartmentID,null)
+  } 
 
   removeEntry(entryObject: Image) {
     this.updateImage.deleteNewImage(entryObject)
   }
 
 }
-
-// @Component({
-//   selector: 'image-preview-modal',
-//   template: `
-//   <h1 mat-dialog-title>Picture Preview</h1>
-//   <div mat-dialog-content>
-//     <img [src]="getImage()">
-//   </div>
-//   <div mat-dialog-actions>
-//     <button mat-button (click)="onNoClick()" cdkFocusInitial>Close</button>
-//   </div>
-//   `,
-//   styles: [
-//     `img {
-//       width: 100%;
-//     }`,
-//     `.mat-dialog-content {
-//       max-height: 79vh;
-//     }`
-//   ]
-// })
-// export class ImagePreviewModal {
-
-//   constructor(
-//     private backend: BackendRequestService,
-//     public dialogRef: MatDialogRef<ImagePreviewModal>,
-//     @Inject(MAT_DIALOG_DATA) public data: PreviewImage) {}
-
-//   onNoClick(): void {
-//     this.dialogRef.close();
-//   }
-//   getImage() {
-//     return this.backend.showImage(this.data.image.ID);
-//   }
-
-// }
