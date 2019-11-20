@@ -1,3 +1,4 @@
+import { ImageContentService } from './image-content.service';
 import { InfoTextService } from './info-text.service';
 import { ApartmentContent, ApartmentDescription, ApartmentPrice, DetailsToApartment, ApartmentDetails } from './../../model/apartment';
 import { NewApartmentObject } from 'src/app/model/apartment';
@@ -22,6 +23,7 @@ export class UpdateContentService {
     private backend: BackendRequestService, 
     private loadContent: LoadContentService,
     private updateApartment: ApartmentContentService,
+    private updateImage: ImageContentService,
     private updateInfoText: InfoTextService) { }
 
   public nextIdOf(itemColl: Array<number>): number { return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1; }
@@ -82,8 +84,10 @@ export class UpdateContentService {
       this.newTile[index].deleteEntry = true;
       const apartObj = this.updateApartment.newApartment.find(el => el.content.fk_tile === obj.ID)
       if (apartObj) {this.updateApartment.deleteNextApartment(apartObj);}
-      const infoTextObj = this.updateInfoText.newInfoText.find(el => el.relation.fk_tile === obj.ID)
-      if (infoTextObj) {this.updateInfoText.deleteNextInfoTile(infoTextObj);}
+      const infoTextObj = this.updateInfoText.newInfoText.filter(el => el.relation.fk_tile === obj.ID)
+      if (infoTextObj.length > 0) {infoTextObj.forEach(el => this.updateInfoText.deleteNextInfoTile(el));}
+      const imageObj = this.updateImage.newImage.filter(el => el.fk_tile === obj.ID)
+      if (imageObj.length > 0) {imageObj.forEach(el => this.updateImage.deleteNewImage(el));}
       return true;
     }
     return false;

@@ -70,6 +70,7 @@ export class InfoTextService {
   public deleteNextInfoTile(entryObj: NewInfoTextToTile) {
     const foundIndex = this.newInfoText.findIndex(el => el === entryObj);
     if (foundIndex >= 0) {
+      let tmp = this.newInfoText[foundIndex];
       this.newInfoText[foundIndex].deleteEntry = true;
     }
   }
@@ -86,24 +87,24 @@ export class InfoTextService {
   private sendDelete() {
     Promise.resolve(this.newInfoText.filter(el => el.deleteEntry))
     .then((res) => {
-      res.map(el => el.relation).forEach((el, i) => {
+      res.map(el => el.relation).forEach((el) => {
         this.backend.deleteToBackend("info_text_to_tile", el.ID).subscribe((response: boolean) => {
         });
       });
       return res;
     })
     .then((res) => {
-      res.map(el => el.infoText).forEach((el, i) => {
+      res.map(el => el.infoText).forEach((el) => {
         this.backend.deleteToBackend("info_text", el.ID).subscribe((response: boolean) => {});
       });
       return res;
     })
-    .then((res) => {
-      res
-        .map(el =>  this.newInfoText.findIndex(item => item === el))
-        .filter(i => i > 0)
-        .forEach(i => this.newInfoText.splice(i, 1));
-    })
+    // .then((res) => {
+    //   res
+    //     .map(el =>  this.newInfoText.findIndex(item => item === el))
+    //     .filter(i => i > 0)
+    //     .forEach(i => this.newInfoText.splice(i, 1));
+    // })
     .catch((err) => {
       console.log("error by send infotext updates: " + JSON.stringify(err));
     });

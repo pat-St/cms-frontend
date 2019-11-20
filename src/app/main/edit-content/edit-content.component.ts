@@ -80,7 +80,7 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
     // update apartment details
     this.updateDetails.sendChangesToBackend();
     // update images
-    //this.updateImage.sendChangesToBackend();
+    this.updateImage.sendChangesToBackend();
     // update tiles
     this.updateContent.sendUpdateToBackend();
   }
