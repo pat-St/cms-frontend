@@ -98,7 +98,21 @@ export class ImageContentService {
       listOfImages.filter(el => this.loadContent.getImages().findIndex(i => i.ID === el.ID) > -1)
     )
     .then((el) => {
-      this.backend.updateToBackend("image", el).toPromise();
+      el.map(i => {
+        const rawImage = new Array(i.image);
+        i.image = new Array();
+        this.backend.updateToBackend("image", new Array(i)).toPromise();
+        const base64Image = this.backend.showImage(i.ID).replace(/data:image\/jpeg;base64,/g, '');
+        const plainString = window.atob(base64Image);
+
+        const arrayBuffer = new ArrayBuffer(plainString.length);
+        const int8Array = new Uint8Array(arrayBuffer);
+        for (let i = 0; i < plainString.length; i++) {
+          int8Array[i] = plainString.charCodeAt(i);
+        }
+        const fileBlob = new Blob([int8Array], { 'type': 'image/jpeg'})
+        this.backend.updateImageToBackend("image/" + i.description, fileBlob).toPromise();
+      })
     })
     .catch((err) => {
       console.log("error by send delete images: " + JSON.stringify(err));

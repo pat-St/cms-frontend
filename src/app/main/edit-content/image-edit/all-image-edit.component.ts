@@ -1,3 +1,4 @@
+import { BackendRequestService } from './../../../service/backend-request/backend-request.service';
 import { ImageContentService } from './../../../service/update-content/image-content.service';
 import { ImagePreviewModalComponent } from '../../image-preview-modal/image-preview-modal.component';
 import { LoadContentService } from '../../../service/load-content/load-content.service';
@@ -23,6 +24,7 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
 
   constructor(
     private updateImage: ImageContentService,
+    private backend: BackendRequestService,
     private _ngZone: NgZone, public dialog: MatDialog) { }
 
   openDialog(imageObj: Image): void {
@@ -46,6 +48,11 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+  }
+
+  onFileChanged(id: number,event) {
+    this.backend.uploadImageFromUser(id,event.target.files[0]);
+    //console.log(event.target.files[0])
   }
 
   addNewEntry() {

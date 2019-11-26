@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AnyARecord } from 'dns';
 @Injectable({
   providedIn: 'root'
 })
@@ -29,6 +30,14 @@ export class BackendRequestService {
 
   public updateToBackend(path: string, obj: Array<any>): Observable<any> {
     return this.httpClient.request(new HttpRequest('PUT', this.hostUrl + path, obj, {headers: this.getModifyHeader()}));
+  }
+
+  public updateImageToBackend(path: string, obj: any): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type':  'image/jpeg',
+      'Accept': 'application/json'
+    });
+    return this.httpClient.request(new HttpRequest('PUT', this.hostUrl + path, obj, {headers: headers}));
   }
 
   public createToBackend(path: string, obj: Array<any>): Observable<any> {
@@ -77,9 +86,15 @@ export class BackendRequestService {
     }
   }
 
-  showImage(desc: number): string {
-    if (this.imageCache.has(desc)) {
-      return this.imageCache.get(desc);
+  public uploadImageFromUser(id: number,image: any) {
+    if (this.imageCache.has(id)) {
+      this.createImageFromBlob(id, image);
+    }
+  }
+
+  showImage(id: number): string {
+    if (this.imageCache.has(id)) {
+      return this.imageCache.get(id);
     }
     return "";
   }
