@@ -1,35 +1,66 @@
-<mat-expansion-panel>
-    <mat-expansion-panel-header>
-    <mat-panel-title>
-        Ferienwohnung
-    </mat-panel-title>
-    <mat-panel-description>
-        Bearbeite Ferienwohnungen
-    </mat-panel-description>
-    </mat-expansion-panel-header>
+<div *ngIf="!tileID">
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+        <mat-panel-title>
+            Ferienwohnung
+        </mat-panel-title>
+        <mat-panel-description>
+            Bearbeite Ferienwohnungen
+        </mat-panel-description>
+        </mat-expansion-panel-header>
+        <ng-template ngFor let-apartExp [ngForOf]="apartmentExpansionList">
+            <div *ngIf="filterView(apartExp)">
+                <mat-accordion multi="true">
+                    <mat-expansion-panel >
+                        <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            {{getTileName(apartExp.content)}}
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            Bearbeite {{getTileName(apartExp.content)}}
+                        </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        <app-apartment-details-edit 
+                            [tileID]="apartExp.content.fk_tile" 
+                            [apartmentID]="apartExp.content.ID"
+                            [(apartmentDescList)]="apartExp.description" 
+                            [(detailsRelation)]="apartExp.detailsToApartment" 
+                            [(apartmentPriceList)]="apartExp.price"
+                        ></app-apartment-details-edit>
+                        <app-all-image-edit [apartmentID]="apartExp.content.ID" [panelTitle]="getTileName(apartExp.content) + ' Bilder'"></app-all-image-edit>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </div>
+            <div class="tile-div"></div>
+        </ng-template>
+        <mat-divider class="tile-div"></mat-divider>
+        <button class="add-button" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Neuer Eintrag" color="primary" (click)="addNewEntry()">Neuer Eintrag</button>
+    </mat-expansion-panel>
+</div>
+<div *ngIf="tileID">
     <ng-template ngFor let-apartExp [ngForOf]="apartmentExpansionList">
-        <mat-accordion multi="true">
-            <mat-expansion-panel >
-                <mat-expansion-panel-header>
-                <mat-panel-title>
-                    {{getTileName(apartExp.content)}}
-                </mat-panel-title>
-                <mat-panel-description>
-                    Bearbeite {{getTileName(apartExp.content)}}
-                </mat-panel-description>
-                </mat-expansion-panel-header>
-                <app-apartment-details-edit 
-                    [tileID]="apartExp.content.fk_tile" 
-                    [apartmentID]="apartExp.content.ID"
-                    [(apartmentDescList)]="apartExp.description" 
-                    [(detailsRelation)]="apartExp.detailsToApartment" 
-                    [(apartmentPriceList)]="apartExp.price"
-                ></app-apartment-details-edit>
-                <app-image-edit-ap [apartmentID]="apartExp.content.ID" [panelTitle]="getTileName(apartExp.content) + ' Bilder'"></app-image-edit-ap>
-            </mat-expansion-panel>
-        </mat-accordion>
+            <div *ngIf="filterView(apartExp)">
+                <mat-accordion multi="true">
+                    <mat-expansion-panel >
+                        <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            {{getTileName(apartExp.content)}}
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            Bearbeite {{getTileName(apartExp.content)}}
+                        </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        <app-apartment-details-edit 
+                            [tileID]="apartExp.content.fk_tile" 
+                            [apartmentID]="apartExp.content.ID"
+                            [(apartmentDescList)]="apartExp.description" 
+                            [(detailsRelation)]="apartExp.detailsToApartment" 
+                            [(apartmentPriceList)]="apartExp.price"
+                        ></app-apartment-details-edit>
+                        <app-all-image-edit [apartmentID]="apartExp.content.ID" [panelTitle]="getTileName(apartExp.content) + ' Bilder'"></app-all-image-edit>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </div>
         <div class="tile-div"></div>
     </ng-template>
-    <mat-divider class="tile-div"></mat-divider>
-    <button class="add-button" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Neuer Eintrag" color="primary" (click)="addNewEntry()">Neuer Eintrag</button>
-</mat-expansion-panel>
+</div>

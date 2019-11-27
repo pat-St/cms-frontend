@@ -26,6 +26,8 @@ export class AllApartmentEditComponent implements OnInit, AfterViewInit {
 
   @ViewChild('autosize', {static: false}) autosize: CdkTextareaAutosize;
 
+  @Input() tileID: number;
+
   constructor(
     private _ngZone: NgZone,
     private updateContent: UpdateContentService,
@@ -97,6 +99,13 @@ export class AllApartmentEditComponent implements OnInit, AfterViewInit {
 
   hasImage(id: number) {
     return this.updateImage.hasImageByFkId(null, id, null);
+  }
+
+  filterView(apartComp: NewApartmentObject) {
+    if (this.tileID) {
+      return apartComp.content.fk_tile === this.tileID;
+    }
+    return !apartComp.deleteEntry;
   }
 }
 

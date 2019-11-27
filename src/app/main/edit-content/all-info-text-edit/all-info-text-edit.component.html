@@ -8,7 +8,7 @@
     </mat-panel-description>
     </mat-expansion-panel-header>
     <ng-template ngFor let-infoTextExp [ngForOf]="newInfoTextList">
-        <div *ngIf="!infoTextExp.deleteEntry">
+        <div *ngIf="filterView(infoTextExp)">
             <mat-divider class="tile-div"></mat-divider>
             <mat-form-field>
                 <input matInput placeholder="Überschrift" [(ngModel)]="infoTextExp.infoText.headerText">
@@ -24,7 +24,7 @@
             <mat-form-field class="info-content-area">
                     <textarea matInput placeholder="Inhalt" [(ngModel)]="infoTextExp.infoText.contentText"></textarea>
             </mat-form-field>
-            <app-image-edit *ngIf="hasImage(infoTextExp.infoText.ID) && isImageDetailsActive(infoTextExp.infoText.ID)" [infoID]="infoTextExp.infoText.ID"></app-image-edit>
+            <app-all-image-edit *ngIf="hasImage(infoTextExp.infoText.ID) && isImageDetailsActive(infoTextExp.infoText.ID)" [infoTextID]="infoTextExp.infoText.ID"></app-all-image-edit>
         </div>
     </ng-template>
     <mat-divider class="tile-div"></mat-divider>

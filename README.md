@@ -79,3 +79,27 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
     => PUT /info_text_to_tile application/json (update_objects)
     
 ```
+
+## TODO
+
+### Input Validation
+
+* Info Text
+* Apartment Content
+* Apartment Details
+* Tiles
+* Image Name and Description
+
+### Display Infos
+
+* Modal for Changes
+
+### Login
+
+* Login page
+* Authentication mechanism
+
+### Testing
+
+* Testing environment
+* Input and Output Testing

@@ -102,16 +102,20 @@ export class ImageContentService {
         const rawImage = new Array(i.image);
         i.image = new Array();
         this.backend.updateToBackend("image", new Array(i)).toPromise();
-        const base64Image = this.backend.showImage(i.ID).replace(/data:image\/jpeg;base64,/g, '');
-        const plainString = window.atob(base64Image);
 
-        const arrayBuffer = new ArrayBuffer(plainString.length);
-        const int8Array = new Uint8Array(arrayBuffer);
-        for (let i = 0; i < plainString.length; i++) {
-          int8Array[i] = plainString.charCodeAt(i);
+        //upload Image
+        if (i.changed) {
+          const base64Image = this.backend.showImage(i.ID).replace(/data:image\/jpeg;base64,/g, '');
+          const plainString = window.atob(base64Image);
+  
+          const arrayBuffer = new ArrayBuffer(plainString.length);
+          const int8Array = new Uint8Array(arrayBuffer);
+          for (let i = 0; i < plainString.length; i++) {
+            int8Array[i] = plainString.charCodeAt(i);
+          }
+          const fileBlob = new Blob([int8Array], { 'type': 'image/jpeg'})
+          this.backend.updateImageToBackend("image/" + i.description, fileBlob).toPromise();
         }
-        const fileBlob = new Blob([int8Array], { 'type': 'image/jpeg'})
-        this.backend.updateImageToBackend("image/" + i.description, fileBlob).toPromise();
       })
     })
     .catch((err) => {

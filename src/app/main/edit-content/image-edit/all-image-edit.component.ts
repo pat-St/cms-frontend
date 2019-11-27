@@ -3,7 +3,7 @@ import { ImageContentService } from './../../../service/update-content/image-con
 import { ImagePreviewModalComponent } from '../../image-preview-modal/image-preview-modal.component';
 import { LoadContentService } from '../../../service/load-content/load-content.service';
 import { Image } from '../../../model/image';
-import { Component, OnInit, ViewChild, NgZone, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, NgZone, AfterViewInit, Input } from '@angular/core';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
 import { MatDialog } from '@angular/material';
@@ -21,6 +21,10 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
   imageExpansionList: Array<Image> = new Array();
 
   @ViewChild('autosize', {static: false}) autosize: CdkTextareaAutosize;
+  @Input() apartmentID: number = null;
+  @Input() tileID: number = null;
+  @Input() infoTextID: number = null;
+  @Input() panelTitle = "Bilder";
 
   constructor(
     private updateImage: ImageContentService,
@@ -52,7 +56,10 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
 
   onFileChanged(id: number,event) {
     this.backend.uploadImageFromUser(id,event.target.files[0]);
-    //console.log(event.target.files[0])
+    const changedObj = this.imageExpansionList.find(el => el.ID === id)
+    if (changedObj) {
+      this.updateImage.updateNewImage(changedObj)
+    }
   }
 
   addNewEntry() {
@@ -62,6 +69,28 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
 
   removeEntry(entryObject: Image) {
     this.updateImage.deleteNewImage(entryObject);
+  }
+
+  isChildComponent() {
+    return this.apartmentID || this.infoTextID || this.tileID;
+  }
+
+  /**
+   * If none parent id is set, every Image will shown
+   * Otherwise, shows only Images with parent references
+   * @param imComp The current Image wich will be shown 
+   */
+  filterView(imComp: Image) {
+    if (this.apartmentID) {
+      return imComp.fk_apartment === this.apartmentID
+    }
+    if (this.infoTextID) {
+      return imComp.fk_info === this.infoTextID
+    }
+    if (this.tileID) {
+      return imComp.fk_tile === this.tileID
+    }
+    return !imComp.deleteEntry;
   }
 
 }

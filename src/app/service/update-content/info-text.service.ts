@@ -1,13 +1,7 @@
-import { ApartmentContent, ApartmentDescription, ApartmentPrice, DetailsToApartment, ApartmentDetails } from './../../model/apartment';
-import { NewApartmentObject } from 'src/app/model/apartment';
 import { InfoTextToTile, InfoText, NewInfoTextToTile } from 'src/app/model/infoText';
 import { LoadContentService } from './../load-content/load-content.service';
 import { BackendRequestService } from './../backend-request/backend-request.service';
-import { Injectable, Optional } from '@angular/core';
-import { element } from 'protractor';
-import { Tile } from 'src/app/model/tile';
-import { Image } from 'src/app/model/image';
-import { filter } from 'minimatch';
+import { Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -99,12 +93,6 @@ export class InfoTextService {
       });
       return res;
     })
-    // .then((res) => {
-    //   res
-    //     .map(el =>  this.newInfoText.findIndex(item => item === el))
-    //     .filter(i => i > 0)
-    //     .forEach(i => this.newInfoText.splice(i, 1));
-    // })
     .catch((err) => {
       console.log("error by send infotext updates: " + JSON.stringify(err));
     });

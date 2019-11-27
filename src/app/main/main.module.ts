@@ -1,6 +1,5 @@
 import { RefreshModalComponent } from './image-preview-modal/refresh-information-modal.component';
 import { ApartmentDetailsContentService } from './../service/update-content/apartment-details-content.service';
-import { ImageEditComponentApartment } from './edit-content/all-apartment-edit/image-edit/image-edit.component';
 import { ImageContentService } from './../service/update-content/image-content.service';
 import { InfoTextService } from './../service/update-content/info-text.service';
 import { NewEntryModalComponent } from './image-preview-modal/new-entry-modal.component';
@@ -22,9 +21,6 @@ import { TileEditComponent } from './edit-content/tile-edit/tile-edit.component'
 import { MainRoutingModule } from './main-routing.module';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
 import { MaterialDependencieModule } from '../material.module';
-import { ImageEditComponent } from './edit-content/tile-edit/image-edit/image-edit.component';
-import { InfoEditComponent } from './edit-content/tile-edit/info-edit/info-edit.component';
-import { ApartmentEditComponent } from './edit-content/tile-edit/apartment-edit/apartment-edit.component';
 import { EditContentComponent } from './edit-content/edit-content.component';
 import { ImagePreviewModalComponent } from './image-preview-modal/image-preview-modal.component';
 import { AllInfoTextEditComponent } from './edit-content/all-info-text-edit/all-info-text-edit.component';
@@ -39,9 +35,6 @@ import { ApartmentContentService } from '../service/update-content/apartment-con
     DashboardComponent,
     DragDropComponent,
     TileEditComponent,
-    ImageEditComponent,
-    InfoEditComponent,
-    ApartmentEditComponent,
     AllImageEditComponent,
     EditContentComponent,
     ImagePreviewModalComponent,
@@ -49,8 +42,7 @@ import { ApartmentContentService } from '../service/update-content/apartment-con
     RefreshModalComponent,
     AllInfoTextEditComponent,
     AllApartmentEditComponent,
-    ApartmentDetailsEditComponent,
-    ImageEditComponentApartment
+    ApartmentDetailsEditComponent
   ],
   imports: [
     CommonModule,

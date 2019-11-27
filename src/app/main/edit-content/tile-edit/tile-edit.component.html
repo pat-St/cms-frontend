@@ -45,11 +45,11 @@
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="removeEntry(kachelExp)">remove_circle</button>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="showTileDetails(kachelExp.ID)">
           {{isTileDetailsActive(kachelExp.ID)? 'expand_less':'expand_more'}}</button>
-        <app-image-edit *ngIf="hasImage(kachelExp.ID) && isTileDetailsActive(kachelExp.ID)" [tileID]="kachelExp.ID"></app-image-edit>
+        <app-all-image-edit *ngIf="hasImage(kachelExp.ID) && isTileDetailsActive(kachelExp.ID)" [tileID]="kachelExp.ID"></app-all-image-edit>
         <div *ngIf="isTileDetailsActive(kachelExp.ID)" class="tile-div"></div>
-        <app-info-edit *ngIf="kachelExp.modalType==2 && isTileDetailsActive(kachelExp.ID)" [tileID]="kachelExp.ID"></app-info-edit>
+        <app-all-info-text-edit *ngIf="kachelExp.modalType==2 && isTileDetailsActive(kachelExp.ID)" [tileID]="kachelExp.ID"></app-all-info-text-edit>
         <div *ngIf="kachelExp.modalType==2 && isTileDetailsActive(kachelExp.ID)" class="tile-div"></div>
-        <app-apartment-edit *ngIf="kachelExp.modalType==0 && isTileDetailsActive(kachelExp.ID)" [tileID]="kachelExp.ID"></app-apartment-edit>
+        <app-all-apartment-edit *ngIf="kachelExp.modalType==0 && isTileDetailsActive(kachelExp.ID)" [tileID]="kachelExp.ID"></app-all-apartment-edit>
         <div *ngIf="kachelExp.modalType==0 && isTileDetailsActive(kachelExp.ID)" class="tile-div"></div>
       </div>
     </ng-template>        

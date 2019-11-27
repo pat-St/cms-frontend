@@ -23,6 +23,8 @@ export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
 
   @ViewChild('autosize', {static: false}) autosize: CdkTextareaAutosize;
 
+  @Input() tileID: number;
+
   constructor(
     private _ngZone: NgZone,
     private updateInfoText: InfoTextService,
@@ -99,6 +101,13 @@ export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
   saveCurrentChanges(objs: NewInfoTextToTile) {
     console.log("save current changes");
     this.updateInfoText.sendSpecificChangesToBackend(objs);
+  }
+
+  filterView(infoComp: NewInfoTextToTile) {
+    if (this.tileID) {
+      return infoComp.relation.fk_tile === this.tileID;
+    }
+    return !infoComp.deleteEntry;
   }
 }
 
