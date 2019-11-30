@@ -25,7 +25,7 @@ export interface NewEntryModal {
   </div>
   <div mat-dialog-actions>
     <button mat-flat-button (click)="onNoClick()" color="warn" cdkFocusInitial>Abbrechen</button>
-    <button mat-stroked-button [mat-dialog-close]="choosenEntry"  color="primary" cdkFocusInitial>OK</button>
+    <button mat-stroked-button [mat-dialog-close]="choosenEntry" color="primary" cdkFocusInitial>OK</button>
   </div>
   `,
   styles: [

@@ -12,7 +12,9 @@ export class ImageContentService {
 
   constructor(private backend: BackendRequestService, private loadContent: LoadContentService) { }
 
-  public nextIdOf(itemColl: Array<number>): number { return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1; }
+  public nextIdOf(itemColl: Array<number>): number {
+    if (itemColl.length > 2) { return itemColl.length + 1 }
+    return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1; }
 
   async loadNewContent(count= 5) {
     if (count < 0) {
@@ -37,7 +39,7 @@ export class ImageContentService {
       if (indexElement >= 0) {
         this.newImage.splice(indexElement, 1);
       }
-      this.newImage.push(element);
+      this.newImage.push(Object.assign({},element));
     });
   }
 
@@ -95,7 +97,9 @@ export class ImageContentService {
   private sendUpdate(singleImage: Image = null) {
     const listOfImages = singleImage ? new Array(singleImage) : this.newImage;
     Promise.resolve(
-      listOfImages.filter(el => this.loadContent.getImages().findIndex(i => i.ID === el.ID) > -1)
+      listOfImages
+      .filter(el => this.loadContent.getImages().findIndex(i => i.ID === el.ID) > -1)
+      .filter(el => JSON.stringify(el) !== JSON.stringify(this.loadContent.getImages().find(i => i.ID === el.ID)))
     )
     .then((el) => {
       el.map(i => {
@@ -123,39 +127,54 @@ export class ImageContentService {
     });
   }
 
-  private sendNew(singleImage: Image = null) {
+  sendNew(singleImage: Image = null) {
     const listOfImages = singleImage ? new Array(singleImage) : this.newImage;
     Promise.resolve(
-      listOfImages.filter(el => this.loadContent.getImages().findIndex(i => i.ID === el.ID) < 0)
+      listOfImages
+      .filter(el => this.loadContent.getImages().findIndex(i => i.ID === el.ID) < 0)
+      .map(el => {
+        el.image = [];
+        return el;
+      })
     )
-    .then((el) => {
-      this.backend.createToBackend("image", el).toPromise();
-    })
-    .catch((err) => {
-      console.log("error by send delete images: " + JSON.stringify(err));
-    });
+    .then((res) =>
+      res.length > 0 ? this.backend.createToBackend("image", res).toPromise() : true
+    )
+    .catch((err) => 
+      console.log("error by send delete images: " + JSON.stringify(err))
+    );
   }
 
   public sendChangesToBackend() {
-    // send delete
-    this.sendDelete();
-
-    // send update
-    this.sendUpdate();
-
-    // send update
-    this.sendNew();
+    return Promise.resolve(true)
+    .then(() => 
+      // send update
+      this.sendUpdate()
+    )
+    //.then(() => 
+      // send update
+    //  this.sendNew()
+    //)
+    .then(() => 
+      // send delete
+      this.sendDelete()
+    );
   }
 
   public sendSpecificChangesToBackend(obj: Image) {
-    // send delete
-    this.sendDelete(obj);
-
-    // send update
-    this.sendUpdate(obj);
-
-    // send update
-    this.sendNew(obj);
+    return Promise.resolve(true)
+    .then(() => 
+      // send update
+      this.sendUpdate(obj)
+    )
+    .then(() => 
+      // send update
+      this.sendNew(obj)
+    )
+    .then(() => 
+      // send delete
+      this.sendDelete(obj)
+    );
   }
 
   public getImageByFkId(apartmentId: number = null, infoId: number = null, tileId: number = null): Image[] {

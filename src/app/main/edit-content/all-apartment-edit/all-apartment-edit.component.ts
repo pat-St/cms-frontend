@@ -60,7 +60,7 @@ export class AllApartmentEditComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe((result: number) => {
       console.log('The dialog was closed');
-      if (!result) {
+      if (result == null) {
         return;
       }
       if (currEntry) {

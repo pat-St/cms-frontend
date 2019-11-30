@@ -11,7 +11,9 @@ export class InfoTextService {
 
   constructor(private backend: BackendRequestService, private loadContent: LoadContentService) { }
 
-  public nextIdOf(itemColl: Array<number>): number { return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1; }
+  public nextIdOf(itemColl: Array<number>): number { 
+    if (itemColl.length > 2) { return itemColl.length + 1 }
+    return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1; }
 
   async loadNewContent(count= 5) {
     if (count < 0) {
@@ -35,7 +37,7 @@ export class InfoTextService {
 
   private addCurrentInfoTextToTile(entryInfo: InfoText[], relation: InfoTextToTile[]) {
     relation.forEach(el => {
-      const infoTileEntry = entryInfo.find(obj => obj.ID === el.ID);
+      const infoTileEntry = Object.assign({}, entryInfo.find(obj => obj.ID === el.ID));
       if (infoTileEntry) {
         const newInftoTile = new NewInfoTextToTile(infoTileEntry, el);
         this.updateNextInfoTile(newInftoTile);
@@ -43,28 +45,26 @@ export class InfoTextService {
     });
   }
 
-  public getNextInfoTile(tileId: number): boolean {
-    if (this.loadContent.isFinished()) {
-      const nextInfoTextToTileID: number = this.nextIdOf(
-        this.loadContent.getInfoTextToTile().map(el => el.ID).concat(this.newInfoText.map(el => el.relation.ID))
-      );
-      const nextInfoTextID: number = this.nextIdOf(
-        this.loadContent.getInfoText().map(el => el.ID).concat(this.newInfoText.map(el => el.infoText.ID))
-        );
-      const newInfoTextToTile = new InfoTextToTile(nextInfoTextToTileID, nextInfoTextID, tileId);
-      const newInfoText = new InfoText(nextInfoTextID, "", "", "");
-      const newInfoTextToTileEntry = new NewInfoTextToTile(newInfoText, newInfoTextToTile);
-      this.newInfoText.push(newInfoTextToTileEntry);
-      return true;
-    } else {
-      return false;
-    }
+  public getNextInfoTile(tileId: number): boolean { 
+    const nextRelationID: number = this.newInfoText.length > 1 ? this.nextIdOf(
+      this.loadContent.getInfoTextToTile().map(el => el.ID).concat(this.newInfoText.map(el => el.relation.ID))
+    ) : this.newInfoText.length;
+
+    const nextInfoTextID: number = this.newInfoText.length > 1 ? this.nextIdOf(
+      this.loadContent.getInfoText().map(el => el.ID).concat(this.newInfoText.map(el => el.infoText.ID))
+    ) : this.newInfoText.length;
+
+    const newInfoTextToTile = new InfoTextToTile(nextRelationID, nextInfoTextID, tileId);
+    const newInfoText = new InfoText(nextInfoTextID, "", "", "");
+    const newInfoTextToTileEntry = new NewInfoTextToTile(newInfoText, newInfoTextToTile);
+    this.newInfoText.push(newInfoTextToTileEntry);
+    console.log(JSON.stringify(newInfoTextToTileEntry))
+    return true;
   }
 
   public deleteNextInfoTile(entryObj: NewInfoTextToTile) {
     const foundIndex = this.newInfoText.findIndex(el => el === entryObj);
     if (foundIndex >= 0) {
-      let tmp = this.newInfoText[foundIndex];
       this.newInfoText[foundIndex].deleteEntry = true;
     }
   }
@@ -82,8 +82,7 @@ export class InfoTextService {
     Promise.resolve(this.newInfoText.filter(el => el.deleteEntry))
     .then((res) => {
       res.map(el => el.relation).forEach((el) => {
-        this.backend.deleteToBackend("info_text_to_tile", el.ID).subscribe((response: boolean) => {
-        });
+        this.backend.deleteToBackend("info_text_to_tile", el.ID).subscribe((response: boolean) => {});
       });
       return res;
     })
@@ -99,60 +98,64 @@ export class InfoTextService {
   }
 
   private sendUpdate() {
-    Promise.resolve(
-      this.newInfoText
-        .filter(el => !el.deleteEntry)
-        .map(el => el.infoText)
-        .filter(el => this.loadContent.infoText.map(s => s.ID).find(s => s === el.ID))
+    let tmp = this.newInfoText
+      .filter(el => !el.deleteEntry)
+      .map(el => el.infoText);
+    let tmp2 = tmp
+      .filter(el => this.loadContent.getInfoText().findIndex(s => s.ID === el.ID) > -1)
+    let tmp3 = tmp2
+      .filter(el => {
+        console.log(JSON.stringify(el))
+        console.log(JSON.stringify(this.loadContent.getInfoText().find(i => i.ID === el.ID)))
+        return JSON.stringify(el) !== JSON.stringify(this.loadContent.getInfoText().find(i => i.ID === el.ID))
+      })
+    return Promise.resolve(tmp3)
+    .then((res: InfoText[]) => 
+      res.length > 0 ? this.backend.updateToBackend("info_text", res).toPromise() : true
     )
-    .then((res: InfoText[]) => {
-      return this.backend.updateToBackend("info_text", res).toPromise();
-    })
-    .then((res) => {
-      return this.newInfoText
+    .then(() => 
+      this.newInfoText
         .filter(el => !el.deleteEntry)
         .map(el => el.relation)
-        .filter(el => this.loadContent.infoTextToTile.map(s => s.ID).find(s => s === el.ID));
-    })
-    .then((res: InfoTextToTile[]) => {
-      return this.backend.updateToBackend("info_text_to_tile", res).toPromise();
-    })
-    .then((res) => {
-      this.newInfoText.forEach(el => { el = el.changed ? el.changeBack() : el; });
-    })
-    .catch((err) => {
-      console.log("error by send infotext updates: " + JSON.stringify(err));
-    });
+        .filter(el => this.loadContent.getInfoTextToTile().findIndex(s => s.ID === el.ID) > -1)
+        .filter(el => JSON.stringify(el) !== JSON.stringify(this.loadContent.getInfoTextToTile().find(i => i.ID === el.ID)))
+    )
+    .then((res: InfoTextToTile[]) => 
+      res.length > 0 ? this.backend.updateToBackend("info_text_to_tile", res).toPromise() : true
+    )
+    .catch((err) => 
+      console.log("error by send infotext updates: " + JSON.stringify(err))
+    );
   }
 
-  private sendNew() {
-    Promise.resolve(
+  sendNew() {
+    return Promise.resolve(
       this.newInfoText
         .filter(el => !el.deleteEntry)
         .map(el => el.infoText)
-        .filter(el => !this.loadContent.infoText.map(s => s.ID).find(s => s === el.ID))
+        .filter(el => this.loadContent.getInfoText().findIndex(s => s.ID === el.ID) < 0)
     )
-    .then((res) =>  this.backend.createToBackend("info_text", res.map(el => el)).toPromise())
-    .then((res) =>  this.newInfoText
+    .then((res) =>  
+      res.length > 0 ? this.backend.createToBackend("info_text", res).toPromise() : true
+    )
+    .then((_) =>  this.newInfoText
       .filter(el => !el.deleteEntry)
       .map(el => el.relation)
-      .filter(el => !this.loadContent.infoTextToTile.map(s => s.ID).find(s => s === el.ID))
+      .filter(el => this.loadContent.getInfoTextToTile().findIndex(s => s.ID === el.ID) < 0)
     )
-    .then((res) => this.backend.createToBackend("info_text_to_tile", res.map(el => el)).toPromise())
-    .catch((err) => {
-      console.log("error by send infotext new entities: " + JSON.stringify(err));
-    });
+    .then((res) => 
+      res.length > 0 ? this.backend.createToBackend("info_text_to_tile", res).toPromise() : true
+    )
+    .catch((err) => 
+      console.log("error by send infotext new entities: " + JSON.stringify(err))
+    );
   }
 
   public sendChangesToBackend() {
-    // send delete
-    this.sendDelete();
-
-    // send updates
-    this.sendUpdate();
-
-    // send new
-    this.sendNew();
+    return Promise.resolve(true)
+    .then(() => this.sendUpdate())
+   // .then(() => this.sendNew())
+    .then(() => this.sendDelete());
   }
 
   public sendSpecificChangesToBackend(objs: NewInfoTextToTile) {
@@ -160,18 +163,20 @@ export class InfoTextService {
       return this.loadContent.infoText.map(s => s.ID).find(s => s === o.infoText.ID) >= 0 &&
       this.loadContent.infoTextToTile.map(s => s.ID).find(s => s === o.relation.ID) >= 0;
     };
-    if (checkObjExists(objs) && objs.deleteEntry) {
-      console.log("delete objs" + JSON.stringify(objs))
-      this.backend.deleteToBackend("info_text_to_tile", objs.relation.ID).subscribe((response: boolean) => {});
-      this.backend.deleteToBackend("info_text", objs.infoText.ID).subscribe((response: boolean) => {});      
-    } else if (checkObjExists(objs) && !objs.deleteEntry) {
+    if (checkObjExists(objs) && !objs.deleteEntry) {
       console.log("update objs" + JSON.stringify(objs))
       this.backend.updateToBackend("info_text", new Array<InfoText>(objs.infoText)).subscribe((response: boolean) => {});
       this.backend.updateToBackend("info_text_to_tile", new Array<InfoTextToTile>(objs.relation)).subscribe((response: boolean) => {});
-    } else {
+    } 
+    if (!checkObjExists(objs) && !objs.deleteEntry) {
       console.log("create objs" + JSON.stringify(objs))
       this.backend.createToBackend("info_text", new Array<InfoText>(objs.infoText)).subscribe((response: boolean) => {});
       this.backend.createToBackend("info_text_to_tile", new Array<InfoTextToTile>(objs.relation)).subscribe((response: boolean) => {});
+    }
+    if (checkObjExists(objs) && objs.deleteEntry) {
+      console.log("delete objs" + JSON.stringify(objs))
+      this.backend.deleteToBackend("info_text_to_tile", objs.relation.ID).subscribe((response: boolean) => {});
+      this.backend.deleteToBackend("info_text", objs.infoText.ID).subscribe((response: boolean) => {});
     }
   }
 }

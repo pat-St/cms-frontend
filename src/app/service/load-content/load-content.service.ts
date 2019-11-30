@@ -183,25 +183,23 @@ export class LoadContentService {
     this.backend.getFromBackend("image/id").subscribe(
       (payloadList: number[]) => {
         this.imageCounter = payloadList.length;
-        let currentCounter = 0;
-        payloadList.forEach( id => {
+        if (payloadList.length === 0) {
           this.imageObject = new Array();
-          this.backend.getFromBackend("image/id/" + id).subscribe(
-            (imageObj: Image) => {
-              this.backend.loadImage(imageObj.description, imageObj.ID);
-              this.imageObject.push(imageObj);
-              currentCounter += 1;
-              this.hasAllImageLoaded(currentCounter);
-
+          this.incrementCounter();
+        } else {
+          payloadList.forEach( (id, index) => {
+            this.imageObject = new Array();
+            this.backend.getFromBackend("image/id/" + id).subscribe(
+              (imageObj: Image) => {
+                this.backend.loadImage(imageObj.description, imageObj.ID);
+                this.imageObject.push(imageObj);
+                if ((index + 1) === this.imageCounter) {
+                  this.incrementCounter();
+                }
+            });
           });
-        });
+        }
     });
-  }
-
-  hasAllImageLoaded(refCounter: number) {
-    if (refCounter === this.imageCounter) {
-      this.incrementCounter();
-    }
   }
 
   getImages(): Image[] {

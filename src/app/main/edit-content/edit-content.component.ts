@@ -73,16 +73,30 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
   }
 
   trigger_save() {
-    // update info text
-    this.updateInfoText.sendChangesToBackend();
-    // update apartment content
-    this.updateApartment.sendChangesToBackend();
-    // update apartment details
-    this.updateDetails.sendChangesToBackend();
+    Promise.resolve(true)
+    .then(() => this.executeNewInRightOrder())
     // update images
-    this.updateImage.sendChangesToBackend();
+    .then(() => this.updateImage.sendChangesToBackend())
+    // update info text
+    .then(() => this.updateInfoText.sendChangesToBackend())
+    // update apartment content
+    .then(() => this.updateApartment.sendChangesToBackend())
+    // update apartment details
+    .then(() => this.updateDetails.sendChangesToBackend())
     // update tiles
-    this.updateContent.sendUpdateToBackend();
+    .then(() => this.updateContent.sendUpdateToBackend());
+  }
+
+  executeNewInRightOrder() {
+    return Promise.resolve(true)
+    .then(() => this.updateContent.sendNew())
+    .then(() => this.updateInfoText.sendNew())
+    .then(() => this.updateApartment.sendNew())
+    .then(() => this.updateDetails.sendNew())
+    .then(() => this.updateImage.sendNew())
+    .catch((err) => {
+      console.log("error by send new objects: " + JSON.stringify(err));
+    });
   }
 
   getSpinnerValue() {
