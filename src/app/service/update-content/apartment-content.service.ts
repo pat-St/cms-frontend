@@ -69,7 +69,7 @@ export class ApartmentContentService {
       const nextDesc = this.nextIdOf(this.getAllApartmentDescriptionID());
       const desc = new Array(new ApartmentDescription(nextDesc, "", "", nextApartmentID));
       const nextPrice = this.nextIdOf(this.getAllPriceID());
-      const price = new Array(new ApartmentPrice(nextPrice,"","","",nextApartmentID));
+      const price = new Array(new ApartmentPrice(nextPrice,"","","","",nextApartmentID));
       this.newApartment.push(new NewApartmentObject(apartment,desc,price, new Array()));
       return true;
     } else {

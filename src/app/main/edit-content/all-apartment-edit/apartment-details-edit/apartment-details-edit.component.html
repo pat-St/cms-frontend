@@ -78,6 +78,9 @@
         <mat-form-field>
           <input matInput placeholder="Neben-Saison" [(ngModel)]="priceExp.offSeason">
         </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Nächte" [(ngModel)]="priceExp.nights">
+        </mat-form-field>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" >save</button>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="removePriceEntry(priceExp)">remove_circle</button>
       </div>
