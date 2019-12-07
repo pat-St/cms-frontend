@@ -84,7 +84,10 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
     // update apartment details
     .then(() => this.updateDetails.sendChangesToBackend())
     // update tiles
-    .then(() => this.updateContent.sendUpdateToBackend());
+    .then(() => this.updateContent.sendUpdateToBackend())
+    .catch((err) => {
+      console.log("error by trigger objects changes: " + JSON.stringify(err));
+    });
   }
 
   executeNewInRightOrder() {

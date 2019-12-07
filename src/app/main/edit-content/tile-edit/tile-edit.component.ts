@@ -22,6 +22,8 @@ export class TileEditComponent implements OnInit, AfterViewInit {
   @ViewChild('autosize', {static: false}) autosize: CdkTextareaAutosize;
 
   panelOpenState = false;
+  // Feature disabled for unknown behavour
+  disableModalChanges = true;
 
   kachelExpansionList: Array<Tile> = new Array();
 

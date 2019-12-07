@@ -35,7 +35,7 @@
           </mat-form-field>
         <mat-form-field>
           <mat-label>Modal Typ</mat-label>
-          <mat-select [(ngModel)]="kachelExp.modalType">
+          <mat-select [disabled]="disableModalChanges" [(ngModel)]="kachelExp.modalType">
             <mat-option *ngFor="let kachelType of modalTypeSelected" [value]="kachelType.desc">
               {{kachelType.value}}
             </mat-option>

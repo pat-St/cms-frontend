@@ -15,7 +15,9 @@ export class ApartmentDetailsContentService {
   constructor(private backend: BackendRequestService, private loadContent: LoadContentService) { }
 
   public nextIdOf(itemColl: Array<number>): number { 
-    if (itemColl.length > 2) { return itemColl.length + 1 }
+    if (itemColl.length < 2) { 
+      return itemColl.length
+    }
     return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1; }
 
   async loadNewContent(count= 5) {

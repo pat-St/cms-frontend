@@ -18,7 +18,9 @@ export class ApartmentContentService {
   constructor(private backend: BackendRequestService, private loadContent: LoadContentService) { }
 
   public nextIdOf(itemColl: Array<number>): number { 
-    if (itemColl.length > 2) { return itemColl.length + 1 }
+    if (itemColl.length < 2) { 
+      return itemColl.length
+    }
     return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1; }
 
   async loadNewContent(count= 5) {
@@ -63,18 +65,14 @@ export class ApartmentContentService {
   }
   
   public getNextApartmentTile(tileId: number): boolean {
-    if (this.loadContent.isFinished()) {
-      const nextApartmentID = this.nextIdOf(this.loadContent.apartmentContent.map(el => el.ID));
-      const apartment = new ApartmentContent(nextApartmentID, tileId);
-      const nextDesc = this.nextIdOf(this.getAllApartmentDescriptionID());
-      const desc = new Array(new ApartmentDescription(nextDesc, "", "", nextApartmentID));
-      const nextPrice = this.nextIdOf(this.getAllPriceID());
-      const price = new Array(new ApartmentPrice(nextPrice,"","","","",nextApartmentID));
-      this.newApartment.push(new NewApartmentObject(apartment,desc,price, new Array()));
-      return true;
-    } else {
-      return false;
-    }
+    const nextApartmentID = this.nextIdOf(this.newApartment.map(el => el.content.ID));
+    const apartment = new ApartmentContent(nextApartmentID, tileId);
+    const nextDesc = this.nextIdOf(this.getAllApartmentDescriptionID());
+    const desc = new Array(new ApartmentDescription(nextDesc, "", "", nextApartmentID));
+    const nextPrice = this.nextIdOf(this.getAllPriceID());
+    const price = new Array(new ApartmentPrice(nextPrice,"", "", "", "", nextApartmentID));
+    this.newApartment.push(new NewApartmentObject(apartment, desc, price, new Array()));
+    return true;
   }
 
   public deleteNextApartment(obj: NewApartmentObject): boolean {
@@ -99,37 +97,66 @@ export class ApartmentContentService {
     }
   }
   private sendDelete() {
-    const deleteDescEntities: ApartmentDescription[] = this.newApartment
-      .map(el => el.description.filter(i => i.deleteEntry))
-      .reduce((prevColl, currColl) => currColl.concat(prevColl));
-    const deletePriceEntities: ApartmentPrice[] = this.newApartment
-      .map(el => el.price.filter(i => i.deleteEntry))
-      .reduce((prevColl, currColl) => currColl.concat(prevColl));
-    const deleteDetailsRelation: DetailsToApartment[] = this.newApartment
-      .map(el => el.detailsToApartment.filter(i => i.deleteEntry))
-      .reduce((prevColl, currColl) => currColl.concat(prevColl));
-    const deleteApartmentEntitites: ApartmentContent[] = this.newApartment
-      .filter(i => i.deleteEntry)
-      .map(i => i.content);
-
+    // const deleteDescEntities: ApartmentDescription[] = this.newApartment
+    //   .map(el => el.description.filter(i => i.deleteEntry))
+    //  .reduce((prevColl, currColl) => currColl.concat(prevColl));
+    // const deletePriceEntities: ApartmentPrice[] = this.newApartment
+    //   .map(el => el.price.filter(i => i.deleteEntry))
+    //   .reduce((prevColl, currColl) => currColl.concat(prevColl));
+    // const deleteDetailsRelation: DetailsToApartment[] = this.newApartment
+    //   .map(el => el.detailsToApartment.filter(i => i.deleteEntry))
+    //   .reduce((prevColl, currColl) => currColl.concat(prevColl));
+    // const deleteApartmentEntitites: ApartmentContent[] = this.newApartment
+    //   .filter(i => i.deleteEntry)
+    //   .map(i => i.content);
     return Promise.resolve(true)
+    // Details to Apartment
     .then(() =>
-      deleteDetailsRelation.map( el => 
+      this.newApartment
+        .map(el => el.detailsToApartment.filter(i => i.deleteEntry))
+    )
+    .then((el) =>
+      el.length > 1 ? el.reduce((prevColl, currColl) => currColl.concat(prevColl)) : el.map(i => i[0])
+    )
+    .then((res) =>
+      res.map( el => 
         this.backend.deleteToBackend("details_to_apartment", el.ID).toPromise()
       )
     )
+    // Apartment Description
     .then(() =>
-      deleteDescEntities.map( el => {
+      this.newApartment
+        .map(el => el.description.filter(i => i.deleteEntry))
+    )
+    .then((el) =>
+      el.length > 1 ? el.reduce((prevColl, currColl) => currColl.concat(prevColl)) : el.map(i => i[0])
+    )
+    .then((res) =>
+      res.map( el => {
         this.backend.deleteToBackend("apartment_desc", el.ID).toPromise();
       })
     )
+    // Apartment Price
     .then(() =>
-      deletePriceEntities.map( el => {
+      this.newApartment
+        .map(el => el.price.filter(i => i.deleteEntry))
+    )
+    .then((el) =>
+      el.length > 1 ? el.reduce((prevColl, currColl) => currColl.concat(prevColl)) : el.map(i => i[0])
+    )
+    .then((res) =>
+      res.map( el => {
         this.backend.deleteToBackend("apartment_price", el.ID).toPromise();
       })
     )
+    // Apartment content
     .then(() =>
-      deleteApartmentEntitites.map( el => {
+      this.newApartment
+        .filter(i => i.deleteEntry)
+        .map(i => i.content)
+    )
+    .then((res) =>
+      res.map( el => {
         this.backend.deleteToBackend("apartment", el.ID).toPromise();
       })
     );
@@ -141,8 +168,12 @@ export class ApartmentContentService {
     .then((_) =>
       this.newApartment
       .map(el => el.description.filter(i => this.loadContent.getApartmentDescription().findIndex(n => n.ID === i.ID) > -1))
-      .reduce((prevColl, currColl) => currColl.concat(prevColl))
-      .filter(el => JSON.stringify(el) !== JSON.stringify(this.loadContent.getApartmentDescription().find(i => i.ID === el.ID)))
+    )
+    .then((res) =>
+        res.length > 1 ? res.reduce((prevColl, currColl) => currColl.concat(prevColl)) : res.map(el => el[0])
+    )
+    .then((res) =>
+      res.filter(el => JSON.stringify(el) !== JSON.stringify(this.loadContent.getApartmentDescription().find(i => i.ID === el.ID))) 
     )
     .then((res) =>
       res.length > 0 ? this.backend.updateToBackend("apartment_desc", res).toPromise() : true
@@ -150,17 +181,25 @@ export class ApartmentContentService {
     .then((_) =>
       this.newApartment
       .map(el => el.price.filter(i => this.loadContent.getApartmentPrice().findIndex(n => n.ID === i.ID) > -1))
-      .reduce((prevColl, currColl) => currColl.concat(prevColl))
-      .filter(el => JSON.stringify(el) !== JSON.stringify(this.loadContent.getApartmentPrice().find(i => i.ID === el.ID)))
+    )
+    .then((res) =>
+        res.length > 1 ? res.reduce((prevColl, currColl) => currColl.concat(prevColl)) : res.map(el => el[0])
+    )
+    .then((res) =>
+      res.filter(el => JSON.stringify(el) !== JSON.stringify(this.loadContent.getApartmentPrice().find(i => i.ID === el.ID)))
     )
     .then((res) =>
       res.length > 0 ? this.backend.updateToBackend("apartment_price", res).toPromise() : true
     )
     .then((_) =>
       this.newApartment
-      .map(el => el.detailsToApartment.filter(i => this.loadContent.getDetailsToApartment().findIndex(n => n.ID === i.ID) > -1))
-      .reduce((prevColl, currColl) => currColl.concat(prevColl))
-      .filter(el => JSON.stringify(el) !== JSON.stringify(this.loadContent.getDetailsToApartment().find(i => i.ID === el.ID)))
+      .map(el => el.detailsToApartment.filter(i => this.loadContent.getDetailsToApartment().findIndex(n => n.ID === i.ID) > -1))      
+    )
+    .then((res) =>
+        res.length > 1 ? res.reduce((prevColl, currColl) => currColl.concat(prevColl)) : res.map(el => el[0])
+    )
+    .then((res) =>
+        res.filter(el => JSON.stringify(el) !== JSON.stringify(this.loadContent.getDetailsToApartment().find(i => i.ID === el.ID)))
     )
     .then((res) =>
       res.length > 0 ? this.backend.updateToBackend("details_to_apartment", res).toPromise() : true
@@ -173,11 +212,15 @@ export class ApartmentContentService {
     )
     .then((res) =>
       res.length > 0 ? this.backend.updateToBackend("apartment", res).toPromise() : true
-    );
+    )
+    .catch((err) => {
+      console.log("error by trigger update apartment: " + JSON.stringify(err));
+    })
   }
 
   sendNew() {
     return Promise.resolve(true)
+    // Apartment Content
     .then(() =>
       this.newApartment
         .filter(i => this.loadContent.getApartmentContent().findIndex(n => n.ID === i.content.ID) < 0)
@@ -186,30 +229,42 @@ export class ApartmentContentService {
     .then((el) =>
       el.length > 0 ? this.backend.createToBackend("apartment", el).toPromise() : true
     )
+    // Apartment Description
     .then(() =>
       this.newApartment
       .map(el => el.description.filter(i => this.loadContent.getApartmentDescription().findIndex(n => n.ID === i.ID) < 0))
-      .reduce((prevColl, currColl) => currColl.concat(prevColl))
+    )
+    .then((res) =>
+      res.length > 1 ? res.reduce((prevColl, currColl) => currColl.concat(prevColl)) : res.map(es => es[0]).filter(es => es != null)
     )
     .then((el) =>
       el.length > 0 ? this.backend.createToBackend("apartment_desc", el).toPromise() : true
     )
+    // Apartment Details
     .then((_) =>
       this.newApartment
       .map(el => el.detailsToApartment.filter(i => this.loadContent.getDetailsToApartment().findIndex(n => n.ID === i.ID) < 0))
-      .reduce((prevColl, currColl) => currColl.concat(prevColl))
+    )
+    .then((res) =>
+      res.length > 1 ? res.reduce((prevColl, currColl) => currColl.concat(prevColl)) : res.map(es => es[0]).filter(es => es != null)
     )
     .then((res) =>
       res.length > 0 ? this.backend.createToBackend("details_to_apartment", res).toPromise() : true
     )
+    // Apartment Price
     .then( (_) =>
       this.newApartment
       .map(el => el.price.filter(i => this.loadContent.getApartmentPrice().findIndex(n => n.ID === i.ID) < 0))
-      .reduce((prevColl, currColl) => currColl.concat(prevColl))
+    )
+    .then((res) =>
+      res.length > 1 ? res.reduce((prevColl, currColl) => currColl.concat(prevColl)) : res.map(es => es[0]).filter(es => es != null)
     )
     .then((res) =>
       res.length > 0 ? this.backend.createToBackend("apartment_price", res).toPromise() : true
-    );
+    )
+    .catch((err) => {
+      console.log("error by trigger changes apartment: " + JSON.stringify(err));
+    })
   }
 
   public sendChangesToBackend() {
@@ -221,7 +276,10 @@ export class ApartmentContentService {
     .then(() => 
       // send delete
       this.sendDelete()
-    );
+    )
+    .catch((err) => {
+      console.log("error by trigger apartment: " + JSON.stringify(err));
+    })
   }
 
   public sendSpecificChangesToBackend(objs: NewApartmentObject) {
@@ -278,15 +336,18 @@ export class ApartmentContentService {
   }
 
   public getAllApartmentDescriptionID(): number[] {
-    const newOrModIDs = this.newApartment.map(el => el.getAllDescID()).reduce((prevEl, curEl) => curEl.concat(prevEl))
-    return this.loadContent.getApartmentDescription().map(el => el.ID).concat(newOrModIDs);
+    const newOrModIDs = this.newApartment.map(el => el.getAllDescID())
+    const flattenIDs = newOrModIDs.length > 1 ? newOrModIDs.reduce((prevEl, curEl) => curEl.concat(prevEl)) : newOrModIDs.map(el => el[0])
+    return this.loadContent.getApartmentDescription().map(el => el.ID).concat(flattenIDs);
   }
   public getAllPriceID(): number[] {
-    const newOrModIDs = this.newApartment.map(el => el.getAllPriceID()).reduce((prevEl, curEl) => curEl.concat(prevEl))
-    return this.loadContent.getApartmentPrice().map(el => el.ID).concat(newOrModIDs);
+    const newOrModIDs = this.newApartment.map(el => el.getAllPriceID())
+    const flattenIDs = newOrModIDs.length > 1 ? newOrModIDs.reduce((prevEl, curEl) => curEl.concat(prevEl)) : newOrModIDs.map(el => el[0])
+    return this.loadContent.getApartmentPrice().map(el => el.ID).concat(flattenIDs);
   }
   public getAllDetailsRelationID(): number[] {
-    const newOrModIDs = this.newApartment.map(el => el.getAllDetailsRelationID()).reduce((prevEl, curEl) => curEl.concat(prevEl))
-    return this.loadContent.getDetailsToApartment().map(el => el.ID).concat(newOrModIDs);
+    const newOrModIDs = this.newApartment.map(el => el.getAllDetailsRelationID())
+    const flattenIDs = newOrModIDs.length > 1 ? newOrModIDs.reduce((prevEl, curEl) => curEl.concat(prevEl)) : newOrModIDs.map(el => el[0])
+    return this.loadContent.getDetailsToApartment().map(el => el.ID).concat(flattenIDs);
   }
 }

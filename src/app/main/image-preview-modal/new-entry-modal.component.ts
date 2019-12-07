@@ -16,7 +16,7 @@ export interface NewEntryModal {
   <div mat-dialog-content>
     <mat-form-field>
     <mat-label>{{data.metaInfo}}</mat-label>
-    <mat-select [(value)]="choosenEntry">
+    <mat-select [disabled]="isDisabled" [(value)]="choosenEntry">
         <mat-option *ngFor="let kachelType of data.listOfEntrys" [value]="kachelType.id">
         {{kachelType.desc}}
         </mat-option>
@@ -25,7 +25,7 @@ export interface NewEntryModal {
   </div>
   <div mat-dialog-actions>
     <button mat-flat-button (click)="onNoClick()" color="warn" cdkFocusInitial>Abbrechen</button>
-    <button mat-stroked-button [mat-dialog-close]="choosenEntry" color="primary" cdkFocusInitial>OK</button>
+    <button mat-stroked-button [disabled]="isDisabled" [mat-dialog-close]="choosenEntry" color="primary" cdkFocusInitial>OK</button>
   </div>
   `,
   styles: [
@@ -43,11 +43,18 @@ export interface NewEntryModal {
 export class NewEntryModalComponent {
 
 choosenEntry: number;
+isDisabled = false
 
   constructor(
     public dialogRef: MatDialogRef<NewEntryModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: NewEntryModal) {
+      if (data.listOfEntrys.length < 1) {
+        this.choosenEntry = 0
+        this.isDisabled = true
+      } else {
         this.choosenEntry = data.listOfEntrys[0].id;
+        this.isDisabled = false
+      }
     }
 
     onNoClick(): void {

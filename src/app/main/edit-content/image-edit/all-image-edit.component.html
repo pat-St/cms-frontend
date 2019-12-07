@@ -14,13 +14,28 @@
       <textarea matInput placeholder="Beschreibung" [(ngModel)]="imageExp.description"></textarea>
       </mat-form-field>
       <mat-form-field *ngIf="!isChildComponent()">
-        <input matInput placeholder="Ferienwohnung" [(ngModel)]="imageExp.fk_apartment">
+        <mat-label>Apartment</mat-label>
+        <mat-select [(ngModel)]="imageExp.fk_apartment">
+          <mat-option *ngFor="let apartmentList of allApartmentList" [value]="apartmentList.desc">
+            {{apartmentList.value}}
+          </mat-option>
+        </mat-select>
       </mat-form-field>
       <mat-form-field *ngIf="!isChildComponent()">
-        <input matInput placeholder="Info" [(ngModel)]="imageExp.fk_info">
+        <mat-label>Info Text</mat-label>
+        <mat-select [(ngModel)]="imageExp.fk_info">
+          <mat-option *ngFor="let infoTextList of allInfoTextList" [value]="infoTextList.desc">
+            {{infoTextList.value}}
+          </mat-option>
+        </mat-select>
       </mat-form-field>
       <mat-form-field *ngIf="!isChildComponent()">
-        <input matInput placeholder="Kachel" [(ngModel)]="imageExp.fk_tile">
+        <mat-label>Kacheln</mat-label>
+        <mat-select [(ngModel)]="imageExp.fk_tile">
+          <mat-option *ngFor="let tileList of allTileList" [value]="tileList.desc">
+            {{tileList.value}}
+          </mat-option>
+        </mat-select>
       </mat-form-field>
       <button class="click-button" mat-stroked-button (click)="fileInput.click()">Hochladen</button>
       <input hidden (change)="onFileChanged(imageExp.ID,$event)" #fileInput type="file" id="file">

@@ -89,6 +89,8 @@ export class BackendRequestService {
   public uploadImageFromUser(id: number,image: any) {
     if (this.imageCache.has(id)) {
       this.createImageFromBlob(id, image);
+    } else {
+      this.createImageFromBlob(id, image);
     }
   }
 

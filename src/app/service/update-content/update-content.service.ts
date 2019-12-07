@@ -16,19 +16,20 @@ import { ApartmentContentService } from './apartment-content.service';
   providedIn: 'root'
 })
 export class UpdateContentService {
-  
   newTile: Array<Tile> = new Array();
 
   constructor(
-    private backend: BackendRequestService, 
+    private backend: BackendRequestService,
     private loadContent: LoadContentService,
     private updateApartment: ApartmentContentService,
     private updateImage: ImageContentService,
     private updateInfoText: InfoTextService) { }
 
   public nextIdOf(itemColl: Array<number>): number {
-    if (itemColl.length > 2) { return itemColl.length + 1 }
-    return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1; 
+    if (itemColl.length < 2) { 
+      return itemColl.length
+    }
+    return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1;
   }
 
   async loadNewContent(count= 5) {
@@ -82,12 +83,21 @@ export class UpdateContentService {
     const index = this.newTile.findIndex(el => el.ID === obj.ID);
     if (index > -1) {
       this.newTile[index].deleteEntry = true;
+      // Delete Apartment
       const apartObj = this.updateApartment.newApartment.find(el => el.content.fk_tile === obj.ID)
-      if (apartObj) {this.updateApartment.deleteNextApartment(apartObj);}
+      if (apartObj) {
+        this.updateApartment.deleteNextApartment(apartObj);
+      }
+      // Delete Info Text
       const infoTextObj = this.updateInfoText.newInfoText.filter(el => el.relation.fk_tile === obj.ID)
-      if (infoTextObj.length > 0) {infoTextObj.forEach(el => this.updateInfoText.deleteNextInfoTile(el));}
+      if (infoTextObj.length > 0) {
+        infoTextObj.forEach(el => this.updateInfoText.deleteNextInfoTile(el));
+      }
+      // Delete Images
       const imageObj = this.updateImage.newImage.filter(el => el.fk_tile === obj.ID)
-      if (imageObj.length > 0) {imageObj.forEach(el => this.updateImage.deleteNewImage(el));}
+      if (imageObj.length > 0) {
+        imageObj.forEach(el => this.updateImage.deleteNewImage(el));
+      }
       return true;
     }
     return false;
@@ -97,18 +107,19 @@ export class UpdateContentService {
     return Promise.resolve(
       this.newTile
       .filter(el => el.deleteEntry)
-      .filter(el => this.loadContent.getTile().findIndex(i => i.ID === el.ID) > -1)
+      //.filter(el => this.loadContent.getTile().find(i => i.ID === el.ID))
     )
-    .then((el) => {
+    .then((el) =>
       el.map(i => this.backend.deleteToBackend("tile", i.ID).toPromise())
-    })
+    )
     .catch((err) => {
       console.log("error by send tile delete: " + JSON.stringify(err));
     });
   }
 
   private sendUpdate() {
-    return Promise.resolve(
+    return Promise.resolve(true)
+    .then(() =>
       this.newTile
       .filter(i => !i.deleteEntry)
       .filter(el => this.loadContent.getTile().findIndex(i => i.ID === el.ID) > -1)
@@ -116,22 +127,22 @@ export class UpdateContentService {
          JSON.stringify(el) !== JSON.stringify(this.loadContent.getTile().find(i => i.ID === el.ID))
       )
     )
-    .then((el) => 
-      el.length > 0 ?  this.backend.updateToBackend("tile", el).toPromise(): true
+    .then((el: Tile[]) =>
+      el.length >= 1 ? this.backend.updateToBackend("tile", el).subscribe(() => {}) : true
     )
-    .catch((err) => 
+    .catch((err) =>
       console.log("error by send update tile: " + JSON.stringify(err))
     );
   }
 
   sendNew() {
-    return Promise.resolve(
+    return Promise.resolve(true)
+    .then(() =>
       this.newTile
-      .filter(i => !i.deleteEntry)
-      .filter(el => this.loadContent.getTile().findIndex(i => i.ID === el.ID) < 0)
+      .filter(el => !el.deleteEntry && this.loadContent.getTile().findIndex(i => i.ID === el.ID) < 0)
     )
-    .then((res) =>
-      res.length > 0 ? this.backend.createToBackend("tile", res).toPromise() : true
+    .then((el: Tile[]) =>
+      el.length >= 1 ? this.backend.createToBackend("tile", el).subscribe(() => {}) : true
     )
     .catch((err) =>
       console.log("error by send new tile: " + JSON.stringify(err))

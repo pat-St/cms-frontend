@@ -12,7 +12,9 @@ export class InfoTextService {
   constructor(private backend: BackendRequestService, private loadContent: LoadContentService) { }
 
   public nextIdOf(itemColl: Array<number>): number { 
-    if (itemColl.length > 2) { return itemColl.length + 1 }
+    if (itemColl.length < 2) { 
+      return itemColl.length
+    }
     return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1; }
 
   async loadNewContent(count= 5) {
@@ -79,51 +81,53 @@ export class InfoTextService {
   }
 
   private sendDelete() {
-    Promise.resolve(this.newInfoText.filter(el => el.deleteEntry))
-    .then((res) => {
-      res.map(el => el.relation).forEach((el) => {
-        this.backend.deleteToBackend("info_text_to_tile", el.ID).subscribe((response: boolean) => {});
-      });
-      return res;
-    })
-    .then((res) => {
-      res.map(el => el.infoText).forEach((el) => {
-        this.backend.deleteToBackend("info_text", el.ID).subscribe((response: boolean) => {});
-      });
-      return res;
-    })
+    Promise.resolve(true)
+    .then((res) =>
+      this.newInfoText
+        .filter(el => el.deleteEntry)
+        .map(el => el.relation)
+        .forEach((el) => {
+          this.backend
+            .deleteToBackend("info_text_to_tile", el.ID)
+            .subscribe(() => {})
+        })
+    )
+    .then((res) =>
+      this.newInfoText
+        .filter(el => el.deleteEntry)
+        .map(el => el.infoText)
+        .forEach((el) => {
+          this.backend
+            .deleteToBackend("info_text", el.ID)
+            .subscribe(() => {})
+        })
+    )
     .catch((err) => {
       console.log("error by send infotext updates: " + JSON.stringify(err));
     });
   }
 
   private sendUpdate() {
-    let tmp = this.newInfoText
-      .filter(el => !el.deleteEntry)
-      .map(el => el.infoText);
-    let tmp2 = tmp
-      .filter(el => this.loadContent.getInfoText().findIndex(s => s.ID === el.ID) > -1)
-    let tmp3 = tmp2
-      .filter(el => {
-        console.log(JSON.stringify(el))
-        console.log(JSON.stringify(this.loadContent.getInfoText().find(i => i.ID === el.ID)))
-        return JSON.stringify(el) !== JSON.stringify(this.loadContent.getInfoText().find(i => i.ID === el.ID))
-      })
-    return Promise.resolve(tmp3)
-    .then((res: InfoText[]) => 
-      res.length > 0 ? this.backend.updateToBackend("info_text", res).toPromise() : true
-    )
-    .then(() => 
+    return Promise.resolve(true)
+    .then(() => {
+      const tmp = this.newInfoText
+        .filter(el => !el.deleteEntry)
+        .map(el => el.infoText)
+        .filter(el => this.loadContent.getInfoText().findIndex(s => s.ID === el.ID) > -1)
+        .filter(el =>  JSON.stringify(el) !== JSON.stringify(this.loadContent.getInfoText().find(i => i.ID === el.ID)))
+      return tmp.length > 0 ? this.backend.updateToBackend("info_text", tmp).toPromise() : true
+    })
+    .then(() =>
       this.newInfoText
         .filter(el => !el.deleteEntry)
         .map(el => el.relation)
         .filter(el => this.loadContent.getInfoTextToTile().findIndex(s => s.ID === el.ID) > -1)
         .filter(el => JSON.stringify(el) !== JSON.stringify(this.loadContent.getInfoTextToTile().find(i => i.ID === el.ID)))
     )
-    .then((res: InfoTextToTile[]) => 
+    .then((res: InfoTextToTile[]) =>
       res.length > 0 ? this.backend.updateToBackend("info_text_to_tile", res).toPromise() : true
     )
-    .catch((err) => 
+    .catch((err) =>
       console.log("error by send infotext updates: " + JSON.stringify(err))
     );
   }
@@ -132,21 +136,21 @@ export class InfoTextService {
     return Promise.resolve(
       this.newInfoText
         .filter(el => !el.deleteEntry)
+        .filter(el => this.loadContent.getInfoText().findIndex(s => s.ID === el.infoText.ID) < 0)
         .map(el => el.infoText)
-        .filter(el => this.loadContent.getInfoText().findIndex(s => s.ID === el.ID) < 0)
     )
-    .then((res) =>  
-      res.length > 0 ? this.backend.createToBackend("info_text", res).toPromise() : true
+    .then((res: InfoText[]) =>
+      res.length >= 1 ? this.backend.createToBackend("info_text", res).toPromise() : true
     )
-    .then((_) =>  this.newInfoText
+    .then(() =>  this.newInfoText
       .filter(el => !el.deleteEntry)
       .map(el => el.relation)
       .filter(el => this.loadContent.getInfoTextToTile().findIndex(s => s.ID === el.ID) < 0)
     )
-    .then((res) => 
-      res.length > 0 ? this.backend.createToBackend("info_text_to_tile", res).toPromise() : true
+    .then((res: InfoTextToTile[]) =>
+      res.length >= 1 ? this.backend.createToBackend("info_text_to_tile", res).toPromise() : true
     )
-    .catch((err) => 
+    .catch((err) =>
       console.log("error by send infotext new entities: " + JSON.stringify(err))
     );
   }
@@ -154,7 +158,6 @@ export class InfoTextService {
   public sendChangesToBackend() {
     return Promise.resolve(true)
     .then(() => this.sendUpdate())
-   // .then(() => this.sendNew())
     .then(() => this.sendDelete());
   }
 
