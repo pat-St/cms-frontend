@@ -62,9 +62,6 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.imageExpansionList = this.updateImage.newImage;
-    // this.allTileList =      this.getAllTileList()
-    // this.allApartmentList = this.getAllApartmentList()
-    // this.allInfoTextList =  this.getAllInfoTextList()
   }
 
   ngAfterViewInit(): void {
@@ -85,7 +82,6 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
     let tmp = []
     this.updateContent.newTile
      .forEach(el => tmp.push(new FormSelectModel(el.titleName,el.ID as any)));
-     console.log("Tile Ref " + JSON.stringify(tmp))
     return tmp;
   }
 
@@ -95,7 +91,6 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
     .forEach(el => {
       tmp.push(new FormSelectModel(this.getNameOfTileRef(el.content.fk_tile),el.content.ID as any))
     })
-    console.log("Apartment Ref " + JSON.stringify(tmp))
     return tmp
   }
 
@@ -105,7 +100,6 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
     .forEach(el => {
       tmp.push(new FormSelectModel(el.infoText.headerText,el.infoText.ID as any))
     })
-    console.log("Info Text Ref " + JSON.stringify(tmp))
     return tmp
   }
 
