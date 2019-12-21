@@ -10,10 +10,10 @@ import { User } from 'src/app/model/user';
 })
 export class LoginPageComponent implements OnInit {
 
+  showSpinner = false;
+  username: string;
+  password: string;
   constructor(private loginService: LoginServiceService,private router: Router) { }
-
-username: string;
-password: string;
 
   ngOnInit() {
   }
@@ -26,6 +26,7 @@ password: string;
       alert("Username or Password to short");
       return;
     }
+    this.showSpinner = true;
     this.loginService.login(new User(this.username,this.password))
     .then((res) => {
       if (res){
@@ -37,7 +38,9 @@ password: string;
     .catch((err) => {
       console.log("Error while login: " + JSON.stringify(err));
       alert("Wrong Username or Password");
-    });
+    }).finally(() => {
+      this.showSpinner = false;
+    })
   }
 
 }

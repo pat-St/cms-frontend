@@ -1,3 +1,5 @@
+import { resolve } from 'path';
+import { ImageContentService } from './image-content.service';
 import { ApartmentContent, ApartmentDescription, ApartmentPrice, DetailsToApartment, ApartmentDetails } from './../../model/apartment';
 import { NewApartmentObject } from 'src/app/model/apartment';
 import { InfoTextToTile, InfoText, NewInfoTextToTile } from 'src/app/model/infoText';
@@ -15,7 +17,10 @@ import { filter } from 'minimatch';
 export class ApartmentContentService {
   newApartment: Array<NewApartmentObject> = new Array();
 
-  constructor(private backend: BackendRequestService, private loadContent: LoadContentService) { }
+  constructor(
+    private backend: BackendRequestService, 
+    private loadContent: LoadContentService,
+    private imageContent: ImageContentService) { }
 
   public nextIdOf(itemColl: Array<number>): number { 
     if (itemColl.length < 2) { 
@@ -81,6 +86,7 @@ export class ApartmentContentService {
       obj.description.forEach(element => element.deleteEntry = true);
       obj.price.forEach(element => element.deleteEntry = true);
       obj.detailsToApartment.forEach(element => element.deleteEntry = true);
+      this.imageContent.getImageByFkId(obj.content.ID).forEach(element => this.imageContent.deleteNewImage(element));
       this.newApartment[index] = obj.setDelete();
       return true;
     } else {
@@ -96,59 +102,77 @@ export class ApartmentContentService {
       return false;
     }
   }
-  private sendDelete() {
-    // const deleteDescEntities: ApartmentDescription[] = this.newApartment
-    //   .map(el => el.description.filter(i => i.deleteEntry))
-    //  .reduce((prevColl, currColl) => currColl.concat(prevColl));
-    // const deletePriceEntities: ApartmentPrice[] = this.newApartment
-    //   .map(el => el.price.filter(i => i.deleteEntry))
-    //   .reduce((prevColl, currColl) => currColl.concat(prevColl));
-    // const deleteDetailsRelation: DetailsToApartment[] = this.newApartment
-    //   .map(el => el.detailsToApartment.filter(i => i.deleteEntry))
-    //   .reduce((prevColl, currColl) => currColl.concat(prevColl));
-    // const deleteApartmentEntitites: ApartmentContent[] = this.newApartment
-    //   .filter(i => i.deleteEntry)
-    //   .map(i => i.content);
+  private sendDelete(): Promise<any> {
     return Promise.resolve(true)
     // Details to Apartment
     .then(() =>
       this.newApartment
         .map(el => el.detailsToApartment.filter(i => i.deleteEntry))
     )
-    .then((el) =>
-      el.length > 1 ? el.reduce((prevColl, currColl) => currColl.concat(prevColl)) : el.map(i => i[0])
-    )
-    .then((res) =>
-      res.map( el => 
-        this.backend.deleteToBackend("details_to_apartment", el.ID).toPromise()
-      )
-    )
+    .then((el) => {
+      if (el.length > 1) {
+        return el.reduce((prevColl, currColl) => currColl.concat(prevColl));
+      }
+      if (el.length > 0) {
+        return el.map(i => i[0]);
+      }
+      return [];
+    })
+    .then((res) => {
+      if (res.length > 0) {
+        return Promise.all(res.map( el => 
+          this.backend.deleteToBackend("details_to_apartment", el.ID).toPromise()
+        ))
+      } 
+      return [];
+    })
+    .catch((err) => {
+      console.log("error by send apartment details delete: " + JSON.stringify(err));
+    })
     // Apartment Description
     .then(() =>
       this.newApartment
         .map(el => el.description.filter(i => i.deleteEntry))
     )
-    .then((el) =>
-      el.length > 1 ? el.reduce((prevColl, currColl) => currColl.concat(prevColl)) : el.map(i => i[0])
-    )
+    .then((el) => {
+      if (el.length > 1) {
+        return el.reduce((prevColl, currColl) => currColl.concat(prevColl));
+      }
+      if (el.length > 0) {
+        return el.map(i => i[0]);
+      }
+      return [];
+    })
     .then((res) =>
-      res.map( el => {
-        this.backend.deleteToBackend("apartment_desc", el.ID).toPromise();
-      })
+      res.length > 0 ? Promise.all(res.map( el => 
+          this.backend.deleteToBackend("apartment_desc", el.ID).toPromise()
+      )): []
     )
+    .catch((err) => {
+      console.log("error by send apartment desc delete: " + JSON.stringify(err));
+    })
     // Apartment Price
     .then(() =>
       this.newApartment
         .map(el => el.price.filter(i => i.deleteEntry))
     )
-    .then((el) =>
-      el.length > 1 ? el.reduce((prevColl, currColl) => currColl.concat(prevColl)) : el.map(i => i[0])
-    )
+    .then((el) => {
+      if (el.length > 1) {
+        return el.reduce((prevColl, currColl) => currColl.concat(prevColl));
+      }
+      if (el.length > 0) {
+        return el.map(i => i[0]);
+      }
+      return [];
+    })
     .then((res) =>
-      res.map( el => {
-        this.backend.deleteToBackend("apartment_price", el.ID).toPromise();
-      })
+      res.length > 0 ? Promise.all(res.map( el => 
+        this.backend.deleteToBackend("apartment_price", el.ID).toPromise()
+      )) : []
     )
+    .catch((err) => {
+      console.log("error by send apartment price delete: " + JSON.stringify(err));
+    })
     // Apartment content
     .then(() =>
       this.newApartment
@@ -156,11 +180,13 @@ export class ApartmentContentService {
         .map(i => i.content)
     )
     .then((res) =>
-      res.map( el => {
-        this.backend.deleteToBackend("apartment", el.ID).toPromise();
-      })
-    );
-
+    res.length > 0 ? Promise.all(res.map( el => 
+        this.backend.deleteToBackend("apartment", el.ID).toPromise()
+      )) : []
+    )
+    .catch((err) => {
+      console.log("error by send apartment delete: " + JSON.stringify(err));
+    });
   }
 
   private sendUpdate() {
@@ -269,14 +295,8 @@ export class ApartmentContentService {
 
   public sendChangesToBackend() {
     return Promise.resolve(true)
-    .then(() => 
-      // send update
-      this.sendUpdate()
-    )
-    .then(() => 
-      // send delete
-      this.sendDelete()
-    )
+    .then(() => this.sendUpdate())
+    .then(() => this.sendDelete())
     .catch((err) => {
       console.log("error by trigger apartment: " + JSON.stringify(err));
     })

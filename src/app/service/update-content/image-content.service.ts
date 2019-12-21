@@ -14,7 +14,7 @@ export class ImageContentService {
 
   public nextIdOf(itemColl: Array<number>): number {
     if (itemColl.length < 2) { 
-      return itemColl.length
+      return itemColl.length;
     }
     return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1; }
 
@@ -68,46 +68,39 @@ export class ImageContentService {
       this.newImage[index].changed = true;
       return true;
     }
-    return false; 
+    return false;
   }
 
-  private sendDelete(singleImage: Image = null) {
+  private sendDelete(singleImage: Image = null): Promise<any> {
     const listOfImages = singleImage ? new Array(singleImage) : this.newImage;
-    Promise.resolve(
+    return Promise.resolve(
       listOfImages.filter(el => el.deleteEntry)
     )
-    .then((el) => {
-      return el.map(i => this.backend.deleteToBackend("image", i.ID).toPromise());
-    })
-    .then((el) => {
-      this.newImage.filter( el => el.deleteEntry).forEach( i => {
-        const index = this.newImage.indexOf(i);
-        if (index > -1) {
-          this.newImage.splice(index, 1);
-        }
-      });
-    })
+    .then((el) => 
+      Promise.all(el.map(i => this.backend.deleteToBackend("image", i.ID).toPromise()))
+    )
     .catch((err) => {
       console.log("error by send delete images: " + JSON.stringify(err));
     });
   }
 
-  private sendUpdate(singleImage: Image = null) {
+  private sendUpdate(singleImage: Image = null): Promise<any> {
     const listOfImages = singleImage ? new Array(singleImage) : this.newImage;
-    Promise.resolve(
+    return Promise.resolve(
       listOfImages
       .filter(el => this.loadContent.getImages().findIndex(i => i.ID === el.ID) > -1)
       .filter(el => JSON.stringify(el) !== JSON.stringify(this.loadContent.getImages().find(i => i.ID === el.ID)))
     )
     .then((el) => {
-      el.map(i => {
+      el.forEach(i => {
+        i.description = i.description.replace(" ","_");
         const rawImage = new Array(i.image);
         i.image = new Array();
         this.backend.updateToBackend("image", new Array(i)).toPromise();
 
         //upload Image
         if (i.changed) {
-          const base64Image = this.backend.showImage(i.ID).replace(/data:image\/jpeg;base64,/g, '');
+          const base64Image = this.loadContent.showImage(i.ID).replace(/data:image\/jpeg;base64,/g, '');
           const plainString = window.atob(base64Image);
   
           const arrayBuffer = new ArrayBuffer(plainString.length);
@@ -139,21 +132,22 @@ export class ImageContentService {
       res.length > 0 ? this.backend.createToBackend("image", res).toPromise() : false
     )
     .then((res) => {
-      if (res == false) return false
-      listOfImages
+      if (res === false) {
+        return false;
+      }
+      return listOfImages
         .filter(el => this.loadContent.getImages().findIndex(i => i.ID === el.ID) < 0)
-        .forEach(i => {
-          const base64Image = this.backend.showImage(i.ID).replace(/data:image\/jpeg;base64,/g, '');
+        .map(i => {
+          const base64Image = this.loadContent.showImage(i.ID).replace(/data:image\/jpeg;base64,/g, '');
           const plainString = window.atob(base64Image);
-  
           const arrayBuffer = new ArrayBuffer(plainString.length);
           const int8Array = new Uint8Array(arrayBuffer);
           for (let n = 0; n < plainString.length; n++) {
             int8Array[n] = plainString.charCodeAt(n);
           }
           const fileBlob = new Blob([int8Array], { 'type': 'image/jpeg'})
-          this.backend.updateImageToBackend("image/" + i.ID, fileBlob).toPromise();
-        })
+          return this.backend.updateImageToBackend("image/" + i.ID, fileBlob).toPromise();
+        });
       }
     )
     .catch((err) => 
@@ -163,53 +157,38 @@ export class ImageContentService {
 
   public sendChangesToBackend() {
     return Promise.resolve(true)
-    .then(() => 
-      // send update
-      this.sendUpdate()
-    )
-    .then(() => 
-      // send delete
-      this.sendDelete()
-    );
+    .then(() => this.sendUpdate())
+    .then(() => this.sendDelete());
   }
 
   public sendSpecificChangesToBackend(obj: Image) {
     return Promise.resolve(true)
-    .then(() => 
-      // send update
-      this.sendUpdate(obj)
-    )
-    .then(() => 
-      // send update
-      this.sendNew(obj)
-    )
-    .then(() => 
-      // send delete
-      this.sendDelete(obj)
-    );
+    .then(() => this.sendUpdate(obj))
+    .then(() => this.sendNew(obj))
+    .then(() => this.sendDelete(obj));
   }
 
   public getImageByFkId(apartmentId: number = null, infoId: number = null, tileId: number = null): Image[] {
-    if (apartmentId) {
+    if (apartmentId !== null) {
       return this.newImage.filter( eachObject => eachObject.fk_apartment === apartmentId);
     }
-    if (infoId) {
+    if (infoId !== null) {
       return this.newImage.filter( eachObject => eachObject.fk_info === infoId);
     }
-    if (tileId) {
+    if (tileId !== null) {
       return this.newImage.filter( eachObject => eachObject.fk_tile === tileId);
     }
     return null;
   }
 
   public hasImageByFkId(apartmentId: number = null, infoId: number = null, tileId: number = null): boolean {
-    if (apartmentId) {
+    if (apartmentId !== null) {
       return this.newImage.map( element => element.fk_apartment).includes(apartmentId);
     }
-    if (infoId) {
+    if (infoId !== null) {
       return this.newImage.map( element => element.fk_info).includes(infoId);
     }
-    if (tileId) {
+    if (tileId !== null) {
       return this.newImage.map( element => element.fk_tile).includes(tileId);
     }
     return false;

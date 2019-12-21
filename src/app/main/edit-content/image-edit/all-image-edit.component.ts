@@ -1,3 +1,5 @@
+import { NewInfoTextToTile } from './../../../model/infoText';
+import { NewApartmentObject } from './../../../model/apartment';
 import { FormSelectModel } from './../../../model/tileEdit/tileEdit';
 import { NewEntryModalComponent } from './../../image-preview-modal/new-entry-modal.component';
 import { NewEntryObject } from 'src/app/model/infoText';
@@ -15,6 +17,7 @@ import { element } from 'protractor';
 import { UpdateContentService } from 'src/app/service/update-content/update-content.service';
 import { TouchSequence } from 'selenium-webdriver';
 import { ApartmentContentService } from 'src/app/service/update-content/apartment-content.service';
+import { Tile } from 'src/app/model/tile';
 
 @Component({
   selector: 'app-all-image-edit',
@@ -25,9 +28,9 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
 
   imageExpansionList: Array<Image> = new Array();
 
-  allTileList: Array<FormSelectModel>      = this.getAllTileList()
-  allApartmentList: Array<FormSelectModel> = this.getAllApartmentList() 
-  allInfoTextList: Array<FormSelectModel>  = this.getAllInfoTextList() 
+  apartmentContentList: Array<NewApartmentObject>;
+  tileContentList: Array<Tile>;
+  infoTextContextList: Array<NewInfoTextToTile>;
 
   @ViewChild('autosize', {static: false}) autosize: CdkTextareaAutosize;
   @Input() apartmentID: number = null;
@@ -40,9 +43,10 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
     private updateInfoText: InfoTextService,
     private updateContent: UpdateContentService,
     private updateApartment: ApartmentContentService,
-    private backend: BackendRequestService,
+    private loadBackend: LoadContentService,
     private entryDialog: MatDialog,
-    private _ngZone: NgZone, public dialog: MatDialog) { }
+    private _ngZone: NgZone,
+    public dialog: MatDialog) { }
 
   openDialog(imageObj: Image): void {
     const dialogRef = this.dialog.open(ImagePreviewModalComponent, {
@@ -62,45 +66,109 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.imageExpansionList = this.updateImage.newImage;
+    this.apartmentContentList = this.updateApartment.newApartment;
+    this.tileContentList = this.updateContent.newTile;
+    this.infoTextContextList = this.updateInfoText.newInfoText;
   }
 
-  ngAfterViewInit(): void {
-  }
+  ngAfterViewInit(): void { }
 
   onFileChanged(id: number,event) {
-    this.backend.uploadImageFromUser(id,event.target.files[0]);
+    this.loadBackend.uploadImageFromUser(id,event.target.files[0]);
     const changedObj = this.imageExpansionList.find(el => el.ID === id)
     this.updateImage.updateNewImage(changedObj)
   }
 
   private getNameOfTileRef(id: number): string {
     const listOf = this.updateContent.newTile.filter(el => el.ID === id).map(i => i.titleName)
-    return listOf.length < 1 ? "NaN" : listOf[0]
+    return listOf.length < 1 ? null : listOf[0];
   }
 
-  private getAllTileList(): FormSelectModel[] {
-    let tmp = []
-    this.updateContent.newTile
-     .forEach(el => tmp.push(new FormSelectModel(el.titleName,el.ID as any)));
-    return tmp;
+  getInfoTextName(id: number): string {
+    if (id === null) {
+      return "";
+    }
+    return this.infoTextContextList.filter(el => el.infoText.ID === id).map(el => el.infoText.headerText)[0]
   }
 
-  private getAllApartmentList(): FormSelectModel[] {
-    let tmp = []
-    this.updateApartment.newApartment
-    .forEach(el => {
-      tmp.push(new FormSelectModel(this.getNameOfTileRef(el.content.fk_tile),el.content.ID as any))
-    })
-    return tmp
+  getTileName(id: number): string {
+    if (id === null) {
+      return "";
+    }
+    return this.tileContentList.filter(el => el.ID === id).map(el => el.titleName)[0]
   }
 
-  private getAllInfoTextList(): FormSelectModel[] {
-    let tmp = []
-    this.updateInfoText.newInfoText
-    .forEach(el => {
-      tmp.push(new FormSelectModel(el.infoText.headerText,el.infoText.ID as any))
-    })
-    return tmp
+  getApartmentName(id: number): string {
+    if (id === null) {
+      return "";
+    }
+    return this.apartmentContentList
+      .filter(el => el.content.ID === id)
+      .map(el => this.getNameOfTileRef(el.content.fk_tile))[0]
+  }
+
+  changeInfoText(obj: Image) {
+    const tileRef = this.infoTextContextList
+      .map(el => new NewEntryObject(el.infoText.ID as number, el.infoText.headerText));
+    tileRef.push(new NewEntryObject(-1 as number, ""))
+    this.entryDialog.open(NewEntryModalComponent, {
+      maxWidth: '50vw',
+      maxHeight: '50vh',
+      data:  {metaInfo: 'Info Text Bild', listOfEntrys: tileRef}
+    }).afterClosed().subscribe(
+      (i) => {
+        const index = this.imageExpansionList.findIndex(el => el.ID === obj.ID)
+        if (i != null && i < 0) {
+          this.imageExpansionList[index].fk_info = null;
+        } 
+        if (i > -1) {
+          this.imageExpansionList[index].fk_info = i
+        }
+      }
+    )
+  }
+
+
+  changeTile(obj: Image) {
+    const tileRef = this.tileContentList
+      .map(el => new NewEntryObject(el.ID as number, el.titleName));
+    tileRef.push(new NewEntryObject(-1 as number, ""))
+    this.entryDialog.open(NewEntryModalComponent, {
+      maxWidth: '50vw',
+      maxHeight: '50vh',
+      data:  {metaInfo: 'Kachel Bild', listOfEntrys: tileRef}
+    }).afterClosed().subscribe(
+      (i) => {
+        const index = this.imageExpansionList.findIndex(el => el.ID === obj.ID)
+        if (i != null && i < 0) {
+          this.imageExpansionList[index].fk_tile = null
+        } 
+        if (i > -1) {
+          this.imageExpansionList[index].fk_tile = i
+        }
+      }
+    )
+  }
+
+  changeApartment(obj: Image) {
+    const tileRef = this.apartmentContentList
+      .map(el => new NewEntryObject(el.content.ID as number, this.getNameOfTileRef(el.content.fk_tile)));
+    tileRef.push(new NewEntryObject(-1 as number, ""))
+    this.entryDialog.open(NewEntryModalComponent, {
+      maxWidth: '50vw',
+      maxHeight: '50vh',
+      data:  {metaInfo: 'Ferienwohnung Bild', listOfEntrys: tileRef}
+    }).afterClosed().subscribe(
+      (i) => {
+        const index = this.imageExpansionList.findIndex(el => el.ID === obj.ID)
+        if (i != null && i < 0) {
+          this.imageExpansionList[index].fk_apartment = null
+        }
+        if (i > -1) {
+          this.imageExpansionList[index].fk_apartment = i;
+        }
+      }
+    )
   }
 
   addNewEntry() {
@@ -117,7 +185,8 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
     )
     .then((res: number) => {
       if (res === 0) {
-        const tileRef = this.getAllTileList().map(el => new NewEntryObject(el.desc,el.value))
+        const tileRef = this.tileContentList
+        .map(el => new NewEntryObject(el.ID as number, el.titleName));
         this.entryDialog.open(NewEntryModalComponent, {
           maxWidth: '50vw',
           maxHeight: '50vh',
@@ -131,7 +200,8 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
         )
       }
       if (res === 1) {
-        const apartRef = this.getAllApartmentList().map(el => new NewEntryObject(el.desc,el.value))
+        const apartRef = this.apartmentContentList
+        .map(el => new NewEntryObject(el.content.ID as number, this.getNameOfTileRef(el.content.fk_tile)));
         this.entryDialog.open(NewEntryModalComponent, {
           maxWidth: '50vw',
           maxHeight: '50vh',
@@ -145,7 +215,8 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
         )
       }
       if (res === 2) {
-        const infoTileRef = this.getAllInfoTextList().map(el => new NewEntryObject(el.desc,el.value))
+        const infoTileRef = this.infoTextContextList
+        .map(el => new NewEntryObject(el.infoText.ID as number, el.infoText.headerText));
         this.entryDialog.open(NewEntryModalComponent, {
           maxWidth: '50vw',
           maxHeight: '50vh',
@@ -177,13 +248,13 @@ export class AllImageEditComponent implements OnInit, AfterViewInit {
    */
   filterView(imComp: Image) {
     if (this.apartmentID != null) {
-      return imComp.fk_apartment === this.apartmentID
+      return imComp.fk_apartment === this.apartmentID;
     }
     if (this.infoTextID != null) {
-      return imComp.fk_info === this.infoTextID
+      return imComp.fk_info === this.infoTextID;
     }
     if (this.tileID != null) {
-      return imComp.fk_tile === this.tileID
+      return imComp.fk_tile === this.tileID;
     }
     return !imComp.deleteEntry;
   }

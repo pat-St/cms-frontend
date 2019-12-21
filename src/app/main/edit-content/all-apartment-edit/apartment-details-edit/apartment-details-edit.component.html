@@ -8,9 +8,9 @@
         Füge eine neuen Beschreibungen hinzu
       </mat-panel-description>
     </mat-expansion-panel-header>
+    <mat-divider class="tile-div"></mat-divider>
     <ng-template ngFor let-descExp [ngForOf]="apartmentDescList">
       <div *ngIf="!descExp.deleteEntry">
-        <mat-divider class="tile-div"></mat-divider>
         <mat-form-field>
           <input matInput placeholder="Beschreibung" [(ngModel)]="descExp.description">
         </mat-form-field>
@@ -36,9 +36,9 @@
         Füge neue Details hinzu
       </mat-panel-description>
     </mat-expansion-panel-header>
+    <mat-divider class="tile-div"></mat-divider>
     <ng-template ngFor let-detailsExp [ngForOf]="detailsRelation">
       <div *ngIf="!detailsExp.deleteEntry">
-        <mat-divider class="tile-div"></mat-divider>
         <mat-form-field>
           <mat-label>Ausstattungen</mat-label>
           <mat-select [(ngModel)]="detailsExp.fk_details">
@@ -66,9 +66,9 @@
         Füge neue Preise hinzu
       </mat-panel-description>
     </mat-expansion-panel-header>
+    <mat-divider class="tile-div"></mat-divider>
     <ng-template ngFor let-priceExp [ngForOf]="apartmentPriceList">
-      <div *ngIf="!priceExp.deleteEntry">
-        <mat-divider class="tile-div"></mat-divider>
+      <div *ngIf="!priceExp.deleteEntry">        
         <mat-form-field>
           <input matInput placeholder="Personen" [(ngModel)]="priceExp.personCount">
         </mat-form-field>
@@ -81,7 +81,7 @@
         <mat-form-field>
           <input matInput placeholder="Nächte" [(ngModel)]="priceExp.nights">
         </mat-form-field>
-        <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" >save</button>
+        <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" [disabled]="true">save</button>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="removePriceEntry(priceExp)">remove_circle</button>
       </div>
     </ng-template>

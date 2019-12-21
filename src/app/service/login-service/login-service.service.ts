@@ -1,3 +1,4 @@
+import { environment } from './../../../environments/environment.prod';
 import { User, Token } from './../../model/user';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -8,22 +9,29 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class LoginServiceService {
-  header: HttpHeaders;
-  hostUrl = "http://localhost:8000/user/";
+  header = new HttpHeaders({
+    'Authorization': 'Basic ',
+  });
+  hostUrl: string;
 
   isLogin = false;
 
   constructor(private httpClient: HttpClient) {
-    this.header = new HttpHeaders({
-      'Authorization': 'Basic ',
-    });
+    this.hostUrl = environment.hostUrl + 'user/';
+  }
+
+  getHeader() {
+    const checkToken = JSON.parse(localStorage.getItem('token')) as any;
+    if (checkToken !== null) {
+      const token = checkToken as Token;
+      return this.header.append('apikey', token.token);
+    }
+    return this.header;
   }
 
   login(user: User): Promise<boolean> {
     const userauth = 'Basic ' + window.btoa(user.getUser()[0] + ':' + user.getUser()[1]);
-    const newHeader = new HttpHeaders({
-      'Authorization': userauth,
-    });
+    const newHeader = new HttpHeaders({'Authorization': userauth});
     return new Promise((resolve, reject) => {
       this.sendLoginToBackend("login", newHeader).subscribe(
         (result: any) => {
@@ -37,8 +45,7 @@ export class LoginServiceService {
           }
         },
         (error) => {
-          console.log("login error " + JSON.stringify(error));
-          return reject(false);
+          return reject("login error " + JSON.stringify(error));
         }
       );
     });
@@ -51,20 +58,22 @@ export class LoginServiceService {
     }
     return new Promise((resolve, reject) => {
       this.sendLogoutToBackend("logout/"+ user).subscribe(
-      (result: boolean) => {
-      if (result) {
-        return resolve(true);
-      }
-    },
-    (error) => {
-      console.log("login error " + JSON.stringify(error));
-      return reject(false);
+        (result: boolean) => {
+          if (result) {
+            return resolve(true);
+          }
+        },
+        (error) => {
+          console.log("login error " + JSON.stringify(error));
+          return reject(false);
+        }
+      );
+    })
+    .then((res) => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      localStorage.clear();
     });
-  }).then((res) => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.clear();
-  });
   }
 
   private sendLoginToBackend(path: string, authheader: HttpHeaders): Observable<any> {
@@ -75,17 +84,7 @@ export class LoginServiceService {
     return this.httpClient.get<boolean>(this.hostUrl + path, {headers: this.header});
   }
 
-  // testMock(): Observable<boolean> {
-  //   const checkToken = JSON.parse(localStorage.getItem('token')) as any;
-  //   if (checkToken !== null) {
-  //     const token = checkToken as Token;
-  //     const newHeader = new HttpHeaders({
-  //       'apikey': token.token,
-  //     });
-  //     return this.httpClient.get<boolean>(this.hostUrl + "mock", {headers: newHeader});
-  //   } else {
-  //     return null;
-  //   }
-  // }
-
+  public testToken(): Observable<any> {
+    return this.httpClient.get<any>(this.hostUrl, {headers: this.getHeader()});
+  }
 }

@@ -1,3 +1,4 @@
+import { ImageContentService } from './image-content.service';
 import { InfoTextToTile, InfoText, NewInfoTextToTile } from 'src/app/model/infoText';
 import { LoadContentService } from './../load-content/load-content.service';
 import { BackendRequestService } from './../backend-request/backend-request.service';
@@ -9,7 +10,10 @@ import { Injectable } from '@angular/core';
 export class InfoTextService {
   newInfoText: Array<NewInfoTextToTile> = new Array();
 
-  constructor(private backend: BackendRequestService, private loadContent: LoadContentService) { }
+  constructor(
+    private backend: BackendRequestService, 
+    private loadContent: LoadContentService,
+    private imageContent: ImageContentService) { }
 
   public nextIdOf(itemColl: Array<number>): number { 
     if (itemColl.length < 2) { 
@@ -41,7 +45,7 @@ export class InfoTextService {
     relation.forEach(el => {
       const infoTileEntry = Object.assign({}, entryInfo.find(obj => obj.ID === el.ID));
       if (infoTileEntry) {
-        const newInftoTile = new NewInfoTextToTile(infoTileEntry, el);
+        const newInftoTile = new NewInfoTextToTile(infoTileEntry, Object.assign({},el));
         this.updateNextInfoTile(newInftoTile);
       }
     });
@@ -67,6 +71,9 @@ export class InfoTextService {
   public deleteNextInfoTile(entryObj: NewInfoTextToTile) {
     const foundIndex = this.newInfoText.findIndex(el => el === entryObj);
     if (foundIndex >= 0) {
+      this.imageContent
+        .getImageByFkId(null, entryObj.infoText.ID, null)
+        .forEach(element => this.imageContent.deleteNewImage(element));
       this.newInfoText[foundIndex].deleteEntry = true;
     }
   }
@@ -80,27 +87,23 @@ export class InfoTextService {
     }
   }
 
-  private sendDelete() {
-    Promise.resolve(true)
+  private sendDelete(): Promise<any> {
+    return Promise.resolve(true)
     .then((res) =>
       this.newInfoText
         .filter(el => el.deleteEntry)
         .map(el => el.relation)
-        .forEach((el) => {
-          this.backend
-            .deleteToBackend("info_text_to_tile", el.ID)
-            .subscribe(() => {})
-        })
+    )
+    .then((res) => 
+      Promise.all(res.map((el) => this.backend.deleteToBackend("info_text_to_tile", el.ID).toPromise()))
     )
     .then((res) =>
       this.newInfoText
         .filter(el => el.deleteEntry)
         .map(el => el.infoText)
-        .forEach((el) => {
-          this.backend
-            .deleteToBackend("info_text", el.ID)
-            .subscribe(() => {})
-        })
+    )
+    .then((res) => 
+      Promise.all(res.map((el) => this.backend.deleteToBackend("info_text", el.ID).toPromise()))
     )
     .catch((err) => {
       console.log("error by send infotext updates: " + JSON.stringify(err));
@@ -114,21 +117,24 @@ export class InfoTextService {
         .filter(el => !el.deleteEntry)
         .map(el => el.infoText)
         .filter(el => this.loadContent.getInfoText().findIndex(s => s.ID === el.ID) > -1)
-        .filter(el =>  JSON.stringify(el) !== JSON.stringify(this.loadContent.getInfoText().find(i => i.ID === el.ID)))
+        .filter(el =>  this.isDiffInfoTextToTile(el, this.loadContent.getInfoText().find(i => i.ID === el.ID)))
       return tmp.length > 0 ? this.backend.updateToBackend("info_text", tmp).toPromise() : true
     })
+    .catch((err) =>
+      console.log("error by send infotext updates: " + JSON.stringify(err))
+    )
     .then(() =>
       this.newInfoText
         .filter(el => !el.deleteEntry)
         .map(el => el.relation)
         .filter(el => this.loadContent.getInfoTextToTile().findIndex(s => s.ID === el.ID) > -1)
-        .filter(el => JSON.stringify(el) !== JSON.stringify(this.loadContent.getInfoTextToTile().find(i => i.ID === el.ID)))
+        .filter(el => this.isDiffInfoTextToTileRef(el, this.loadContent.getInfoTextToTile().find(i => i.ID === el.ID)))
     )
     .then((res: InfoTextToTile[]) =>
       res.length > 0 ? this.backend.updateToBackend("info_text_to_tile", res).toPromise() : true
     )
     .catch((err) =>
-      console.log("error by send infotext updates: " + JSON.stringify(err))
+      console.log("error by send infotext to tile updates: " + JSON.stringify(err))
     );
   }
 
@@ -181,5 +187,37 @@ export class InfoTextService {
       this.backend.deleteToBackend("info_text_to_tile", objs.relation.ID).subscribe((response: boolean) => {});
       this.backend.deleteToBackend("info_text", objs.infoText.ID).subscribe((response: boolean) => {});
     }
+  }
+
+  isDiffInfoTextToTile(obj1: InfoText, obj2: InfoText) {
+    if (obj1.ID !== obj2.ID) {
+      return false;
+    }
+    if (obj1.contentText !== obj2.contentText) {
+      return true;
+    }
+    if (obj1.headerText !== obj2.headerText) {
+      return true;
+    }
+    if (obj1.link !== obj2.link) {
+      return true;
+    }
+    return false;
+  }
+
+  isDiffInfoTextToTileRef(obj1: InfoTextToTile, obj2: InfoTextToTile) {
+    if (obj1.ID !== obj2.ID) {
+      return false;
+    }
+    if (obj1.changed !== obj2.changed) {
+      return true;
+    }
+    if ((obj1.fk_info - obj2.fk_info) !== 0) {
+      return true;
+    }
+    if ((obj1.fk_tile - obj2.fk_tile) !== 0) {
+      return true;
+    }
+    return false;
   }
 }

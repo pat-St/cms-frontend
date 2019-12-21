@@ -96,10 +96,10 @@ export class TileEditComponent implements OnInit, AfterViewInit {
     const tileType = this.kachelTypeSelected.map(el => new NewEntryObject(el.desc as number, el.value));
     const tileModal = this.modalTypeSelected.map(el => new NewEntryObject(el.desc as number, el.value));
     const tileSize = this.kachelSizeSelected.map(el => new NewEntryObject(el.desc as number, el.value));
-    let choosedTileType : number;
-    let choosedTileModal : number;
-    let choosedTileSize : number;
-    new Promise((resolve, reject) => {
+    let choosedTileType: number;
+    let choosedTileModal: number;
+    let choosedTileSize: number;
+    new Promise((resolve) => {
       resolve("ok");
     })
     .then((res) => 

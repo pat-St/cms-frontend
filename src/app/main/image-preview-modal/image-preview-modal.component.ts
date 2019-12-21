@@ -1,4 +1,4 @@
-import { BackendRequestService } from './../../service/backend-request/backend-request.service';
+import { LoadContentService } from './../../service/load-content/load-content.service';
 import { Image } from 'src/app/model/image';
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
@@ -30,15 +30,15 @@ export interface PreviewImage {
 export class ImagePreviewModalComponent {
 
   constructor(
-    private backend: BackendRequestService,
     public dialogRef: MatDialogRef<ImagePreviewModalComponent>,
+    private loadBackend: LoadContentService,
     @Inject(MAT_DIALOG_DATA) public data: PreviewImage) {}
 
   onNoClick(): void {
     this.dialogRef.close();
   }
   getImage() {
-    return this.backend.showImage(this.data.image.ID);
+    return this.loadBackend.showImage(this.data.image.ID);
   }
 
 }

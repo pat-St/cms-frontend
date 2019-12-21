@@ -9,9 +9,9 @@ const routes: Routes = [
     path: 'main',
     component: MainComponent,
     children: [
-        { path: 'dashboard', component: DashboardComponent, outlet: 'nav' },
+        { path: '', component: DashboardComponent, outlet: 'nav' },
         { path: 'tile', component: EditContentComponent, outlet: 'nav', },
-        // { path: '', redirectTo: 'dashboard', pathMatch: 'full'}
+        { path: 'dashboard', component: DashboardComponent, outlet: 'nav' },
     ]
   },
   {path: '', redirectTo: 'main', pathMatch: 'full'}

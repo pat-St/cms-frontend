@@ -7,10 +7,10 @@
     Verändere und füge neue Kacheln hinzu
     </mat-panel-description>
   </mat-expansion-panel-header>
+  <mat-divider class="tile-div"></mat-divider>
   <div *ngIf="kachelExpansionList.length > 0">
   <ng-template ngFor let-kachelExp [ngForOf]="kachelExpansionList" matExpansionPanelContent>
-    <div *ngIf="!kachelExp.deleteEntry">
-      <mat-divider class="tile-div"></mat-divider>
+    <div *ngIf="!kachelExp.deleteEntry">      
       <mat-form-field>
           <input matInput placeholder="Name" [(ngModel)]="kachelExp.titleName">
         </mat-form-field>
@@ -41,16 +41,22 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
-        <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" (click)="saveEntry(kachelExp)">save</button>
+        <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" [disabled]="true" (click)="saveEntry(kachelExp)">save</button>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="removeEntry(kachelExp)">remove_circle</button>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="showTileDetails(kachelExp.ID)">
           {{isTileDetailsActive(kachelExp.ID)? 'expand_less':'expand_more'}}</button>
-        <app-all-image-edit *ngIf="hasImage(kachelExp.ID) && isTileDetailsActive(kachelExp.ID)" [tileID]="kachelExp.ID"></app-all-image-edit>
-        <div *ngIf="isTileDetailsActive(kachelExp.ID)" class="tile-div"></div>
-        <app-all-info-text-edit *ngIf="kachelExp.modalType==2 && isTileDetailsActive(kachelExp.ID)" [tileID]="kachelExp.ID"></app-all-info-text-edit>
-        <div *ngIf="kachelExp.modalType==2 && isTileDetailsActive(kachelExp.ID)" class="tile-div"></div>
-        <app-all-apartment-edit *ngIf="kachelExp.modalType==0 && isTileDetailsActive(kachelExp.ID)" [tileID]="kachelExp.ID"></app-all-apartment-edit>
-        <div *ngIf="kachelExp.modalType==0 && isTileDetailsActive(kachelExp.ID)" class="tile-div"></div>
+        <div *ngIf="hasImage(kachelExp.ID) && isTileDetailsActive(kachelExp.ID)" >
+            <app-all-image-edit [tileID]="kachelExp.ID"></app-all-image-edit>
+            <div class="tile-div"></div>
+        </div>
+        <div *ngIf="kachelExp.modalType==2 && isTileDetailsActive(kachelExp.ID)">
+          <app-all-info-text-edit  [tileID]="kachelExp.ID"></app-all-info-text-edit>
+          <div class="tile-div"></div>
+        </div>
+        <div *ngIf="kachelExp.modalType==0 && isTileDetailsActive(kachelExp.ID)">
+          <app-all-apartment-edit  [tileID]="kachelExp.ID"></app-all-apartment-edit>
+          <div class="tile-div"></div>
+        </div>
       </div>
     </ng-template>        
     <mat-divider class="tile-div"></mat-divider>

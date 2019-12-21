@@ -8,7 +8,6 @@
 <div class="spinner-container" *ngIf="!isFinished()">
     <mat-progress-spinner class="spinner-view" mode="determinate" [value]="getSpinnerValue()"></mat-progress-spinner>
 </div>
-
 <mat-accordion *ngIf="isFinished()" multi="true">
     <app-tile-edit></app-tile-edit>
     <app-all-image-edit></app-all-image-edit>

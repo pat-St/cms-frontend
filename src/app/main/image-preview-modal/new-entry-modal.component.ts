@@ -42,14 +42,13 @@ export interface NewEntryModal {
 })
 export class NewEntryModalComponent {
 
-choosenEntry: number;
+choosenEntry: number = null;
 isDisabled = false
 
   constructor(
     public dialogRef: MatDialogRef<NewEntryModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: NewEntryModal) {
       if (data.listOfEntrys.length < 1) {
-        this.choosenEntry = 0
         this.isDisabled = true
       } else {
         this.choosenEntry = data.listOfEntrys[0].id;

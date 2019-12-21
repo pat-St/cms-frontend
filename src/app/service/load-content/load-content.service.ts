@@ -25,6 +25,8 @@ export class LoadContentService {
   apartmentDetails: ApartmentDetails[];
   apartmentPrice: ApartmentPrice[];
   imageObject: Image[];
+  imageCache: Map<number, string>;
+
   imageCounter = 0;
   finishCounter = 0;
   maxCounter = 9;
@@ -42,6 +44,7 @@ export class LoadContentService {
     this.apartmentDetails = null;
     this.apartmentPrice = null;
     this.imageObject = null;
+    this.imageCache = new Map();
     this.imageCounter = 0;
     this.apartmentCounter = 0;
     this.finishCounter = 0;
@@ -115,7 +118,7 @@ export class LoadContentService {
       .subscribe((payload: ApartmentContent[]) => {
         this.apartmentContent = payload;
         this.incrementCounter();
-        this.apartmentCounter+=1;
+        this.apartmentCounter += 1;
       });
   }
 
@@ -129,7 +132,7 @@ export class LoadContentService {
       .subscribe((payload: ApartmentDescription[]) => {
         this.apartmentDescription = payload;
         this.incrementCounter();
-        this.apartmentCounter+=1;
+        this.apartmentCounter += 1;
       });
   }
 
@@ -143,7 +146,7 @@ export class LoadContentService {
       .subscribe((payload: DetailsToApartment[]) => {
         this.detailsToApartment = payload;
         this.incrementCounter();
-        this.apartmentCounter+=1;
+        this.apartmentCounter += 1;
       });
   }
 
@@ -157,7 +160,7 @@ export class LoadContentService {
       .subscribe((payload: ApartmentDetails[]) => {
         this.apartmentDetails = payload;
         this.incrementCounter();
-        this.apartmentCounter+=1;
+        this.apartmentCounter += 1;
       });
   }
 
@@ -171,7 +174,7 @@ export class LoadContentService {
       .subscribe((payload: ApartmentPrice[]) => {
         this.apartmentPrice = payload;
         this.incrementCounter();
-        this.apartmentCounter+=1;
+        this.apartmentCounter += 1;
       });
   }
 
@@ -185,13 +188,15 @@ export class LoadContentService {
         this.imageCounter = payloadList.length;
         if (payloadList.length === 0) {
           this.imageObject = new Array();
+          this.imageCache = new Map();
           this.incrementCounter();
         } else {
           payloadList.forEach( (id, index) => {
             this.imageObject = new Array();
             this.backend.getFromBackend("image/id/" + id).subscribe(
               (imageObj: Image) => {
-                this.backend.loadImage(imageObj.description, imageObj.ID);
+                imageObj.description = this.convertImageDesc(imageObj.description);
+                this.loadBackendImage(imageObj.ID);
                 this.imageObject.push(imageObj);
                 if ((index + 1) === this.imageCounter) {
                   this.incrementCounter();
@@ -202,8 +207,58 @@ export class LoadContentService {
     });
   }
 
+  convertImageDesc(old: string): string {
+    return old.replace('_', '');
+  }
+
   getImages(): Image[] {
     return this.imageObject;
+  }
+
+  public fetchImageFromCache(desc: number) {
+    return new Promise((resolve, reject) => {
+      if (!this.imageCache.has(desc)) {
+        setTimeout(() => {
+          resolve(null);
+        }, 1000);
+      } else {
+        resolve(this.imageCache.get(desc));
+      }
+    });
+  }
+
+  private async loadBackendImage(id: number) {
+    this.backend.getBinaryFromBackend('image/binary/' + id).subscribe(
+      (val: Blob) => {
+        this.createImageFromBlob(id, val);
+      },
+      response => {
+        console.log('Image Error', response);
+      },
+      () => { }
+    );
+  }
+
+  private async createImageFromBlob(idOfImage: number, image: Blob) {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      this.imageCache.set(idOfImage, reader.result.toString());
+    }, false);
+    if (image) {
+      reader.readAsDataURL(image);
+    }
+  }
+
+  public uploadImageFromUser(id: number, image: any) {
+    if (this.imageCache.has(id)) {
+      this.createImageFromBlob(id, image);
+    } else {
+      this.createImageFromBlob(id, image);
+    }
+  }
+
+  public showImage(id: number): string {
+    return this.imageCache.has(id) ? this.imageCache.get(id) : '';
   }
 
   getCounter() {

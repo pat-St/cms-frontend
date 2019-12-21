@@ -58,12 +58,12 @@ export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
         console.log("no response")
         return;
       }
-      if (currEntry) {
+      if (currEntry != null) {
         const indexElement = this.newInfoTextList.findIndex(compE => compE === currEntry);
         if (indexElement >= 0) {
-          const newEntry = this.newInfoTextList[indexElement];
-          newEntry.relation.fk_tile = result;
-          this.newInfoTextList[indexElement] = newEntry;
+          // const newEntry = this.newInfoTextList[indexElement];
+          // newEntry.relation.fk_tile = result;
+          this.newInfoTextList[indexElement].relation.fk_tile = result;
         }
       } else {
         this.addNewInfoTextToTile(result);

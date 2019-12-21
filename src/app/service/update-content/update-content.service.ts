@@ -169,12 +169,6 @@ export class UpdateContentService {
       .then((el) => 
           this.backend.deleteToBackend("tile", el.ID).toPromise()
       )
-      .then((el) => {
-        const index = this.newTile.findIndex(item => item.ID === obj.ID);
-        if (index > -1) {
-          this.newTile.splice(index, 1);
-        }
-      })
       .catch((err) => {
         console.log("error by send tile delete entities: " + JSON.stringify(err));
       });
