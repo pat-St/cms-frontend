@@ -66,7 +66,7 @@ export class ApartmentDetailsEditComponent implements OnInit, AfterViewInit, Aft
 
   addNewPriceEntry() {
     const newID = this.updateApartment.nextIdOf(this.updateApartment.getAllPriceID());
-    const newEntry: ApartmentPrice = new ApartmentPrice(newID, "", "", "", this.apartmentID);
+    const newEntry: ApartmentPrice = new ApartmentPrice(newID, "", "", "", "", this.apartmentID);
     this.apartmentPriceList.push(newEntry);
   }
 

@@ -45,7 +45,7 @@ export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void { }
 
   addNewEntry(currEntry: NewInfoTextToTile = null) {
-    const tileRef = this.updateContent.newTile.filter(el => el.modalType === 2).map(el => new NewEntryObject(el.ID, el.titleName));
+    const tileRef = this.tileExpantionList.filter(el => el.modalType === 2).map(el => new NewEntryObject(el.ID, el.titleName));
     const dialogRef = this.entryDialog.open(NewEntryModalComponent, {
       maxWidth: '50vw',
       maxHeight: '50vh',
@@ -54,15 +54,16 @@ export class AllInfoTextEditComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe((result: number) => {
       console.log('The dialog was closed');
-      if (!result) {
+      if (result == null) {
+        console.log("no response")
         return;
       }
-      if (currEntry) {
+      if (currEntry != null) {
         const indexElement = this.newInfoTextList.findIndex(compE => compE === currEntry);
         if (indexElement >= 0) {
-          const newEntry = this.newInfoTextList[indexElement];
-          newEntry.relation.fk_tile = result;
-          this.newInfoTextList[indexElement] = newEntry;
+          // const newEntry = this.newInfoTextList[indexElement];
+          // newEntry.relation.fk_tile = result;
+          this.newInfoTextList[indexElement].relation.fk_tile = result;
         }
       } else {
         this.addNewInfoTextToTile(result);

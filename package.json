@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "s": "ng serve",
+    "start": "ng serve --host $(ip addr show enp0s20f0u5u2 | grep inet | head -1 | cut -d' ' -f6 | cut -d'/' -f1) --port 8080 --disable-host-check",
+    "build": "ng build --prod --verbose --progress",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
@@ -52,6 +53,6 @@
     "protractor": "5.4.2",
     "ts-node": "8.5.2",
     "tslint": "5.20.1",
-    "typescript": "<3.6.0"
+    "typescript": "~<3.6.0"
   }
 }

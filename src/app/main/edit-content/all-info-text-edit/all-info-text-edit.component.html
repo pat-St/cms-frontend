@@ -7,9 +7,9 @@
         Füge eine neuen Info-Text hinzu
     </mat-panel-description>
     </mat-expansion-panel-header>
+    <mat-divider class="tile-div"></mat-divider>
     <ng-template ngFor let-infoTextExp [ngForOf]="newInfoTextList">
         <div *ngIf="filterView(infoTextExp)">
-            <mat-divider class="tile-div"></mat-divider>
             <mat-form-field>
                 <input matInput placeholder="Überschrift" [(ngModel)]="infoTextExp.infoText.headerText">
             </mat-form-field>
@@ -17,14 +17,17 @@
                 <input matInput placeholder="Link" [(ngModel)]="infoTextExp.infoText.link">
             </mat-form-field>
             <button class="click-button" mat-stroked-button (click)="addNewEntry(infoTextExp)">{{getTileName(infoTextExp)}}</button>
-            <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" (click)="saveCurrentChanges(infoTextExp)">save</button>
+            <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" [disabled]="true" (click)="saveCurrentChanges(infoTextExp)">save</button>
             <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="removeEntry(infoTextExp)">remove_circle</button>
             <button *ngIf="hasImage(infoTextExp.infoText.ID)" class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="showImageDetails(infoTextExp.infoText.ID)">
                 {{isImageDetailsActive(infoTextExp.ID)? 'expand_less':'expand_more'}}</button>
             <mat-form-field class="info-content-area">
                     <textarea matInput placeholder="Inhalt" [(ngModel)]="infoTextExp.infoText.contentText"></textarea>
             </mat-form-field>
-            <app-all-image-edit *ngIf="hasImage(infoTextExp.infoText.ID) && isImageDetailsActive(infoTextExp.infoText.ID)" [infoTextID]="infoTextExp.infoText.ID"></app-all-image-edit>
+            <div *ngIf="hasImage(infoTextExp.infoText.ID) && isImageDetailsActive(infoTextExp.infoText.ID)">
+                <app-all-image-edit  [infoTextID]="infoTextExp.infoText.ID"></app-all-image-edit>
+                <div class="tile-div"></div>
+            </div>
         </div>
     </ng-template>
     <mat-divider class="tile-div"></mat-divider>

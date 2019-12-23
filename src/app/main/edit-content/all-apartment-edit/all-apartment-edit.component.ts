@@ -51,7 +51,10 @@ export class AllApartmentEditComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void { }
 
   addNewEntry(currEntry: NewApartmentObject = null) {
-    const tileRef = this.tileExpantionList.filter(el => el.modalType === 0).map(el => new NewEntryObject(el.ID, el.titleName));
+    const tileRef = this.tileExpantionList
+      .filter(el => el.modalType === 0)
+      .filter(el => this.apartmentExpansionList.findIndex(i => i.content.fk_tile === el.ID) < 0)
+      .map(el => new NewEntryObject(el.ID, el.titleName));
     const dialogRef = this.entryDialog.open(NewEntryModalComponent, {
       maxWidth: '50vw',
       maxHeight: '50vh',
@@ -60,10 +63,10 @@ export class AllApartmentEditComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe((result: number) => {
       console.log('The dialog was closed');
-      if (!result) {
+      if (result == null) {
         return;
       }
-      if (currEntry) {
+      if (currEntry != null) {
         const indexElement = this.apartmentExpansionList.findIndex(compE => compE === currEntry);
         if (indexElement >= 0) {
           const newEntry = this.apartmentExpansionList[indexElement];

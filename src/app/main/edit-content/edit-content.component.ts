@@ -1,3 +1,5 @@
+import { resolve } from 'path';
+import { LoginServiceService } from './../../service/login-service/login-service.service';
 import { RefreshModalComponent } from './../image-preview-modal/refresh-information-modal.component';
 import { ApartmentDetailsContentService } from './../../service/update-content/apartment-details-content.service';
 import { ImageContentService } from './../../service/update-content/image-content.service';
@@ -9,6 +11,7 @@ import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
 import { UpdateContentService } from 'src/app/service/update-content/update-content.service';
 import { MatDialog } from '@angular/material';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-edit-content',
   templateUrl: './edit-content.component.html',
@@ -21,25 +24,23 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
   spinnerValue = 0;
 
   constructor(
-    private content: LoadContentService,
     private _ngZone: NgZone,
     private cdRef: ChangeDetectorRef,
-    public dialog: MatDialog,
+    private dialog: MatDialog,
+    private content: LoadContentService,
     private updateContent: UpdateContentService,
     private updateInfoText: InfoTextService,
     private updateApartment: ApartmentContentService,
     private updateDetails: ApartmentDetailsContentService,
-    private updateImage: ImageContentService) { }
+    private updateImage: ImageContentService,
+    private loginService: LoginServiceService,
+    private router: Router) { }
 
   ngOnInit() {
-    if (!this.content.isFinished()) {
-      this.content.loadAll();
-      this.updateContent.loadNewContent();
-      this.updateInfoText.loadNewContent();
-      this.updateApartment.loadNewContent();
-      this.updateDetails.loadNewContent();
-      this.updateImage.loadNewContent();
-    }
+    this.loginService.testToken().subscribe(
+      () => this.trigger_refresh(),
+      (error) => this.router.navigate(['login'])
+    );
   }
   triggerResize() {
     // Wait for changes to be applied, then trigger textarea resize.
@@ -50,13 +51,14 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
   isFinished() {
     return this.content.isFinished();
   }
+
   ngAfterViewChecked(): void {
     if (this.content.isFinished()) {
       this.cdRef.detectChanges();
     }
   }
 
-  trigger_refresh() {
+  async trigger_refresh() {
     // reset
     this.updateContent.reset();
     this.updateInfoText.reset();
@@ -72,17 +74,36 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
     this.updateImage.loadNewContent();
   }
 
-  trigger_save() {
-    // update info text
-    this.updateInfoText.sendChangesToBackend();
-    // update apartment content
-    this.updateApartment.sendChangesToBackend();
-    // update apartment details
-    this.updateDetails.sendChangesToBackend();
+  async trigger_save() {
+    this.executeNewInRightOrder()
     // update images
-    this.updateImage.sendChangesToBackend();
+    .then(() => this.updateImage.sendChangesToBackend())
+    // update info text
+    .then(() => this.updateInfoText.sendChangesToBackend())
+    // update apartment content
+    .then(() => this.updateApartment.sendChangesToBackend())
+    // update apartment details
+    .then(() => this.updateDetails.sendChangesToBackend())
     // update tiles
-    this.updateContent.sendUpdateToBackend();
+    .then(() => this.updateContent.sendUpdateToBackend())
+    .catch((err) => {
+      console.log("error by trigger objects changes: " + JSON.stringify(err));
+    })
+    .finally(() => 
+      setTimeout(() => { this.trigger_refresh(); }, 400)
+    )
+  }
+
+  executeNewInRightOrder() {
+    return Promise.resolve(true)
+    .then(() => this.updateContent.sendNew())
+    .then(() => this.updateInfoText.sendNew())
+    .then(() => this.updateApartment.sendNew())
+    .then(() => this.updateDetails.sendNew())
+    .then(() => this.updateImage.sendNew())
+    .catch((err) => {
+      console.log("error by send new objects: " + JSON.stringify(err));
+    });
   }
 
   getSpinnerValue() {

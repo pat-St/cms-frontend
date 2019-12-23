@@ -1,13 +1,10 @@
-import { ApartmentContent, ApartmentDescription, ApartmentPrice, DetailsToApartment, ApartmentDetails } from './../../model/apartment';
-import { NewApartmentObject } from 'src/app/model/apartment';
-import { InfoTextToTile, InfoText, NewInfoTextToTile } from 'src/app/model/infoText';
+import { filter } from 'minimatch';
+import { ApartmentDetails } from './../../model/apartment';
 import { LoadContentService } from './../load-content/load-content.service';
 import { BackendRequestService } from './../backend-request/backend-request.service';
-import { Injectable, Optional } from '@angular/core';
-import { element } from 'protractor';
-import { Tile } from 'src/app/model/tile';
-import { Image } from 'src/app/model/image';
-import { filter } from 'minimatch';
+import { Injectable } from '@angular/core';
+import { JsonPipe } from '@angular/common';
+
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +13,12 @@ export class ApartmentDetailsContentService {
   newApartmentDetails: Array<ApartmentDetails> = new Array();
 
   constructor(private backend: BackendRequestService, private loadContent: LoadContentService) { }
-  
-  public nextIdOf(itemColl: Array<number>): number { return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1; }
+
+  public nextIdOf(itemColl: Array<number>): number { 
+    if (itemColl.length < 2) { 
+      return itemColl.length
+    }
+    return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1; }
 
   async loadNewContent(count= 5) {
     if (count < 0) {
@@ -43,7 +44,7 @@ export class ApartmentDetailsContentService {
       if (indexElement >= 0) {
         this.newApartmentDetails.splice(indexElement, 1);
       }
-      this.newApartmentDetails.push(el);
+      this.newApartmentDetails.push(Object.assign({},el));
     });
   }
   public deleteNextDetails(obj: ApartmentDetails): boolean {
@@ -75,8 +76,8 @@ export class ApartmentDetailsContentService {
       deleteDescEntities = this.newApartmentDetails
       .filter(el => el.deleteEntry);
     }
-    deleteDescEntities.forEach( el => {
-      this.backend.deleteToBackend("apartment_details", el.ID).subscribe((response: boolean) => {});
+    return deleteDescEntities.map( el => {
+      this.backend.deleteToBackend("apartment_details", el.ID).toPromise();
     });
   }
 
@@ -86,12 +87,13 @@ export class ApartmentDetailsContentService {
       updateDescEntities =  new Array(objs);
     } else {
       updateDescEntities = this.newApartmentDetails
-    .filter(el => this.loadContent.getApartmentDetails().findIndex(i => i.ID === el.ID) > -1);
+      .filter(el => this.loadContent.getApartmentDetails().findIndex(i => i.ID === el.ID) > -1)
+      .filter(el => JSON.stringify(el) !== JSON.stringify(this.loadContent.getApartmentDetails().find(i => i.ID === el.ID)))
     }
-    this.backend.updateToBackend("apartment_details", updateDescEntities).subscribe((response: boolean) => {});
+    return updateDescEntities.length > 0 ? this.backend.updateToBackend("apartment_details", updateDescEntities).toPromise() : true;
   }
 
-  private sendNew(objs: ApartmentDetails = null) {
+  sendNew(objs: ApartmentDetails = null) {
     let newDescEntities: ApartmentDetails[];
     if (objs) {
       newDescEntities =  new Array(objs);
@@ -99,25 +101,25 @@ export class ApartmentDetailsContentService {
       newDescEntities = this.newApartmentDetails
     .filter(el => this.loadContent.getApartmentDetails().findIndex(i => i.ID === el.ID) < 0);
     }
-    this.backend.updateToBackend("apartment_details", newDescEntities).subscribe((response: boolean) => {});
+    return newDescEntities.length > 0 ? this.backend.updateToBackend("apartment_details", newDescEntities).toPromise() : true;
   }
 
   public sendChangesToBackend() {
-    // send delete
-    this.sendDelete();
     // send update
-    this.sendUpdate();
+    return Promise.resolve(this.sendUpdate())
     // send new
-    this.sendNew();
+   // .then(() => this.sendNew())
+    // send delete
+    .then(() => this.sendDelete())
   }
 
   public sendSpecificChangesToBackend(objs: ApartmentDetails) {
-    // send delete
-    this.sendDelete(objs);
     // send update
-    this.sendUpdate(objs);
+    return Promise.resolve(this.sendUpdate(objs))
     // send new
-    this.sendNew(objs);
+    .then(() => this.sendNew(objs))
+    // send delete
+    .then(() => this.sendDelete(objs))
   }
 
 

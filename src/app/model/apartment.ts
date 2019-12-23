@@ -119,6 +119,7 @@ export class ApartmentPrice {
   personCount: string;
   peakSeason: string;
   offSeason: string;
+  nights: string;
   fk_apartment: number;
   deleteEntry: boolean = false;
   changed: boolean = false;
@@ -127,6 +128,7 @@ export class ApartmentPrice {
     personCount: string = null,
     peakSeason: string = null,
     offSeason: string = null,
+    nights: string = null,
     fk_apartment: number = null,
     deleteEntry: boolean = false,
     changed: boolean = false
@@ -135,6 +137,7 @@ export class ApartmentPrice {
     this.personCount = personCount;
     this.peakSeason = peakSeason;
     this.offSeason = offSeason;
+    this.nights = nights;
     this.fk_apartment = fk_apartment;
     this.deleteEntry = deleteEntry;
     this.changed = changed;

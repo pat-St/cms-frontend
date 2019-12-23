@@ -1,3 +1,6 @@
+import { NewEntryObject } from './../../../model/infoText';
+import { NewEntryModalComponent } from './../../image-preview-modal/new-entry-modal.component';
+import { MatDialog } from '@angular/material';
 import { ImageContentService } from './../../../service/update-content/image-content.service';
 import { FormSelectModel } from '../../../model/tileEdit/tileEdit';
 import { Tile } from 'src/app/model/tile';
@@ -7,6 +10,7 @@ import { Component, OnInit, NgZone, ViewChild, AfterViewInit } from '@angular/co
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
 import { UpdateContentService } from 'src/app/service/update-content/update-content.service';
+import { reject } from 'q';
 
 @Component({
   selector: 'app-tile-edit',
@@ -18,6 +22,8 @@ export class TileEditComponent implements OnInit, AfterViewInit {
   @ViewChild('autosize', {static: false}) autosize: CdkTextareaAutosize;
 
   panelOpenState = false;
+  // Feature disabled for unknown behavour
+  disableModalChanges = true;
 
   kachelExpansionList: Array<Tile> = new Array();
 
@@ -31,6 +37,7 @@ export class TileEditComponent implements OnInit, AfterViewInit {
   constructor(
     private updateContent: UpdateContentService,
     private updateImage: ImageContentService,
+    private entryDialog: MatDialog,
     private _ngZone: NgZone) { }
 
   ngOnInit() {
@@ -86,7 +93,63 @@ export class TileEditComponent implements OnInit, AfterViewInit {
   }
 
   addNewEntry() {
-    this.updateContent.getNextNewTile();
+    const tileType = this.kachelTypeSelected.map(el => new NewEntryObject(el.desc as number, el.value));
+    const tileModal = this.modalTypeSelected.map(el => new NewEntryObject(el.desc as number, el.value));
+    const tileSize = this.kachelSizeSelected.map(el => new NewEntryObject(el.desc as number, el.value));
+    let choosedTileType: number;
+    let choosedTileModal: number;
+    let choosedTileSize: number;
+    new Promise((resolve) => {
+      resolve("ok");
+    })
+    .then((res) => 
+      this.entryDialog.open(NewEntryModalComponent, {
+        maxWidth: '50vw',
+        maxHeight: '50vh',
+        data:  {metaInfo: 'Kachel Art', listOfEntrys: tileType}
+      }).afterClosed().toPromise()
+    )
+    .then((res: number) => {
+      choosedTileType = res
+      if (res === null) {
+        throw new Error("No Size set")
+      }
+      return res
+      }
+    )
+    .then((res) => 
+      this.entryDialog.open(NewEntryModalComponent, {
+        maxWidth: '50vw',
+        maxHeight: '50vh',
+        data:  {metaInfo: 'Kachel Größe', listOfEntrys: tileSize}
+      }).afterClosed().toPromise()
+    )
+    .then((res) => {
+      choosedTileSize = res
+      if (res === null) {
+        throw new Error("No Size set")
+      }
+      return res
+    })
+    .then((res) => 
+      this.entryDialog.open(NewEntryModalComponent, {
+        maxWidth: '50vw',
+        maxHeight: '50vh',
+        data:  {metaInfo: 'Modal Art', listOfEntrys: tileModal}
+      }).afterClosed().toPromise()
+    )
+    .then((res: number) => {
+      choosedTileModal = res
+      if (res === null) {
+        throw new Error("No Size set")
+      }
+      return res
+    }).then(() => {
+      if (choosedTileType >= 0 && choosedTileModal >= 0 && choosedTileSize >= 0) {
+        this.updateContent.getNextNewTile(choosedTileType, choosedTileSize, choosedTileModal)
+      }
+    })
+    .catch((res) => console.log(JSON.stringify(res)))
   }
 
   removeEntry(entryObject: Tile) {

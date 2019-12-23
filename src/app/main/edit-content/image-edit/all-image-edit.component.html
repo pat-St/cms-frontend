@@ -7,25 +7,19 @@
       Füge eine neues Bild hinzu
     </mat-panel-description>
   </mat-expansion-panel-header>
+  <mat-divider class="tile-div"></mat-divider>
   <ng-template ngFor let-imageExp [ngForOf]="imageExpansionList">
     <div *ngIf="filterView(imageExp)">
-      <mat-divider class="tile-div"></mat-divider>
       <mat-form-field class="desc-form-field">
       <textarea matInput placeholder="Beschreibung" [(ngModel)]="imageExp.description"></textarea>
       </mat-form-field>
-      <mat-form-field *ngIf="!isChildComponent()">
-        <input matInput placeholder="Ferienwohnung" [(ngModel)]="imageExp.fk_apartment">
-      </mat-form-field>
-      <mat-form-field *ngIf="!isChildComponent()">
-        <input matInput placeholder="Info" [(ngModel)]="imageExp.fk_info">
-      </mat-form-field>
-      <mat-form-field *ngIf="!isChildComponent()">
-        <input matInput placeholder="Kachel" [(ngModel)]="imageExp.fk_tile">
-      </mat-form-field>
+      <button *ngIf="!isChildComponent()" class="click-button" mat-flat-button color="primary" (click)="changeApartment(imageExp)">Ferienwohnung: {{getApartmentName(imageExp.fk_apartment)}}</button>
+      <button *ngIf="!isChildComponent()" class="click-button" mat-flat-button color="primary" (click)="changeInfoText(imageExp)">Info Text: {{getInfoTextName(imageExp.fk_info)}}</button>
+      <button *ngIf="!isChildComponent()" class="click-button" mat-flat-button color="primary" (click)="changeTile(imageExp)">Kachel: {{getTileName(imageExp.fk_tile)}}</button>
       <button class="click-button" mat-stroked-button (click)="fileInput.click()">Hochladen</button>
       <input hidden (change)="onFileChanged(imageExp.ID,$event)" #fileInput type="file" id="file">
       <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="preview" matTooltip="Picture Preview" color="primary" (click)="openDialog(imageExp)">satellite</button>
-      <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Save Picture" color="primary" >save</button>
+      <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Save Picture" color="primary" [disabled]="true">save</button>
       <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Delete Picture" color="warn" (click)="removeEntry(imageExp)">remove_circle</button>
       <div class="tile-div"></div>
     </div>
