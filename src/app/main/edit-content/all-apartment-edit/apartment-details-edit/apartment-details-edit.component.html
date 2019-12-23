@@ -17,7 +17,7 @@
         <mat-form-field>
           <input matInput placeholder="Bedeutung" [(ngModel)]="descExp.info">
         </mat-form-field>
-        <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" >save</button>
+        <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" [disabled]="true">save</button>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="removeDescEntry(descExp)">remove_circle</button>
       </div>
     </ng-template>
@@ -47,7 +47,7 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
-        <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" >save</button>
+        <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" [disabled]="true">save</button>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="removeDetailsRelationEntry(detailsExp)">remove_circle</button>
       </div>
       </ng-template>

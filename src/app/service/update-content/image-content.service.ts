@@ -41,7 +41,8 @@ export class ImageContentService {
       if (indexElement >= 0) {
         this.newImage.splice(indexElement, 1);
       }
-      this.newImage.push(Object.assign({},element));
+      const imageCopy = Object.assign({}, element);
+      this.newImage.push(imageCopy);
     });
   }
 
@@ -89,17 +90,16 @@ export class ImageContentService {
     return Promise.resolve(
       listOfImages
       .filter(el => this.loadContent.getImages().findIndex(i => i.ID === el.ID) > -1)
-      .filter(el => JSON.stringify(el) !== JSON.stringify(this.loadContent.getImages().find(i => i.ID === el.ID)))
+      .filter(el => this.imageCmp(el, this.loadContent.getImages().find(i => i.ID === el.ID)))
     )
     .then((el) => {
       el.forEach(i => {
-        i.description = i.description.replace(" ","_");
-        const rawImage = new Array(i.image);
+        i.description = i.description.replace(/\s/g,"_");
         i.image = new Array();
         this.backend.updateToBackend("image", new Array(i)).toPromise();
-
+        const imageCmpBinary = this.imageBinaryCmp(i, this.loadContent.getImages().find(r => r.ID === i.ID));
         //upload Image
-        if (i.changed) {
+        if (i.changed || imageCmpBinary) {
           const base64Image = this.loadContent.showImage(i.ID).replace(/data:image\/jpeg;base64,/g, '');
           const plainString = window.atob(base64Image);
   
@@ -125,6 +125,7 @@ export class ImageContentService {
       .filter(el => this.loadContent.getImages().findIndex(i => i.ID === el.ID) < 0)
       .map(el => {
         el.image = [];
+        el.description = el.description.replace(/\s/g,"_");
         return el;
       })
     )
@@ -190,6 +191,47 @@ export class ImageContentService {
     }
     if (tileId !== null) {
       return this.newImage.map( element => element.fk_tile).includes(tileId);
+    }
+    return false;
+  }
+
+  private imageCmp(obj1: Image, obj2: Image): boolean {
+    if (obj1 === null || obj2 === null) {
+      return false;
+    }
+    if (obj1.ID !== obj2.ID) {
+      return false;
+    }
+    if (obj1.changed !== obj2.changed) {
+      return true;
+    }
+    if (this.loadContent.showImage(obj1.ID).localeCompare(this.loadContent.showImage(obj1.ID)) !== 0) {
+      return true;
+    }
+    if (obj1.description !== obj2.description) {
+      return true;
+    }
+    if (obj1.fk_apartment !== obj2.fk_apartment) {
+      return true;
+    }
+    if (obj1.fk_info !== obj2.fk_info) {
+      return true;
+    }
+    if (obj1.fk_tile !== obj2.fk_tile) {
+      return true;
+    }
+    return false;
+  }
+
+  private imageBinaryCmp(obj1: Image, obj2: Image): boolean {
+    if (obj1 === null || obj2 === null) {
+      return false;
+    }
+    if (obj1.ID !== obj2.ID) {
+      return false;
+    }
+    if (this.loadContent.showImage(obj1.ID).localeCompare(this.loadContent.showImage(obj1.ID)) !== 0) {
+      return true;
     }
     return false;
   }

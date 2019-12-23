@@ -1,15 +1,9 @@
 import { ImageContentService } from './image-content.service';
 import { InfoTextService } from './info-text.service';
-import { ApartmentContent, ApartmentDescription, ApartmentPrice, DetailsToApartment, ApartmentDetails } from './../../model/apartment';
-import { NewApartmentObject } from 'src/app/model/apartment';
-import { InfoTextToTile, InfoText, NewInfoTextToTile } from 'src/app/model/infoText';
 import { LoadContentService } from './../load-content/load-content.service';
 import { BackendRequestService } from './../backend-request/backend-request.service';
-import { Injectable, Optional } from '@angular/core';
-import { element } from 'protractor';
+import { Injectable } from '@angular/core';
 import { Tile } from 'src/app/model/tile';
-import { Image } from 'src/app/model/image';
-import { filter } from 'minimatch';
 import { ApartmentContentService } from './apartment-content.service';
 
 @Injectable({
@@ -151,8 +145,6 @@ export class UpdateContentService {
 
   public sendNewTileChangesToBackend() {
     return Promise.resolve(true)
-    // send new
-    //.then(e => this.sendNew())
     // send update
     .then(e => this.sendUpdate())
     // send delete

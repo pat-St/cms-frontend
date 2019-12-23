@@ -208,7 +208,7 @@ export class LoadContentService {
   }
 
   convertImageDesc(old: string): string {
-    return old.replace('_', '');
+    return old.replace(/(_)/g, ' ');
   }
 
   getImages(): Image[] {
