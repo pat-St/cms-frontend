@@ -1,3 +1,4 @@
+import { environment } from './../environments/environment';
 import { LoginModule } from "./login/login.module";
 import { BrowserModule } from "@angular/platform-browser";
 import { RouterModule } from "@angular/router";
@@ -25,6 +26,9 @@ import { HttpClientModule } from '@angular/common/http';
   ],
   exports: [
     MaterialDependencieModule,
+  ],
+  providers: [
+    {provide: 'BACKEND_API_URL', useValue: environment.hostUrl},
   ],
   bootstrap: [AppComponent]
 })

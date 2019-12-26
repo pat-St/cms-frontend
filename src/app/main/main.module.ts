@@ -1,3 +1,4 @@
+import { environment } from './../../environments/environment';
 import { RefreshModalComponent } from './image-preview-modal/refresh-information-modal.component';
 import { ApartmentDetailsContentService } from './../service/update-content/apartment-details-content.service';
 import { ImageContentService } from './../service/update-content/image-content.service';

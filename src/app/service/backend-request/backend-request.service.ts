@@ -1,6 +1,5 @@
-import { environment } from './../../../environments/environment';
 import { Token } from './../../model/user';
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpResponse, HttpHeaders, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AnyARecord } from 'dns';
@@ -9,10 +8,8 @@ import { AnyARecord } from 'dns';
 })
 export class BackendRequestService {
   header = new HttpHeaders({'Accept': 'application/json'});
-  hostUrl: string;
   
-  constructor(private httpClient: HttpClient) {
-    this.hostUrl = environment.hostUrl;
+  constructor(@Inject('BACKEND_API_URL') private hostUrl: string, private httpClient: HttpClient) {
   }
 
   getHeader() {
