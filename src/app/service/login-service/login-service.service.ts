@@ -1,9 +1,8 @@
-import { environment } from './../../../environments/environment.prod';
 import { User, Token } from './../../model/user';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BackendRequestService } from './../backend-request/backend-request.service';
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -12,12 +11,10 @@ export class LoginServiceService {
   header = new HttpHeaders({
     'Authorization': 'Basic ',
   });
-  hostUrl: string;
 
   isLogin = false;
 
-  constructor(private httpClient: HttpClient) {
-    this.hostUrl = environment.hostUrl + 'user/';
+  constructor(@Inject('BACKEND_API_URL') private hostUrl: string, private httpClient: HttpClient) {
   }
 
   getHeader() {
@@ -77,14 +74,14 @@ export class LoginServiceService {
   }
 
   private sendLoginToBackend(path: string, authheader: HttpHeaders): Observable<any> {
-    return this.httpClient.get<any>(this.hostUrl + path, {headers: authheader});
+    return this.httpClient.get<any>(this.hostUrl + 'user/' + path, {headers: authheader});
   }
 
   private sendLogoutToBackend(path: string): Observable<boolean> {
-    return this.httpClient.get<boolean>(this.hostUrl + path, {headers: this.header});
+    return this.httpClient.get<boolean>(this.hostUrl + 'user/' + path, {headers: this.header});
   }
 
   public testToken(): Observable<any> {
-    return this.httpClient.get<any>(this.hostUrl, {headers: this.getHeader()});
+    return this.httpClient.get<any>(this.hostUrl + 'user/', {headers: this.getHeader()});
   }
 }
