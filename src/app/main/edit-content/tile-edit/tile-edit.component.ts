@@ -1,5 +1,5 @@
 import { NewEntryObject } from './../../../model/infoText';
-import { NewEntryModalComponent } from './../../image-preview-modal/new-entry-modal.component';
+import { NewEntryModalComponent } from '../../custom-info-modal/new-entry-modal.component';
 import { MatDialog } from '@angular/material';
 import { ImageContentService } from './../../../service/update-content/image-content.service';
 import { FormSelectModel } from '../../../model/tileEdit/tileEdit';

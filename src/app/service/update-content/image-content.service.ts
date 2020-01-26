@@ -72,26 +72,32 @@ export class ImageContentService {
     return false;
   }
 
-  private sendDelete(singleImage: Image = null): Promise<any> {
+  public getDeleteChanges(singleImage: Image = null): Image[] {
     const listOfImages = singleImage ? new Array(singleImage) : this.newImage;
-    return Promise.resolve(
-      listOfImages.filter(el => el.deleteEntry)
-    )
-    .then((el) => 
-      Promise.all(el.map(i => this.backend.deleteToBackend("image", i.ID).toPromise()))
+    return listOfImages.filter(el => el.deleteEntry);
+  }
+
+  private sendDelete(singleImage: Image = null): Promise<any> {
+    return Promise.resolve(this.getDeleteChanges(singleImage))
+    .then((el) =>
+      Promise.all(
+        el.map(i => this.backend.deleteToBackend("image", i.ID).toPromise())
+      )
     )
     .catch((err) => {
       console.log("error by send delete images: " + JSON.stringify(err));
     });
   }
 
-  private sendUpdate(singleImage: Image = null): Promise<any> {
+  public getUpdateChanges(singleImage: Image = null): Image[] {
     const listOfImages = singleImage ? new Array(singleImage) : this.newImage;
-    return Promise.resolve(
-      listOfImages
+    return  listOfImages
       .filter(el => this.loadContent.getImages().findIndex(i => i.ID === el.ID) > -1)
-      .filter(el => this.imageCmp(el, this.loadContent.getImages().find(i => i.ID === el.ID)))
-    )
+      .filter(el => this.imageCmp(el, this.loadContent.getImages().find(i => i.ID === el.ID)));
+  }
+
+  private sendUpdate(singleImage: Image = null): Promise<any> {
+    return Promise.resolve(this.getUpdateChanges(singleImage))
     .then((el) => {
       el.forEach(i => {
         i.description = i.description.replace(/\s/g,"_");
@@ -108,7 +114,7 @@ export class ImageContentService {
           for (let n = 0; n < plainString.length; n++) {
             int8Array[n] = plainString.charCodeAt(n);
           }
-          const fileBlob = new Blob([int8Array], { 'type': 'image/jpeg'})
+          const fileBlob = new Blob([int8Array], { 'type': 'image/jpeg'});
           this.backend.updateImageToBackend("image/" + i.ID, fileBlob).toPromise();
         }
       })
@@ -118,12 +124,18 @@ export class ImageContentService {
     });
   }
 
+  public getNewChanges(singleImage: Image = null): Image[] {
+    const listOfImages = singleImage ? new Array(singleImage) : this.newImage;
+    return listOfImages
+    .filter(el => this.loadContent.getImages().findIndex(i => i.ID === el.ID) < 0);
+  }
+
   sendNew(singleImage: Image = null) {
     const listOfImages = singleImage ? new Array(singleImage) : this.newImage;
-    Promise.resolve(
-      listOfImages
-      .filter(el => this.loadContent.getImages().findIndex(i => i.ID === el.ID) < 0)
-      .map(el => {
+    Promise.resolve(this.getNewChanges(singleImage))
+    // remove image data and replace desction
+    .then((res) =>
+      res.map(el => {
         el.image = [];
         el.description = el.description.replace(/\s/g,"_");
         return el;
@@ -152,7 +164,7 @@ export class ImageContentService {
       }
     )
     .catch((err) => 
-      console.log("error by send delete images: " + JSON.stringify(err))
+      console.log("error by send new images: " + JSON.stringify(err))
     );
   }
 

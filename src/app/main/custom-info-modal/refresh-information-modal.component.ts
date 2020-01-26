@@ -1,4 +1,4 @@
-import { BackendRequestService } from './../../service/backend-request/backend-request.service';
+import { BackendRequestService } from '../../service/backend-request/backend-request.service';
 import { Image } from 'src/app/model/image';
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';

@@ -2,7 +2,7 @@ import { ApartmentDetailsContentService } from './../../../service/update-conten
 import { ImageContentService } from './../../../service/update-content/image-content.service';
 import { ApartmentContentService } from './../../../service/update-content/apartment-content.service';
 import { NewEntryObject } from 'src/app/model/infoText';
-import { NewEntryModalComponent } from './../../image-preview-modal/new-entry-modal.component';
+import { NewEntryModalComponent } from '../../custom-info-modal/new-entry-modal.component';
 import { NewApartmentObject, ApartmentDetails } from 'src/app/model/apartment';
 import { ApartmentContent, ApartmentDescription, ApartmentPrice, DetailsToApartment } from './../../../model/apartment';
 import { LoadContentService } from '../../../service/load-content/load-content.service';

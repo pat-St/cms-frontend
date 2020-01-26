@@ -87,22 +87,19 @@ export class InfoTextService {
     }
   }
 
+  public getDeleteChanges(entryObj: NewInfoTextToTile = null): NewInfoTextToTile[] {
+    const listOfTextToTile = entryObj ? new Array(entryObj) : this.newInfoText;
+    return listOfTextToTile.filter(el => el.deleteEntry);
+  }
+
   private sendDelete(): Promise<any> {
     return Promise.resolve(true)
+    .then((res) =>  this.getDeleteChanges().map(el => el.relation))
     .then((res) =>
-      this.newInfoText
-        .filter(el => el.deleteEntry)
-        .map(el => el.relation)
-    )
-    .then((res) => 
       Promise.all(res.map((el) => this.backend.deleteToBackend("info_text_to_tile", el.ID).toPromise()))
     )
+    .then((res) => this.getDeleteChanges().map(el => el.infoText))
     .then((res) =>
-      this.newInfoText
-        .filter(el => el.deleteEntry)
-        .map(el => el.infoText)
-    )
-    .then((res) => 
       Promise.all(res.map((el) => this.backend.deleteToBackend("info_text", el.ID).toPromise()))
     )
     .catch((err) => {
@@ -110,49 +107,57 @@ export class InfoTextService {
     });
   }
 
+  public getUpdateChanges(entryObj: NewInfoTextToTile = null): NewInfoTextToTile[] {
+    const listOfTextToTile = entryObj ? new Array(entryObj) : this.newInfoText;
+    return listOfTextToTile
+      .filter(el => !el.deleteEntry)
+      .filter(el => this.filterInfoText(el) > -1 || this.filterInfoTextToTile(el) > -1)
+      .filter(el =>
+        this.isDiffInfoTextToTile(el.infoText, this.loadContent.getInfoText().find(i => i.ID === el.infoText.ID))
+        ||
+        this.isDiffInfoTextToTileRef(el.relation, this.loadContent.getInfoTextToTile().find(i => i.ID === el.relation.ID))
+      );
+  }
+
   private sendUpdate() {
     return Promise.resolve(true)
-    .then(() => {
-      const tmp = this.newInfoText
-        .filter(el => !el.deleteEntry)
-        .map(el => el.infoText)
-        .filter(el => this.loadContent.getInfoText().findIndex(s => s.ID === el.ID) > -1)
-        .filter(el =>  this.isDiffInfoTextToTile(el, this.loadContent.getInfoText().find(i => i.ID === el.ID)))
-      return tmp.length > 0 ? this.backend.updateToBackend("info_text", tmp).toPromise() : true
-    })
+    .then(() => this.getUpdateChanges())
+    .then((res: NewInfoTextToTile[]) =>
+      res.length > 0 ? this.backend.updateToBackend("info_text", res.map(el => el.infoText)).toPromise() : true
+    )
     .catch((err) =>
       console.log("error by send infotext updates: " + JSON.stringify(err))
     )
-    .then(() =>
-      this.newInfoText
-        .filter(el => !el.deleteEntry)
-        .map(el => el.relation)
-        .filter(el => this.loadContent.getInfoTextToTile().findIndex(s => s.ID === el.ID) > -1)
-        .filter(el => this.isDiffInfoTextToTileRef(el, this.loadContent.getInfoTextToTile().find(i => i.ID === el.ID)))
-    )
-    .then((res: InfoTextToTile[]) =>
-      res.length > 0 ? this.backend.updateToBackend("info_text_to_tile", res).toPromise() : true
+    .then(() => this.getUpdateChanges())
+    .then((res: NewInfoTextToTile[]) =>
+      res.length > 0 ? this.backend.updateToBackend("info_text_to_tile", res.map(el => el.relation)).toPromise() : true
     )
     .catch((err) =>
       console.log("error by send infotext to tile updates: " + JSON.stringify(err))
     );
   }
 
+  private filterInfoText(entryObj: NewInfoTextToTile): number {
+    return this.loadContent.getInfoText().findIndex(s => s.ID === entryObj.infoText.ID)
+  }
+
+  private filterInfoTextToTile(entryObj: NewInfoTextToTile): number {
+    return this.loadContent.getInfoTextToTile().findIndex(s => s.ID === entryObj.relation.ID);
+  }
+
+  public getNewChanges(entryObj: NewInfoTextToTile = null): NewInfoTextToTile[] {
+    const listOfTextToTile = entryObj ? new Array(entryObj) : this.newInfoText;
+    return listOfTextToTile
+      .filter(el => !el.deleteEntry)
+      .filter(el => this.filterInfoText(el) < 0 || this.filterInfoTextToTile(el) < 0);
+  }
+
   sendNew() {
-    return Promise.resolve(
-      this.newInfoText
-        .filter(el => !el.deleteEntry)
-        .filter(el => this.loadContent.getInfoText().findIndex(s => s.ID === el.infoText.ID) < 0)
-        .map(el => el.infoText)
-    )
+    return Promise.resolve(this.getNewChanges(null).map(el => el.infoText))
     .then((res: InfoText[]) =>
       res.length >= 1 ? this.backend.createToBackend("info_text", res).toPromise() : true
     )
-    .then(() =>  this.newInfoText
-      .filter(el => !el.deleteEntry)
-      .map(el => el.relation)
-      .filter(el => this.loadContent.getInfoTextToTile().findIndex(s => s.ID === el.ID) < 0)
-    )
+    .then(() => this.getNewChanges(null).map(el => el.relation))
     .then((res: InfoTextToTile[]) =>
       res.length >= 1 ? this.backend.createToBackend("info_text_to_tile", res).toPromise() : true
     )
