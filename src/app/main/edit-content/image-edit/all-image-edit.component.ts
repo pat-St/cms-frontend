@@ -1,12 +1,12 @@
 import { NewInfoTextToTile } from './../../../model/infoText';
 import { NewApartmentObject } from './../../../model/apartment';
 import { FormSelectModel } from './../../../model/tileEdit/tileEdit';
-import { NewEntryModalComponent } from './../../image-preview-modal/new-entry-modal.component';
+import { NewEntryModalComponent } from '../../custom-info-modal/new-entry-modal.component';
 import { NewEntryObject } from 'src/app/model/infoText';
 import { InfoTextService } from './../../../service/update-content/info-text.service';
 import { BackendRequestService } from './../../../service/backend-request/backend-request.service';
 import { ImageContentService } from './../../../service/update-content/image-content.service';
-import { ImagePreviewModalComponent } from '../../image-preview-modal/image-preview-modal.component';
+import { ImagePreviewModalComponent } from '../../custom-info-modal/image-preview-modal.component';
 import { LoadContentService } from '../../../service/load-content/load-content.service';
 import { Image } from '../../../model/image';
 import { Component, OnInit, ViewChild, NgZone, AfterViewInit, Input } from '@angular/core';

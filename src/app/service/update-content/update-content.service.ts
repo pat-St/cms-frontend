@@ -97,12 +97,13 @@ export class UpdateContentService {
     return false;
   }
 
+  public getDeleteChanges(singleTile: Tile = null): Tile[] {
+    const listOfTiles = singleTile ? new Array(singleTile) : this.newTile;
+    return listOfTiles.filter(el => el.deleteEntry);
+  }
+
   private sendDelete() {
-    return Promise.resolve(
-      this.newTile
-      .filter(el => el.deleteEntry)
-      //.filter(el => this.loadContent.getTile().find(i => i.ID === el.ID))
-    )
+    return Promise.resolve(this.getDeleteChanges(null))
     .then((el) =>
       el.map(i => this.backend.deleteToBackend("tile", i.ID).toPromise())
     )
@@ -111,16 +112,19 @@ export class UpdateContentService {
     });
   }
 
+  public getUpdateChanges(singleTile: Tile = null): Tile[] {
+    const listOfTiles = singleTile ? new Array(singleTile) : this.newTile;
+    return listOfTiles
+    .filter(i => !i.deleteEntry)
+    .filter(el => this.loadContent.getTile().findIndex(i => i.ID === el.ID) > -1)
+    .filter(el => 
+       JSON.stringify(el) !== JSON.stringify(this.loadContent.getTile().find(i => i.ID === el.ID))
+    )
+  }
+
   private sendUpdate() {
     return Promise.resolve(true)
-    .then(() =>
-      this.newTile
-      .filter(i => !i.deleteEntry)
-      .filter(el => this.loadContent.getTile().findIndex(i => i.ID === el.ID) > -1)
-      .filter(el => 
-         JSON.stringify(el) !== JSON.stringify(this.loadContent.getTile().find(i => i.ID === el.ID))
-      )
-    )
+    .then(() => this.getUpdateChanges(null))
     .then((el: Tile[]) =>
       el.length >= 1 ? this.backend.updateToBackend("tile", el).subscribe(() => {}) : true
     )
@@ -129,12 +133,15 @@ export class UpdateContentService {
     );
   }
 
+  public getNewChanges(singleTile: Tile = null): Tile[] {
+    const listOfTiles = singleTile ? new Array(singleTile) : this.newTile;
+    return listOfTiles
+      .filter(el => !el.deleteEntry && this.loadContent.getTile().findIndex(i => i.ID === el.ID) < 0)
+  }
+
   sendNew() {
     return Promise.resolve(true)
-    .then(() =>
-      this.newTile
-      .filter(el => !el.deleteEntry && this.loadContent.getTile().findIndex(i => i.ID === el.ID) < 0)
-    )
+    .then(() => this.getNewChanges(null))
     .then((el: Tile[]) =>
       el.length >= 1 ? this.backend.createToBackend("tile", el).subscribe(() => {}) : true
     )

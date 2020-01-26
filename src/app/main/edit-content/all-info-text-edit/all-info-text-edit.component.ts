@@ -1,6 +1,6 @@
 import { ImageContentService } from './../../../service/update-content/image-content.service';
 import { InfoTextService } from './../../../service/update-content/info-text.service';
-import { NewEntryModalComponent } from './../../image-preview-modal/new-entry-modal.component';
+import { NewEntryModalComponent } from '../../custom-info-modal/new-entry-modal.component';
 import { LoadContentService } from '../../../service/load-content/load-content.service';
 import { Component, OnInit, AfterViewInit, NgZone, ViewChild, Input } from '@angular/core';
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';

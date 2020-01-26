@@ -1,9 +1,10 @@
+import { ModifyModalComponent } from './custom-info-modal/modify-list-for-save.component';
 import { environment } from './../../environments/environment';
-import { RefreshModalComponent } from './image-preview-modal/refresh-information-modal.component';
+import { RefreshModalComponent } from './custom-info-modal/refresh-information-modal.component';
 import { ApartmentDetailsContentService } from './../service/update-content/apartment-details-content.service';
 import { ImageContentService } from './../service/update-content/image-content.service';
 import { InfoTextService } from './../service/update-content/info-text.service';
-import { NewEntryModalComponent } from './image-preview-modal/new-entry-modal.component';
+import { NewEntryModalComponent } from './custom-info-modal/new-entry-modal.component';
 import { UpdateContentService } from './../service/update-content/update-content.service';
 import { AllImageEditComponent } from './edit-content/image-edit/all-image-edit.component';
 import { BackendRequestService } from './../service/backend-request/backend-request.service';
@@ -23,7 +24,7 @@ import { MainRoutingModule } from './main-routing.module';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
 import { MaterialDependencieModule } from '../material.module';
 import { EditContentComponent } from './edit-content/edit-content.component';
-import { ImagePreviewModalComponent } from './image-preview-modal/image-preview-modal.component';
+import { ImagePreviewModalComponent } from './custom-info-modal/image-preview-modal.component';
 import { AllInfoTextEditComponent } from './edit-content/all-info-text-edit/all-info-text-edit.component';
 import { AllApartmentEditComponent } from './edit-content/all-apartment-edit/all-apartment-edit.component';
 import { ApartmentDetailsEditComponent } from './edit-content/all-apartment-edit/apartment-details-edit/apartment-details-edit.component';
@@ -41,6 +42,7 @@ import { ApartmentContentService } from '../service/update-content/apartment-con
     ImagePreviewModalComponent,
     NewEntryModalComponent,
     RefreshModalComponent,
+    ModifyModalComponent,
     AllInfoTextEditComponent,
     AllApartmentEditComponent,
     ApartmentDetailsEditComponent
@@ -69,7 +71,8 @@ import { ApartmentContentService } from '../service/update-content/apartment-con
   entryComponents: [
     ImagePreviewModalComponent,
     NewEntryModalComponent,
-    RefreshModalComponent
+    RefreshModalComponent,
+    ModifyModalComponent
   ]
 })
 export class MainModule { }
