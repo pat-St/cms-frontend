@@ -14,9 +14,9 @@ export class ApartmentDetailsContentService {
 
   constructor(private backend: BackendRequestService, private loadContent: LoadContentService) { }
 
-  public nextIdOf(itemColl: Array<number>): number { 
-    if (itemColl.length < 2) { 
-      return itemColl.length
+  public nextIdOf(itemColl: Array<number>): number {
+    if (itemColl.length < 2) {
+      return itemColl.length;
     }
     return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1; }
 
@@ -44,11 +44,11 @@ export class ApartmentDetailsContentService {
       if (indexElement >= 0) {
         this.newApartmentDetails.splice(indexElement, 1);
       }
-      this.newApartmentDetails.push(Object.assign({},el));
+      this.newApartmentDetails.push(Object.assign({}, el));
     });
   }
   public deleteNextDetails(obj: ApartmentDetails): boolean {
-    const index = this.newApartmentDetails.findIndex(el => el.ID === obj.ID)
+    const index = this.newApartmentDetails.findIndex(el => el.ID === obj.ID);
     if (index >= 0) {
       this.newApartmentDetails[index].deleteEntry = true;
       return true;
@@ -56,7 +56,6 @@ export class ApartmentDetailsContentService {
       return false;
     }
   }
-
 
   public updateNextApartment(obj: ApartmentDetails): boolean {
     const index = this.newApartmentDetails.findIndex(el => el.ID === obj.ID)
@@ -110,7 +109,7 @@ export class ApartmentDetailsContentService {
     // send new
    // .then(() => this.sendNew())
     // send delete
-    .then(() => this.sendDelete())
+    .then(() => this.sendDelete());
   }
 
   public sendSpecificChangesToBackend(objs: ApartmentDetails) {
@@ -119,10 +118,6 @@ export class ApartmentDetailsContentService {
     // send new
     .then(() => this.sendNew(objs))
     // send delete
-    .then(() => this.sendDelete(objs))
+    .then(() => this.sendDelete(objs));
   }
-
-
-
-
 }
