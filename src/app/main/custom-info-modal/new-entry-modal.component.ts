@@ -57,7 +57,7 @@ isDisabled = false
     }
 
     onNoClick(): void {
-        this.dialogRef.close();
+        this.dialogRef.close(null);
     }
 
 }

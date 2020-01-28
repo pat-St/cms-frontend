@@ -40,7 +40,7 @@ export class LoginPageComponent implements OnInit {
       alert("Wrong Username or Password");
     }).finally(() => {
       this.showSpinner = false;
-    })
+    });
   }
 
 }
