@@ -47,14 +47,14 @@ export class TileEditComponent implements OnInit, AfterViewInit {
     this.kachelSizeSelected = this.getKachelSize();
    }
   ngAfterViewInit(): void { }
-  
+
   triggerResize() {
     // Wait for changes to be applied, then trigger textarea resize.
     this._ngZone.onStable.pipe(take(1))
         .subscribe(() => this.autosize.resizeToFitContent(true));
   }
   getKachelSize() {
-    let kachelSizeList: FormSelectModel[] = [];
+    const kachelSizeList: FormSelectModel[] = [];
     for (const i in KachelSize) {
       if (typeof KachelSize[i] === 'number') {
         kachelSizeList.push(new FormSelectModel(i, KachelSize[i] as any));
@@ -63,7 +63,7 @@ export class TileEditComponent implements OnInit, AfterViewInit {
     return kachelSizeList;
   }
   getModalType() {
-    let modalTypeList: FormSelectModel[] = [];
+    const modalTypeList: FormSelectModel[] = [];
     for (const i in ModalType) {
       if (typeof ModalType[i] === 'number') {
         modalTypeList.push(new FormSelectModel(i, ModalType[i] as any));
@@ -72,7 +72,7 @@ export class TileEditComponent implements OnInit, AfterViewInit {
     return modalTypeList;
   }
   getKachelType() {
-    let kachelTypeList: FormSelectModel[] = [];
+    const kachelTypeList: FormSelectModel[] = [];
     for (const i in KachelType) {
       if (typeof KachelType[i] === 'number') {
         kachelTypeList.push(new FormSelectModel(i, KachelType[i] as any));
@@ -100,24 +100,25 @@ export class TileEditComponent implements OnInit, AfterViewInit {
     let choosedTileModal: number;
     let choosedTileSize: number;
     new Promise((resolve) => {
-      resolve("ok");
+      resolve('ok');
     })
-    .then((res) => 
+    .then((res) =>
       this.entryDialog.open(NewEntryModalComponent, {
         maxWidth: '50vw',
         maxHeight: '50vh',
         data:  {metaInfo: 'Kachel Art', listOfEntrys: tileType}
       }).afterClosed().toPromise()
     )
-    .then((res: number) => {
-      choosedTileType = res
-      if (res === null) {
-        throw new Error("No Size set")
-      }
-      return res
-      }
+    .then(
+      (res: number) => {
+        if (res === null) {
+          throw new Error('No Size set');
+        }
+        choosedTileType = res;
+      },
+      (res) => {throw new Error('No Size set'); }
     )
-    .then((res) => 
+    .then((res) =>
       this.entryDialog.open(NewEntryModalComponent, {
         maxWidth: '50vw',
         maxHeight: '50vh',
@@ -125,13 +126,14 @@ export class TileEditComponent implements OnInit, AfterViewInit {
       }).afterClosed().toPromise()
     )
     .then((res) => {
-      choosedTileSize = res
-      if (res === null) {
-        throw new Error("No Size set")
-      }
-      return res
-    })
-    .then((res) => 
+        if (res === null) {
+          throw new Error('No Size set');
+        }
+        choosedTileSize = res;
+      },
+      (res) => {throw new Error('No Size set'); }
+    )
+    .then((res) =>
       this.entryDialog.open(NewEntryModalComponent, {
         maxWidth: '50vw',
         maxHeight: '50vh',
@@ -139,21 +141,22 @@ export class TileEditComponent implements OnInit, AfterViewInit {
       }).afterClosed().toPromise()
     )
     .then((res: number) => {
-      choosedTileModal = res
-      if (res === null) {
-        throw new Error("No Size set")
-      }
-      return res
-    }).then(() => {
+        if (res === null) {
+          throw new Error('No Size set');
+        }
+        choosedTileModal = res;
+      },
+      (res) => {throw new Error('No Size set'); }
+    ).then(() => {
       if (choosedTileType >= 0 && choosedTileModal >= 0 && choosedTileSize >= 0) {
-        this.updateContent.getNextNewTile(choosedTileType, choosedTileSize, choosedTileModal)
+        this.updateContent.getNextNewTile(choosedTileType, choosedTileSize, choosedTileModal);
       }
     })
-    .catch((res) => console.log(JSON.stringify(res)))
+    .catch((res) => {}/*console.log(res)*/);
   }
 
   removeEntry(entryObject: Tile) {
-    this.updateContent.deleteNewTile(entryObject)
+    this.updateContent.deleteNewTile(entryObject);
   }
   saveEntry(entryObject: Tile) {
     this.updateContent.sendSpecificNewTileChangesToBackend(entryObject);

@@ -1,3 +1,4 @@
+import { AuthGuard } from './../guard/auth/auth.guard';
 import { EditContentComponent } from './edit-content/edit-content.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { MainComponent } from './main.component';
@@ -8,6 +9,7 @@ const routes: Routes = [
   {
     path: 'main',
     component: MainComponent,
+    canActivateChild: [AuthGuard],
     children: [
         { path: '', component: DashboardComponent, outlet: 'nav' },
         { path: 'tile', component: EditContentComponent, outlet: 'nav', },

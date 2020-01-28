@@ -38,6 +38,7 @@ export class ApartmentDetailsContentService {
   reset() {
     this.newApartmentDetails = new Array();
   }
+
   private addDetailsListEntry(entryObj: ApartmentDetails[]) {
     entryObj.forEach(el => {
       const indexElement = this.newApartmentDetails.findIndex((compE: ApartmentDetails) => compE.ID === el.ID);
@@ -47,6 +48,7 @@ export class ApartmentDetailsContentService {
       this.newApartmentDetails.push(Object.assign({}, el));
     });
   }
+
   public deleteNextDetails(obj: ApartmentDetails): boolean {
     const index = this.newApartmentDetails.findIndex(el => el.ID === obj.ID);
     if (index >= 0) {
