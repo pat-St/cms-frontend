@@ -88,7 +88,7 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 ### Send Changes to Backend
 
-* Send correct order by new objects ( 1. tile 2. infotext 3. reation)
+* ~~Send correct order by new objects ( 1. tile 2. infotext 3. reation)~~
 * Send individual entity in correct order
 
 ### Input Validation
