@@ -9,10 +9,8 @@ import { Injectable, Inject } from '@angular/core';
 })
 export class LoginServiceService {
   header = new HttpHeaders({
-    'Authorization': 'Basic ',
+    Authorization: 'Basic ',
   });
-
-  isLogin = false;
 
   constructor(@Inject('BACKEND_API_URL') private hostUrl: string, private httpClient: HttpClient) {
   }
@@ -28,21 +26,21 @@ export class LoginServiceService {
 
   login(user: User): Promise<boolean> {
     const userauth = 'Basic ' + window.btoa(user.getUser()[0] + ':' + user.getUser()[1]);
-    const newHeader = new HttpHeaders({'Authorization': userauth});
+    const newHeader = new HttpHeaders({Authorization: userauth});
     return new Promise((resolve, reject) => {
-      this.sendLoginToBackend("login", newHeader).subscribe(
+      this.sendLoginToBackend('login', newHeader).subscribe(
         (result: any) => {
           if (result as Token) {
             localStorage.setItem('token', JSON.stringify(result));
             localStorage.setItem('username', JSON.stringify(user.getUser()[0]));
             return resolve(true);
           } else {
-            console.log("login error " + JSON.stringify(result));
+            console.log('login error ' + JSON.stringify(result));
             return resolve(false);
           }
         },
         (error) => {
-          return reject("login error " + JSON.stringify(error));
+          return reject('login error ' + JSON.stringify(error));
         }
       );
     });
@@ -54,14 +52,14 @@ export class LoginServiceService {
       return;
     }
     return new Promise((resolve, reject) => {
-      this.sendLogoutToBackend("logout/"+ user).subscribe(
+      this.sendLogoutToBackend('logout/' + user).subscribe(
         (result: boolean) => {
           if (result) {
             return resolve(true);
           }
         },
         (error) => {
-          console.log("login error " + JSON.stringify(error));
+          console.log('login error ' + JSON.stringify(error));
           return reject(false);
         }
       );

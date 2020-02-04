@@ -22,7 +22,7 @@ export class ApartmentDetailsContentService {
 
   async loadNewContent(count= 5) {
     if (count < 0) {
-      console.warn("could not load content from backend");
+      console.warn('could not load content from backend');
       return;
     }
     if (this.loadContent.isApartmentFinished()) {
@@ -30,7 +30,7 @@ export class ApartmentDetailsContentService {
       const apartmentDetails = this.loadContent.getApartmentDetails();
       this.addDetailsListEntry(apartmentDetails);
     } else {
-      console.log("await for apartment");
+      console.log('await for apartment');
       setTimeout( () => this.loadNewContent(count - 1), count * 1000 );
     }
   }
@@ -60,7 +60,7 @@ export class ApartmentDetailsContentService {
   }
 
   public updateNextApartment(obj: ApartmentDetails): boolean {
-    const index = this.newApartmentDetails.findIndex(el => el.ID === obj.ID)
+    const index = this.newApartmentDetails.findIndex(el => el.ID === obj.ID);
     if (index >= 0) {
       this.newApartmentDetails[index].changed = true;
       return true;
@@ -78,7 +78,7 @@ export class ApartmentDetailsContentService {
       .filter(el => el.deleteEntry);
     }
     return deleteDescEntities.map( el => {
-      this.backend.deleteToBackend("apartment_details", el.ID).toPromise();
+      this.backend.deleteToBackend('apartment_details', el.ID).toPromise();
     });
   }
 
@@ -89,9 +89,9 @@ export class ApartmentDetailsContentService {
     } else {
       updateDescEntities = this.newApartmentDetails
       .filter(el => this.loadContent.getApartmentDetails().findIndex(i => i.ID === el.ID) > -1)
-      .filter(el => JSON.stringify(el) !== JSON.stringify(this.loadContent.getApartmentDetails().find(i => i.ID === el.ID)))
+      .filter(el => JSON.stringify(el) !== JSON.stringify(this.loadContent.getApartmentDetails().find(i => i.ID === el.ID)));
     }
-    return updateDescEntities.length > 0 ? this.backend.updateToBackend("apartment_details", updateDescEntities).toPromise() : true;
+    return updateDescEntities.length > 0 ? this.backend.updateToBackend('apartment_details', updateDescEntities).toPromise() : true;
   }
 
   sendNew(objs: ApartmentDetails = null) {
@@ -102,7 +102,7 @@ export class ApartmentDetailsContentService {
       newDescEntities = this.newApartmentDetails
     .filter(el => this.loadContent.getApartmentDetails().findIndex(i => i.ID === el.ID) < 0);
     }
-    return newDescEntities.length > 0 ? this.backend.updateToBackend("apartment_details", newDescEntities).toPromise() : true;
+    return newDescEntities.length > 0 ? this.backend.updateToBackend('apartment_details', newDescEntities).toPromise() : true;
   }
 
   public sendChangesToBackend() {

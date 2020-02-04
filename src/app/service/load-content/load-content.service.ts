@@ -4,16 +4,16 @@ import {
   ApartmentPrice,
   ApartmentContent,
   ApartmentDetails
-} from "./../../model/apartment";
-import { BackendRequestService } from "./../backend-request/backend-request.service";
-import { Injectable } from "@angular/core";
-import { Tile } from "src/app/model/tile";
-import { InfoText, InfoTextToTile } from "src/app/model/infoText";
-import { Image } from "src/app/model/image";
+} from './../../model/apartment';
+import { BackendRequestService } from './../backend-request/backend-request.service';
+import { Injectable } from '@angular/core';
+import { Tile } from 'src/app/model/tile';
+import { InfoText, InfoTextToTile } from 'src/app/model/infoText';
+import { Image } from 'src/app/model/image';
 import { platform } from 'os';
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root'
 })
 export class LoadContentService {
   tile: Tile[];
@@ -76,7 +76,7 @@ export class LoadContentService {
   }
 
   async loadTile() {
-    this.backend.getFromBackend("tile").subscribe((payload: Tile[]) => {
+    this.backend.getFromBackend('tile').subscribe((payload: Tile[]) => {
       this.tile = payload;
       this.incrementCounter();
     });
@@ -88,7 +88,7 @@ export class LoadContentService {
 
   async loadInfoText() {
     this.backend
-      .getFromBackend("info_text")
+      .getFromBackend('info_text')
       .subscribe((payload: InfoText[]) => {
         this.infoText = payload;
         this.incrementCounter();
@@ -101,7 +101,7 @@ export class LoadContentService {
 
   async loadTextToTile() {
     this.backend
-      .getFromBackend("info_text_to_tile")
+      .getFromBackend('info_text_to_tile')
       .subscribe((payload: InfoTextToTile[]) => {
         this.infoTextToTile = payload;
         this.incrementCounter();
@@ -114,7 +114,7 @@ export class LoadContentService {
 
   async loadApartmentContent() {
     this.backend
-      .getFromBackend("apartment")
+      .getFromBackend('apartment')
       .subscribe((payload: ApartmentContent[]) => {
         this.apartmentContent = payload;
         this.incrementCounter();
@@ -128,7 +128,7 @@ export class LoadContentService {
 
   async loadApartmentDesc() {
     this.backend
-      .getFromBackend("apartment_desc")
+      .getFromBackend('apartment_desc')
       .subscribe((payload: ApartmentDescription[]) => {
         this.apartmentDescription = payload;
         this.incrementCounter();
@@ -142,7 +142,7 @@ export class LoadContentService {
 
   async loadDetailsToApartment() {
     this.backend
-      .getFromBackend("details_to_apartment")
+      .getFromBackend('details_to_apartment')
       .subscribe((payload: DetailsToApartment[]) => {
         this.detailsToApartment = payload;
         this.incrementCounter();
@@ -156,7 +156,7 @@ export class LoadContentService {
 
   async loadApartmentDetails() {
     this.backend
-      .getFromBackend("apartment_details")
+      .getFromBackend('apartment_details')
       .subscribe((payload: ApartmentDetails[]) => {
         this.apartmentDetails = payload;
         this.incrementCounter();
@@ -170,7 +170,7 @@ export class LoadContentService {
 
   async loadApartmentPrice() {
     this.backend
-      .getFromBackend("apartment_price")
+      .getFromBackend('apartment_price')
       .subscribe((payload: ApartmentPrice[]) => {
         this.apartmentPrice = payload;
         this.incrementCounter();
@@ -183,7 +183,7 @@ export class LoadContentService {
   }
 
   async loadImage() {
-    this.backend.getFromBackend("image/id").subscribe(
+    this.backend.getFromBackend('image/id').subscribe(
       (payloadList: number[]) => {
         this.imageCounter = payloadList.length;
         if (payloadList.length === 0) {
@@ -193,7 +193,7 @@ export class LoadContentService {
         } else {
           payloadList.forEach( (id, index) => {
             this.imageObject = new Array();
-            this.backend.getFromBackend("image/id/" + id).subscribe(
+            this.backend.getFromBackend('image/id/' + id).subscribe(
               (imageObj: Image) => {
                 imageObj.description = this.convertImageDesc(imageObj.description);
                 this.loadBackendImage(imageObj.ID);
@@ -241,7 +241,7 @@ export class LoadContentService {
 
   private async createImageFromBlob(idOfImage: number, image: Blob) {
     const reader = new FileReader();
-    reader.addEventListener("load", () => {
+    reader.addEventListener('load', () => {
       this.imageCache.set(idOfImage, reader.result.toString());
     }, false);
     if (image) {

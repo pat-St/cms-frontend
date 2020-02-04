@@ -13,21 +13,21 @@ export class ImageContentService {
   constructor(private backend: BackendRequestService, private loadContent: LoadContentService) { }
 
   public nextIdOf(itemColl: Array<number>): number {
-    if (itemColl.length < 2) { 
+    if (itemColl.length < 2) {
       return itemColl.length;
     }
     return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1; }
 
   async loadNewContent(count= 5) {
     if (count < 0) {
-      console.warn("could not load content from backend");
+      console.warn('could not load content from backend');
       return;
     }
     if (this.loadContent.isFinished()) {
       const images = this.loadContent.getImages();
       this.addImageEntry(images);
     } else {
-      console.log("await for info text");
+      console.log('await for info text');
       setTimeout( () => this.loadNewContent(count - 1), count * 1000 );
     }
   }
@@ -37,7 +37,7 @@ export class ImageContentService {
 
   private addImageEntry(entryObject: Image[]) {
     entryObject.forEach((element: Image) => {
-      const indexElement = this.newImage.findIndex((compE: Image) => compE.ID === element.ID)
+      const indexElement = this.newImage.findIndex((compE: Image) => compE.ID === element.ID);
       if (indexElement >= 0) {
         this.newImage.splice(indexElement, 1);
       }
@@ -50,7 +50,7 @@ export class ImageContentService {
       const nextImageID = this.nextIdOf(
         this.loadContent.getImages().map(el => el.ID).concat(this.newImage.map(el => el.ID))
       );
-      this.newImage.push(new Image(nextImageID, [], "", apartmentID, infoTetxId, tileID));
+      this.newImage.push(new Image(nextImageID, [], '', apartmentID, infoTetxId, tileID));
       return true;
   }
 
@@ -81,11 +81,11 @@ export class ImageContentService {
     return Promise.resolve(this.getDeleteChanges(singleImage))
     .then((el) =>
       Promise.all(
-        el.map(i => this.backend.deleteToBackend("image", i.ID).toPromise())
+        el.map(i => this.backend.deleteToBackend('image', i.ID).toPromise())
       )
     )
     .catch((err) => {
-      console.log("error by send delete images: " + JSON.stringify(err));
+      console.log('error by send delete images: ' + JSON.stringify(err));
     });
   }
 
@@ -100,27 +100,27 @@ export class ImageContentService {
     return Promise.resolve(this.getUpdateChanges(singleImage))
     .then((el) => {
       el.forEach(i => {
-        i.description = i.description.replace(/\s/g,"_");
+        i.description = i.description.replace(/\s/g, '_');
         i.image = new Array();
-        this.backend.updateToBackend("image", new Array(i)).toPromise();
+        this.backend.updateToBackend('image', new Array(i)).toPromise();
         const imageCmpBinary = this.imageBinaryCmp(i, this.loadContent.getImages().find(r => r.ID === i.ID));
-        //upload Image
+        // upload Image
         if (i.changed || imageCmpBinary) {
           const base64Image = this.loadContent.showImage(i.ID).replace(/data:image\/jpeg;base64,/g, '');
           const plainString = window.atob(base64Image);
-  
+
           const arrayBuffer = new ArrayBuffer(plainString.length);
           const int8Array = new Uint8Array(arrayBuffer);
           for (let n = 0; n < plainString.length; n++) {
             int8Array[n] = plainString.charCodeAt(n);
           }
-          const fileBlob = new Blob([int8Array], { 'type': 'image/jpeg'});
-          this.backend.updateImageToBackend("image/" + i.ID, fileBlob).toPromise();
+          const fileBlob = new Blob([int8Array], { type: 'image/jpeg'});
+          this.backend.updateImageToBackend('image/' + i.ID, fileBlob).toPromise();
         }
-      })
+      });
     })
     .catch((err) => {
-      console.log("error by send delete images: " + JSON.stringify(err));
+      console.log('error by send delete images: ' + JSON.stringify(err));
     });
   }
 
@@ -137,12 +137,12 @@ export class ImageContentService {
     .then((res) =>
       res.map(el => {
         el.image = [];
-        el.description = el.description.replace(/\s/g,"_");
+        el.description = el.description.replace(/\s/g, '_');
         return el;
       })
     )
     .then((res) =>
-      res.length > 0 ? this.backend.createToBackend("image", res).toPromise() : false
+      res.length > 0 ? this.backend.createToBackend('image', res).toPromise() : false
     )
     .then((res) => {
       if (res === false) {
@@ -158,13 +158,13 @@ export class ImageContentService {
           for (let n = 0; n < plainString.length; n++) {
             int8Array[n] = plainString.charCodeAt(n);
           }
-          const fileBlob = new Blob([int8Array], { 'type': 'image/jpeg'})
-          return this.backend.updateImageToBackend("image/" + i.ID, fileBlob).toPromise();
+          const fileBlob = new Blob([int8Array], { type: 'image/jpeg'});
+          return this.backend.updateImageToBackend('image/' + i.ID, fileBlob).toPromise();
         });
       }
     )
-    .catch((err) => 
-      console.log("error by send new images: " + JSON.stringify(err))
+    .catch((err) =>
+      console.log('error by send new images: ' + JSON.stringify(err))
     );
   }
 

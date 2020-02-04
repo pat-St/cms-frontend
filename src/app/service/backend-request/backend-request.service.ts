@@ -7,8 +7,8 @@ import { AnyARecord } from 'dns';
   providedIn: 'root'
 })
 export class BackendRequestService {
-  header = new HttpHeaders({'Accept': 'application/json'});
-  
+  header = new HttpHeaders({Accept: 'application/json'});
+
   constructor(@Inject('BACKEND_API_URL') private hostUrl: string, private httpClient: HttpClient) {
   }
 
