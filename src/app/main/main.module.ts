@@ -29,6 +29,7 @@ import { AllInfoTextEditComponent } from './edit-content/all-info-text-edit/all-
 import { AllApartmentEditComponent } from './edit-content/all-apartment-edit/all-apartment-edit.component';
 import { ApartmentDetailsEditComponent } from './edit-content/all-apartment-edit/apartment-details-edit/apartment-details-edit.component';
 import { ApartmentContentService } from '../service/update-content/apartment-content.service';
+import { AllApartmentDetailsEditComponent } from './edit-content/all-apartment-details-edit/all-apartment-details-edit.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { ApartmentContentService } from '../service/update-content/apartment-con
     ModifyModalComponent,
     AllInfoTextEditComponent,
     AllApartmentEditComponent,
-    ApartmentDetailsEditComponent
+    ApartmentDetailsEditComponent,
+    AllApartmentDetailsEditComponent
   ],
   imports: [
     CommonModule,

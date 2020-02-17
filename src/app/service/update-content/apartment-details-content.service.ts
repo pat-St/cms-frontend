@@ -26,7 +26,6 @@ export class ApartmentDetailsContentService {
       return;
     }
     if (this.loadContent.isApartmentFinished()) {
-
       const apartmentDetails = this.loadContent.getApartmentDetails();
       this.addDetailsListEntry(apartmentDetails);
     } else {
@@ -49,6 +48,14 @@ export class ApartmentDetailsContentService {
     });
   }
 
+  addDetailsEntry(entryObj: ApartmentDetails) {
+    const indexElement = this.newApartmentDetails.findIndex((compE: ApartmentDetails) => compE.ID === entryObj.ID);
+    if (indexElement >= 0) {
+      this.newApartmentDetails.splice(indexElement, 1);
+    }
+    this.newApartmentDetails.push(Object.assign({}, entryObj));
+  }
+
   public deleteNextDetails(obj: ApartmentDetails): boolean {
     const index = this.newApartmentDetails.findIndex(el => el.ID === obj.ID);
     if (index >= 0) {
@@ -69,40 +76,38 @@ export class ApartmentDetailsContentService {
     }
   }
 
+  public getDeleteDetailsChanges(singleImage: ApartmentDetails = null): ApartmentDetails[] {
+    const listOfImages = singleImage ? new Array(singleImage) : this.newApartmentDetails;
+    return listOfImages.filter(i => i.deleteEntry);
+  }
+
   private sendDelete(objs: ApartmentDetails = null) {
-    let deleteDescEntities: ApartmentDetails[];
-    if (objs) {
-      deleteDescEntities =  new Array(objs);
-    } else {
-      deleteDescEntities = this.newApartmentDetails
-      .filter(el => el.deleteEntry);
-    }
+    const deleteDescEntities: ApartmentDetails[] = this.getDeleteDetailsChanges(objs);
     return deleteDescEntities.map( el => {
       this.backend.deleteToBackend('apartment_details', el.ID).toPromise();
     });
   }
 
-  private sendUpdate(objs: ApartmentDetails = null) {
-    let updateDescEntities: ApartmentDetails[];
-    if (objs) {
-      updateDescEntities =  new Array(objs);
-    } else {
-      updateDescEntities = this.newApartmentDetails
+  public getUpdateDetailsChanges(singleImage: ApartmentDetails = null): ApartmentDetails[] {
+    const listOfImages = singleImage ? new Array(singleImage) : this.newApartmentDetails;
+    return listOfImages
       .filter(el => this.loadContent.getApartmentDetails().findIndex(i => i.ID === el.ID) > -1)
       .filter(el => JSON.stringify(el) !== JSON.stringify(this.loadContent.getApartmentDetails().find(i => i.ID === el.ID)));
-    }
+  }
+
+  private sendUpdate(objs: ApartmentDetails = null) {
+    const updateDescEntities: ApartmentDetails[] = this.getUpdateDetailsChanges(objs);
     return updateDescEntities.length > 0 ? this.backend.updateToBackend('apartment_details', updateDescEntities).toPromise() : true;
   }
 
+  public getNewDetailsChanges(singleImage: ApartmentDetails = null): ApartmentDetails[] {
+    const listOfImages = singleImage ? new Array(singleImage) : this.newApartmentDetails;
+    return listOfImages.filter(i => this.loadContent.getApartmentDetails().findIndex(n => n.ID === i.ID) < 0);
+  }
+
   sendNew(objs: ApartmentDetails = null) {
-    let newDescEntities: ApartmentDetails[];
-    if (objs) {
-      newDescEntities =  new Array(objs);
-    } else {
-      newDescEntities = this.newApartmentDetails
-    .filter(el => this.loadContent.getApartmentDetails().findIndex(i => i.ID === el.ID) < 0);
-    }
-    return newDescEntities.length > 0 ? this.backend.updateToBackend('apartment_details', newDescEntities).toPromise() : true;
+    const newDescEntities: ApartmentDetails[] = this.getNewDetailsChanges(objs);
+    return newDescEntities.length > 0 ? this.backend.createToBackend('apartment_details', newDescEntities).toPromise() : true;
   }
 
   public sendChangesToBackend() {

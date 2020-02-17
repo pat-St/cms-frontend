@@ -12,7 +12,7 @@
   <ng-template ngFor let-kachelExp [ngForOf]="kachelExpansionList" matExpansionPanelContent>
     <div *ngIf="!kachelExp.deleteEntry">      
       <mat-form-field>
-          <input matInput placeholder="Name" [(ngModel)]="kachelExp.titleName">
+          <input matInput placeholder="Name" [(ngModel)]="kachelExp.titleName" minlength="5" required>
         </mat-form-field>
         <mat-form-field>
           <input matInput placeholder="Beschreibung" [(ngModel)]="kachelExp.description">

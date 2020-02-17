@@ -22,7 +22,7 @@
             <button *ngIf="hasImage(infoTextExp.infoText.ID)" class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="showImageDetails(infoTextExp.infoText.ID)">
                 {{isImageDetailsActive(infoTextExp.ID)? 'expand_less':'expand_more'}}</button>
             <mat-form-field class="info-content-area">
-                    <textarea matInput placeholder="Inhalt" [(ngModel)]="infoTextExp.infoText.contentText"></textarea>
+                    <textarea matInput placeholder="Inhalt" [(ngModel)]="infoTextExp.infoText.contentText" minlength="5" required></textarea>
             </mat-form-field>
             <div *ngIf="hasImage(infoTextExp.infoText.ID) && isImageDetailsActive(infoTextExp.infoText.ID)">
                 <app-all-image-edit  [infoTextID]="infoTextExp.infoText.ID"></app-all-image-edit>

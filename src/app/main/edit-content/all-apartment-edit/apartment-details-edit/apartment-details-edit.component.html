@@ -12,10 +12,10 @@
     <ng-template ngFor let-descExp [ngForOf]="apartmentDescList">
       <div *ngIf="!descExp.deleteEntry">
         <mat-form-field>
-          <input matInput placeholder="Beschreibung" [(ngModel)]="descExp.description">
+          <input matInput placeholder="Beschreibung" [(ngModel)]="descExp.description" minlength="5" required>
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Bedeutung" [(ngModel)]="descExp.info">
+          <input matInput placeholder="Bedeutung" [(ngModel)]="descExp.info" minlength="5" required>
         </mat-form-field>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" [disabled]="true">save</button>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="removeDescEntry(descExp)">remove_circle</button>
@@ -70,16 +70,16 @@
     <ng-template ngFor let-priceExp [ngForOf]="apartmentPriceList">
       <div *ngIf="!priceExp.deleteEntry">        
         <mat-form-field>
-          <input matInput placeholder="Personen" [(ngModel)]="priceExp.personCount">
+          <input matInput placeholder="Personen" [(ngModel)]="priceExp.personCount" minlength="1" required>
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Haupt-Saison" [(ngModel)]="priceExp.peakSeason">
+          <input matInput placeholder="Haupt-Saison" [(ngModel)]="priceExp.peakSeason" minlength="1" required>
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Neben-Saison" [(ngModel)]="priceExp.offSeason">
+          <input matInput placeholder="Neben-Saison" [(ngModel)]="priceExp.offSeason" minlength="1" required>
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Nächte" [(ngModel)]="priceExp.nights">
+          <input matInput placeholder="Nächte" [(ngModel)]="priceExp.nights" minlength="1" required>
         </mat-form-field>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="save" matTooltip="Eintrag Speichern" color="primary" [disabled]="true">save</button>
         <button class="save-button material-icons" mat-stroked-button aria-hidden="false" aria-label="remove" matTooltip="Eintrag Löschen" color="warn" (click)="removePriceEntry(priceExp)">remove_circle</button>
