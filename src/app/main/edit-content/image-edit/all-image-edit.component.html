@@ -11,7 +11,7 @@
   <ng-template ngFor let-imageExp [ngForOf]="imageExpansionList">
     <div *ngIf="filterView(imageExp)">
       <mat-form-field class="desc-form-field">
-      <textarea matInput placeholder="Beschreibung" [(ngModel)]="imageExp.description"></textarea>
+      <textarea matInput placeholder="Beschreibung" [(ngModel)]="imageExp.description" minlength="5" required></textarea>
       </mat-form-field>
       <button *ngIf="!isChildComponent()" class="click-button" mat-flat-button color="primary" (click)="changeApartment(imageExp)">Ferienwohnung: {{getApartmentName(imageExp.fk_apartment)}}</button>
       <button *ngIf="!isChildComponent()" class="click-button" mat-flat-button color="primary" (click)="changeInfoText(imageExp)">Info Text: {{getInfoTextName(imageExp.fk_info)}}</button>

@@ -82,10 +82,10 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
     .then(() => this.updateImage.sendChangesToBackend())
     // update info text
     .then(() => this.updateInfoText.sendChangesToBackend())
-    // update apartment content
-    .then(() => this.updateApartment.sendChangesToBackend())
     // update apartment details
     .then(() => this.updateDetails.sendChangesToBackend())
+    // update apartment content
+    .then(() => this.updateApartment.sendChangesToBackend())
     // update tiles
     .then(() => this.updateContent.sendUpdateToBackend())
     .catch((err) => {
@@ -97,8 +97,8 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
     return Promise.resolve(true)
     .then(() => this.updateContent.sendNew())
     .then(() => this.updateInfoText.sendNew())
-    .then(() => this.updateApartment.sendNew())
     .then(() => this.updateDetails.sendNew())
+    .then(() => this.updateApartment.sendNew())
     .then(() => this.updateImage.sendNew())
     .catch((err) => {
       console.log("error by send new objects: " + JSON.stringify(err));
@@ -165,6 +165,19 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
     return deteleColl.concat(updateColl).concat(newColl);
   }
 
+  private collectDetailsForApartmentModification(): ModalTableEntry[] {
+    const deteleColl: ModalTableEntry[] = this.updateDetails
+      .getDeleteDetailsChanges()
+      .map((i) => ({name: i.identifier, status: "löschen"}));
+    const updateColl: ModalTableEntry[] = this.updateDetails
+      .getUpdateDetailsChanges()
+      .map((i) => ({name: i.identifier, status: "ändern"}));
+    const newColl: ModalTableEntry[] = this.updateDetails
+      .getNewDetailsChanges()
+      .map((i) => ({name: i.identifier, status: "neu"}));
+    return deteleColl.concat(updateColl).concat(newColl);
+  }
+
   private collectApartmentDescModification(): ModalTableEntry[] {
     const deteleColl: ModalTableEntry[] = this.updateApartment
       .getDeleteDescChanges()
@@ -209,6 +222,7 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
     mapOfColl.set("Bilder", this.collectImageModification());
     mapOfColl.set("Kacheln", this.collectTileModification());
     mapOfColl.set("Infotext", this.collectTextToTileModification());
+    mapOfColl.set("Details für Ferienwohnung", this.collectDetailsForApartmentModification());
     mapOfColl.set("Ferienwohnung", this.collectApartmentContentModification());
     mapOfColl.set("Ferienwohnung Details", this.collectApartmentDetailsModification());
     mapOfColl.set("Ferienwohnung Preise", this.collectApartmentPriceModification());
