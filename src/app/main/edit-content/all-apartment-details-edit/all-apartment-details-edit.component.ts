@@ -21,6 +21,7 @@ export class AllApartmentDetailsEditComponent implements OnInit, AfterViewInit {
   constructor(
     private _ngZone: NgZone,
     private updateDetails: ApartmentDetailsContentService,
+    private updateApartment: ApartmentContentService,
     private entryDialog: MatDialog) { }
 
 
@@ -54,6 +55,8 @@ export class AllApartmentDetailsEditComponent implements OnInit, AfterViewInit {
   }
 
   removeEntry(entryObject: ApartmentDetails) {
+    // set delete of every apartment dependencies to this entry
+    this.updateApartment.deleteAllApartmentDetailsRelation(entryObject);
     this.updateDetails.deleteNextDetails(entryObject);
   }
 

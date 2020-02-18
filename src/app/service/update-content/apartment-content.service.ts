@@ -1,3 +1,4 @@
+import { ApartmentDetails } from 'src/app/model/apartment';
 import { ImageContentService } from './image-content.service';
 import { ApartmentContent, ApartmentDescription, ApartmentPrice, DetailsToApartment, NewApartmentObject } from './../../model/apartment';
 import { LoadContentService } from './../load-content/load-content.service';
@@ -88,6 +89,18 @@ export class ApartmentContentService {
       return false;
     }
   }
+
+  // search in all apartments and set delete of found ApartmentDetails relation.
+  // will be used to eliminate all dependencies of ApartmentDetails.
+  public deleteAllApartmentDetailsRelation(obj: ApartmentDetails) {
+    this.newApartment.forEach(el => {
+      el.detailsToApartment
+        .filter(i => i.fk_details === obj.ID)
+        .forEach(i => i.deleteEntry = true);
+    })
+    return true;
+  }
+
   public updateNextApartment(obj: NewApartmentObject): boolean {
     const index = this.newApartment.findIndex(el => el.content.ID === obj.content.ID);
     if (index >= 0) {
@@ -100,7 +113,7 @@ export class ApartmentContentService {
 
   public getDeleteDetailsChanges(singleImage: NewApartmentObject = null): DetailsToApartment[] {
     const listOfImages = singleImage ? new Array(singleImage) : this.newApartment;
-    const lsitofList = listOfImages.map(el => el.detailsToApartment.filter(i => i.deleteEntry));
+    const lsitofList = listOfImages.map(el => el.detailsToApartment.filter(i => i.deleteEntry)).filter(el => el.length > 0);
     if (lsitofList.length > 1) {
       return lsitofList.reduce((prevColl, currColl) => currColl.concat(prevColl));
     }
@@ -112,7 +125,7 @@ export class ApartmentContentService {
 
   public getDeleteDescChanges(singleImage: NewApartmentObject = null): ApartmentDescription[] {
     const listOfImages = singleImage ? new Array(singleImage) : this.newApartment;
-    const lsitofList = listOfImages.map(el => el.description.filter(i => i.deleteEntry));
+    const lsitofList = listOfImages.map(el => el.description.filter(i => i.deleteEntry)).filter(el => el.length > 0);
     if (lsitofList.length > 1) {
       return lsitofList.reduce((prevColl, currColl) => currColl.concat(prevColl));
     }
@@ -124,7 +137,7 @@ export class ApartmentContentService {
 
   public getDeletePriceChanges(singleImage: NewApartmentObject = null): ApartmentPrice[] {
     const listOfImages = singleImage ? new Array(singleImage) : this.newApartment;
-    const lsitofList = listOfImages.map(el => el.price.filter(i => i.deleteEntry));
+    const lsitofList = listOfImages.map(el => el.price.filter(i => i.deleteEntry)).filter(el => el.length > 0);
     if (lsitofList.length > 1) {
       return lsitofList.reduce((prevColl, currColl) => currColl.concat(prevColl));
     }
