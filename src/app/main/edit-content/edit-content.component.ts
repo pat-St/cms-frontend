@@ -82,10 +82,10 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
     .then(() => this.updateImage.sendChangesToBackend())
     // update info text
     .then(() => this.updateInfoText.sendChangesToBackend())
-    // update apartment details
-    .then(() => this.updateDetails.sendChangesToBackend())
     // update apartment content
     .then(() => this.updateApartment.sendChangesToBackend())
+    // update apartment details
+    .then(() => this.updateDetails.sendChangesToBackend())
     // update tiles
     .then(() => this.updateContent.sendUpdateToBackend())
     .catch((err) => {
@@ -248,7 +248,7 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
     const dialogRef = this.dialog.open(ModifyModalComponent, {
       maxWidth: '97vw',
       maxHeight: '97vh',
-      data : {header: 'Folgende Änderung werden gespeichert', listOfEntrys: this.collectModification()},
+      data : {header: 'Folgende Änderung werden gespeichert oder verändert', listOfEntrys: this.collectModification()},
     });
     dialogRef.afterClosed().subscribe((result: boolean) => {
       if (result) {
