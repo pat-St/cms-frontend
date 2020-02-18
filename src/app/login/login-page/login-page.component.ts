@@ -1,7 +1,7 @@
 import { Router } from '@angular/router';
 import { LoginServiceService } from './../../service/login-service/login-service.service';
 import { Component, OnInit } from '@angular/core';
-import {MatDialog} from '@angular/material'
+import {MatDialog} from '@angular/material/dialog'
 import { User } from 'src/app/model/user';
 @Component({
   selector: 'app-login-page',

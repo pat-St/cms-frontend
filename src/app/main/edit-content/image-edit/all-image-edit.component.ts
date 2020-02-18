@@ -12,7 +12,7 @@ import { Image } from '../../../model/image';
 import { Component, OnInit, ViewChild, NgZone, AfterViewInit, Input } from '@angular/core';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { element } from 'protractor';
 import { UpdateContentService } from 'src/app/service/update-content/update-content.service';
 import { TouchSequence } from 'selenium-webdriver';

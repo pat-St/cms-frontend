@@ -1,7 +1,7 @@
 import { LoadContentService } from '../../service/load-content/load-content.service';
 import { Image } from 'src/app/model/image';
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 export interface PreviewImage {
   image: Image;

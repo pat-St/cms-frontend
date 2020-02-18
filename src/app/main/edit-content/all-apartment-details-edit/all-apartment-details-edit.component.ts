@@ -1,5 +1,5 @@
 import { NewEntryModalComponent } from './../../custom-info-modal/new-entry-modal.component';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { ApartmentDetails } from './../../../model/apartment';
 import { Component, OnInit, AfterViewInit, ViewChild, NgZone } from '@angular/core';
 import { UpdateContentService } from 'src/app/service/update-content/update-content.service';

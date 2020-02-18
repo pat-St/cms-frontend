@@ -11,7 +11,7 @@ import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
 import { Tile } from 'src/app/model/tile';
 import { UpdateContentService } from 'src/app/service/update-content/update-content.service';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-all-apartment-edit',

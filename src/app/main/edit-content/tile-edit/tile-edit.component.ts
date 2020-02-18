@@ -1,6 +1,6 @@
 import { NewEntryObject } from './../../../model/infoText';
 import { NewEntryModalComponent } from '../../custom-info-modal/new-entry-modal.component';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { ImageContentService } from './../../../service/update-content/image-content.service';
 import { FormSelectModel } from '../../../model/tileEdit/tileEdit';
 import { Tile } from 'src/app/model/tile';

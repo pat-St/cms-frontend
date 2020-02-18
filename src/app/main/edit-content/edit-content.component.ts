@@ -10,7 +10,7 @@ import { Component, OnInit, ViewChild, NgZone, ChangeDetectorRef, AfterViewCheck
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
 import { UpdateContentService } from 'src/app/service/update-content/update-content.service';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 @Component({
   selector: 'app-edit-content',
