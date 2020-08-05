@@ -27,9 +27,9 @@
         </mat-form-field>
         <mat-form-field>
             <mat-label>Kachel Größe</mat-label>
-            <mat-select [(ngModel)]="kachelExp.kachelSize">
-              <mat-option *ngFor="let kachelType of kachelSizeSelected" [value]="kachelType.desc">
-                {{kachelType.value}}
+            <mat-select [(ngModel)]="kachelExp.tileSizeType">
+              <mat-option *ngFor="let tileSize of kachelSizeSelected" [value]="tileSize.desc">
+                {{tileSize.value}}
               </mat-option>
             </mat-select>
           </mat-form-field>

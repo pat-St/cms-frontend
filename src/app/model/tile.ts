@@ -4,7 +4,7 @@ export class Tile {
   description: string;
   kachelType: number;
   modalType: number;
-  kachelSize: number;
+  tileSizeType: number;
   deleteEntry: boolean = false;
   changed: boolean = false;
 
@@ -14,7 +14,7 @@ export class Tile {
     description: string = null,
     kachelType: number = 0,
     modalType: number = 2,
-    kachelSize: number = 20,
+    tileSizeType: number = 20,
     deleteEntry: boolean = false,
     changed: boolean = false
   ) {
@@ -23,7 +23,7 @@ export class Tile {
     this.description = description;
     this.kachelType = kachelType;
     this.modalType = modalType;
-    this.kachelSize = kachelSize;
+    this.tileSizeType = tileSizeType;
     this.changed = changed;
     this.deleteEntry = deleteEntry;
   }

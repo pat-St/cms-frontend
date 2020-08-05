@@ -5,12 +5,10 @@ import { ImageContentService } from './../../../service/update-content/image-con
 import { FormSelectModel } from '../../../model/tileEdit/tileEdit';
 import { Tile } from 'src/app/model/tile';
 import { KachelSize, KachelType, ModalType } from '../../../model/tile';
-import { LoadContentService } from '../../../service/load-content/load-content.service';
 import { Component, OnInit, NgZone, ViewChild, AfterViewInit } from '@angular/core';
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 import {take} from 'rxjs/operators';
 import { UpdateContentService } from 'src/app/service/update-content/update-content.service';
-import { reject } from 'q';
 
 @Component({
   selector: 'app-tile-edit',
@@ -22,7 +20,7 @@ export class TileEditComponent implements OnInit, AfterViewInit {
   @ViewChild('autosize', {static: false}) autosize: CdkTextareaAutosize;
 
   panelOpenState = false;
-  // Feature disabled for unknown behavour
+  // TODO: Feature disabled for unknown behavour
   disableModalChanges = true;
 
   kachelExpansionList: Array<Tile> = new Array();
@@ -55,11 +53,14 @@ export class TileEditComponent implements OnInit, AfterViewInit {
   }
   getKachelSize() {
     const kachelSizeList: FormSelectModel[] = [];
+    let index = 0;
     for (const i in KachelSize) {
       if (typeof KachelSize[i] === 'number') {
-        kachelSizeList.push(new FormSelectModel(i, KachelSize[i] as any));
+        kachelSizeList.push(new FormSelectModel(i, index));
+        index += 1;
       }
     }
+    console.log(JSON.stringify(kachelSizeList))
     return kachelSizeList;
   }
   getModalType() {
@@ -95,7 +96,7 @@ export class TileEditComponent implements OnInit, AfterViewInit {
   addNewEntry() {
     const tileType = this.kachelTypeSelected.map(el => new NewEntryObject(el.desc as number, el.value));
     const tileModal = this.modalTypeSelected.map(el => new NewEntryObject(el.desc as number, el.value));
-    const tileSize = this.kachelSizeSelected.map(el => new NewEntryObject(el.desc as number, el.value));
+    const tileSize = this.kachelSizeSelected.map((el: FormSelectModel, index: number) => new NewEntryObject(index, el.value));
     let choosedTileType: number;
     let choosedTileModal: number;
     let choosedTileSize: number;
