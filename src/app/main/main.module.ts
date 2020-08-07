@@ -1,3 +1,4 @@
+import { TileOrderContentService } from './../service/update-content/tile-order-content.service';
 import { ModifyModalComponent } from './custom-info-modal/modify-list-for-save.component';
 import { environment } from './../../environments/environment';
 import { RefreshModalComponent } from './custom-info-modal/refresh-information-modal.component';
@@ -30,6 +31,7 @@ import { AllApartmentEditComponent } from './edit-content/all-apartment-edit/all
 import { ApartmentDetailsEditComponent } from './edit-content/all-apartment-edit/apartment-details-edit/apartment-details-edit.component';
 import { ApartmentContentService } from '../service/update-content/apartment-content.service';
 import { AllApartmentDetailsEditComponent } from './edit-content/all-apartment-details-edit/all-apartment-details-edit.component';
+import { TileOrderEditComponent } from './edit-content/tile-order-edit/tile-order-edit.component';
 
 @NgModule({
   declarations: [
@@ -47,7 +49,8 @@ import { AllApartmentDetailsEditComponent } from './edit-content/all-apartment-d
     AllInfoTextEditComponent,
     AllApartmentEditComponent,
     ApartmentDetailsEditComponent,
-    AllApartmentDetailsEditComponent
+    AllApartmentDetailsEditComponent,
+    TileOrderEditComponent
   ],
   imports: [
     CommonModule,
@@ -67,7 +70,8 @@ import { AllApartmentDetailsEditComponent } from './edit-content/all-apartment-d
     InfoTextService,
     ImageContentService,
     ApartmentDetailsContentService,
-    ApartmentContentService
+    ApartmentContentService,
+    TileOrderContentService
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
   entryComponents: [

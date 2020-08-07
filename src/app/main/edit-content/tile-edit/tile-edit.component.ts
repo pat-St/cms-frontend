@@ -1,3 +1,4 @@
+import { TileOrderContentService } from './../../../service/update-content/tile-order-content.service';
 import { NewEntryObject } from './../../../model/infoText';
 import { NewEntryModalComponent } from '../../custom-info-modal/new-entry-modal.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -36,6 +37,7 @@ export class TileEditComponent implements OnInit, AfterViewInit {
     private updateContent: UpdateContentService,
     private updateImage: ImageContentService,
     private entryDialog: MatDialog,
+    private tileOrderContent: TileOrderContentService,
     private _ngZone: NgZone) { }
 
   ngOnInit() {
@@ -60,7 +62,6 @@ export class TileEditComponent implements OnInit, AfterViewInit {
         index += 1;
       }
     }
-    console.log(JSON.stringify(kachelSizeList))
     return kachelSizeList;
   }
   getModalType() {
@@ -110,8 +111,7 @@ export class TileEditComponent implements OnInit, AfterViewInit {
         data:  {metaInfo: 'Kachel Art', listOfEntrys: tileType}
       }).afterClosed().toPromise()
     )
-    .then(
-      (res: number) => {
+    .then((res: number) => {
         if (res === null) {
           throw new Error('No Size set');
         }
@@ -150,13 +150,15 @@ export class TileEditComponent implements OnInit, AfterViewInit {
       (res) => {throw new Error('No Size set'); }
     ).then(() => {
       if (choosedTileType >= 0 && choosedTileModal >= 0 && choosedTileSize >= 0) {
-        this.updateContent.getNextNewTile(choosedTileType, choosedTileSize, choosedTileModal);
+        const newTile = this.updateContent.getNextNewTile(choosedTileType, choosedTileSize, choosedTileModal);
+        this.tileOrderContent.getNextTileOrder(newTile.ID);
       }
     })
     .catch((res) => {}/*console.log(res)*/);
   }
 
   removeEntry(entryObject: Tile) {
+    this.tileOrderContent.deleteNextTileOrder(entryObject);
     this.updateContent.deleteNewTile(entryObject);
   }
   saveEntry(entryObject: Tile) {

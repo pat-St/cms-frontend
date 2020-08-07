@@ -1,3 +1,4 @@
+import { TileOrderContentService } from './../../service/update-content/tile-order-content.service';
 import { ModalTableEntry, ListModify, ModifyModalComponent } from './../custom-info-modal/modify-list-for-save.component';
 import { LoginServiceService } from './../../service/login-service/login-service.service';
 import { RefreshModalComponent } from '../custom-info-modal/refresh-information-modal.component';
@@ -33,6 +34,7 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
     private updateApartment: ApartmentContentService,
     private updateDetails: ApartmentDetailsContentService,
     private updateImage: ImageContentService,
+    private updateTileOrder: TileOrderContentService,
     private loginService: LoginServiceService,
     private router: Router) { }
 
@@ -63,6 +65,7 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
   async trigger_refresh() {
     // reset
     this.updateContent.reset();
+    this.updateTileOrder.reset();
     this.updateInfoText.reset();
     this.updateApartment.reset();
     this.updateDetails.reset();
@@ -70,6 +73,7 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
     // load new
     this.content.loadAll();
     this.updateContent.loadNewContent();
+    this.updateTileOrder.loadNewContent();
     this.updateInfoText.loadNewContent();
     this.updateApartment.loadNewContent();
     this.updateDetails.loadNewContent();
@@ -77,7 +81,9 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
   }
 
   private trigger_save() {
-    return this.executeNewInRightOrder()
+    return Promise.resolve(true)
+    // pre changes
+    .then(() => this.preChanges())
     // update images
     .then(() => this.updateImage.sendChangesToBackend())
     // update info text
@@ -86,14 +92,18 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
     .then(() => this.updateApartment.sendChangesToBackend())
     // update apartment details
     .then(() => this.updateDetails.sendChangesToBackend())
+    // update tile order
+    .then(() => this.updateTileOrder.sendChangesToBackend())
     // update tiles
     .then(() => this.updateContent.sendUpdateToBackend())
+    // post changes
+    .then(() => this.postChanges())
     .catch((err) => {
-      console.log("error by trigger objects changes: " + JSON.stringify(err));
+      console.log('error by trigger objects changes: ' + JSON.stringify(err));
     });
   }
 
-  private executeNewInRightOrder() {
+  private preChanges(): Promise<any> {
     return Promise.resolve(true)
     .then(() => this.updateContent.sendNew())
     .then(() => this.updateInfoText.sendNew())
@@ -101,7 +111,17 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
     .then(() => this.updateApartment.sendNew())
     .then(() => this.updateImage.sendNew())
     .catch((err) => {
-      console.log("error by send new objects: " + JSON.stringify(err));
+      console.log('error by pre changes objects: ' + JSON.stringify(err));
+      return err;
+    });
+  }
+
+  private postChanges(): Promise<any> {
+    return Promise.resolve(true)
+    .then(() => this.updateTileOrder.sendNew())
+    .catch((err) => {
+      console.log('error by post change objects: ' + JSON.stringify(err));
+      return err;
     });
   }
 
@@ -112,39 +132,39 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
   private collectImageModification(): ModalTableEntry[] {
     const deteleColl: ModalTableEntry[] = this.updateImage
       .getDeleteChanges()
-      .map((i) => ({name: i.description, status: "löschen"}));
+      .map((i) => ({name: i.description, status: 'löschen'}));
     const updateColl: ModalTableEntry[] = this.updateImage
       .getUpdateChanges()
-      .map((i) => ({name: i.description, status: "ändern"}));
+      .map((i) => ({name: i.description, status: 'ändern'}));
     const newColl: ModalTableEntry[] = this.updateImage
       .getNewChanges()
-      .map((i) => ({name: i.description, status: "neu"}));
+      .map((i) => ({name: i.description, status: 'neu'}));
     return deteleColl.concat(updateColl).concat(newColl);
   }
 
   private collectTileModification(): ModalTableEntry[] {
     const deteleColl: ModalTableEntry[] = this.updateContent
       .getDeleteChanges()
-      .map((i) => ({name: i.titleName, status: "löschen"}));
+      .map((i) => ({name: i.titleName, status: 'löschen'}));
     const updateColl: ModalTableEntry[] = this.updateContent
       .getUpdateChanges()
-      .map((i) => ({name: i.titleName, status: "ändern"}));
+      .map((i) => ({name: i.titleName, status: 'ändern'}));
     const newColl: ModalTableEntry[] = this.updateContent
       .getNewChanges()
-      .map((i) => ({name: i.titleName, status: "neu"}));
+      .map((i) => ({name: i.titleName, status: 'neu'}));
     return deteleColl.concat(updateColl).concat(newColl);
   }
 
   private collectTextToTileModification(): ModalTableEntry[] {
     const deteleColl: ModalTableEntry[] = this.updateInfoText
       .getDeleteChanges()
-      .map((i) => ({name: i.infoText.headerText, status: "löschen"}));
+      .map((i) => ({name: i.infoText.headerText, status: 'löschen'}));
     const updateColl: ModalTableEntry[] = this.updateInfoText
       .getUpdateChanges()
-      .map((i) => ({name: i.infoText.headerText, status: "ändern"}));
+      .map((i) => ({name: i.infoText.headerText, status: 'ändern'}));
     const newColl: ModalTableEntry[] = this.updateInfoText
       .getNewChanges()
-      .map((i) => ({name: i.infoText.headerText, status: "neu"}));
+      .map((i) => ({name: i.infoText.headerText, status: 'neu'}));
     return deteleColl.concat(updateColl).concat(newColl);
   }
 
@@ -155,78 +175,92 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
   private collectApartmentDetailsModification(): ModalTableEntry[] {
     const deteleColl: ModalTableEntry[] = this.updateApartment
       .getDeleteDetailsChanges()
-      .map((i) => ({name: this.getItemOfDetails(i.fk_details), status: "löschen"}));
+      .map((i) => ({name: this.getItemOfDetails(i.fk_details), status: 'löschen'}));
     const updateColl: ModalTableEntry[] = this.updateApartment
       .getUpdateDetailsChanges()
-      .map((i) => ({name: this.getItemOfDetails(i.fk_details), status: "ändern"}));
+      .map((i) => ({name: this.getItemOfDetails(i.fk_details), status: 'ändern'}));
     const newColl: ModalTableEntry[] = this.updateApartment
       .getNewDetailChanges()
-      .map((i) => ({name: this.getItemOfDetails(i.fk_details), status: "neu"}));
+      .map((i) => ({name: this.getItemOfDetails(i.fk_details), status: 'neu'}));
     return deteleColl.concat(updateColl).concat(newColl);
   }
 
   private collectDetailsForApartmentModification(): ModalTableEntry[] {
     const deteleColl: ModalTableEntry[] = this.updateDetails
       .getDeleteDetailsChanges()
-      .map((i) => ({name: i.identifier, status: "löschen"}));
+      .map((i) => ({name: i.identifier, status: 'löschen'}));
     const updateColl: ModalTableEntry[] = this.updateDetails
       .getUpdateDetailsChanges()
-      .map((i) => ({name: i.identifier, status: "ändern"}));
+      .map((i) => ({name: i.identifier, status: 'ändern'}));
     const newColl: ModalTableEntry[] = this.updateDetails
       .getNewDetailsChanges()
-      .map((i) => ({name: i.identifier, status: "neu"}));
+      .map((i) => ({name: i.identifier, status: 'neu'}));
     return deteleColl.concat(updateColl).concat(newColl);
   }
 
   private collectApartmentDescModification(): ModalTableEntry[] {
     const deteleColl: ModalTableEntry[] = this.updateApartment
       .getDeleteDescChanges()
-      .map((i) => ({name: i.description + " : " + i.info, status: "löschen"}));
+      .map((i) => ({name: i.description + ' : ' + i.info, status: 'löschen'}));
     const updateColl: ModalTableEntry[] = this.updateApartment
       .getUpdateDescChanges()
-      .map((i) => ({name: i.description + " : " + i.info, status: "ändern"}));
+      .map((i) => ({name: i.description + ' : ' + i.info, status: 'ändern'}));
     const newColl: ModalTableEntry[] = this.updateApartment
       .getNewDescChanges()
-      .map((i) => ({name: i.description + " : " + i.info, status: "neu"}));
+      .map((i) => ({name: i.description + ' : ' + i.info, status: 'neu'}));
     return deteleColl.concat(updateColl).concat(newColl);
   }
 
   private collectApartmentPriceModification(): ModalTableEntry[] {
     const deteleColl: ModalTableEntry[] = this.updateApartment
       .getDeletePriceChanges()
-      .map((i) => ({ name: i.nights, status: "löschen"}));
+      .map((i) => ({ name: i.nights, status: 'löschen'}));
     const updateColl: ModalTableEntry[] = this.updateApartment
       .getUpdatePriceChanges()
-      .map((i) => ({ name: i.nights, status: "ändern"}));
+      .map((i) => ({ name: i.nights, status: 'ändern'}));
     const newColl: ModalTableEntry[] = this.updateApartment
       .getNewPriceChanges()
-      .map((i) => ({ name: i.nights, status: "neu" }));
+      .map((i) => ({ name: i.nights, status: 'neu' }));
     return deteleColl.concat(updateColl).concat(newColl);
   }
 
   private collectApartmentContentModification(): ModalTableEntry[] {
     const deteleColl: ModalTableEntry[] = this.updateApartment
       .getDeleteApartmentChanges()
-      .map((i) => ({name: i.fk_tile.toString(), status: "löschen"}));
+      .map((i) => ({name: i.fk_tile.toString(), status: 'löschen'}));
     const updateColl: ModalTableEntry[] = this.updateApartment
       .getUpdateApartmentChanges()
-      .map((i) => ({name: i.fk_tile.toString(), status: "ändern"}));
+      .map((i) => ({name: i.fk_tile.toString(), status: 'ändern'}));
     const newColl: ModalTableEntry[] = this.updateApartment
       .getNewApartmentChanges()
-      .map((i) => ({name: i.fk_tile.toString(), status: "neu"}));
+      .map((i) => ({name: i.fk_tile.toString(), status: 'neu'}));
+    return deteleColl.concat(updateColl).concat(newColl);
+  }
+
+  private collectTileOderModification(): ModalTableEntry[] {
+    const deteleColl: ModalTableEntry[] = this.updateTileOrder
+      .getDeleteChanges()
+      .map((i) => ({name: this.getTileTitle(i.fk_tile), status: 'löschen'}));
+    const updateColl: ModalTableEntry[] = this.updateTileOrder
+      .getUpdateChanges()
+      .map((i) => ({name: this.getTileTitle(i.fk_tile), status: 'ändern'}));
+    const newColl: ModalTableEntry[] = this.updateTileOrder
+      .getNewChanges()
+      .map((i) => ({name: this.getTileTitle(i.fk_tile), status: 'neu'}));
     return deteleColl.concat(updateColl).concat(newColl);
   }
 
   private collectModification(): Map<string, ModalTableEntry[]> {
     const mapOfColl: Map<string, ModalTableEntry[]> = new Map();
-    mapOfColl.set("Bilder", this.collectImageModification());
-    mapOfColl.set("Kacheln", this.collectTileModification());
-    mapOfColl.set("Infotext", this.collectTextToTileModification());
-    mapOfColl.set("Details für Ferienwohnung", this.collectDetailsForApartmentModification());
-    mapOfColl.set("Ferienwohnung", this.collectApartmentContentModification());
-    mapOfColl.set("Ferienwohnung Details", this.collectApartmentDetailsModification());
-    mapOfColl.set("Ferienwohnung Preise", this.collectApartmentPriceModification());
-    mapOfColl.set("Ferienwohnung Beschreibung", this.collectApartmentDescModification());
+    mapOfColl.set('Bilder',                     this.collectImageModification());
+    mapOfColl.set('Kacheln',                    this.collectTileModification());
+    mapOfColl.set('Infotext',                   this.collectTextToTileModification());
+    mapOfColl.set('Details für Ferienwohnung',  this.collectDetailsForApartmentModification());
+    mapOfColl.set('Ferienwohnung',              this.collectApartmentContentModification());
+    mapOfColl.set('Ferienwohnung Details',      this.collectApartmentDetailsModification());
+    mapOfColl.set('Ferienwohnung Preise',       this.collectApartmentPriceModification());
+    mapOfColl.set('Ferienwohnung Beschreibung', this.collectApartmentDescModification());
+    mapOfColl.set('Kachel Anordnung',           this.collectTileOderModification());
     return mapOfColl;
   }
 
@@ -236,7 +270,6 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
       maxHeight: '97vh',
       data : { header: 'Folgende Änderungen gehen verloren', listOfEntrys: this.collectModification()},
     });
-
     dialogRef.afterClosed().subscribe((result: boolean) => { 
       if (result) {
         this.trigger_refresh();
@@ -256,6 +289,11 @@ export class EditContentComponent implements OnInit, AfterViewChecked {
         .finally(() => setTimeout(() => { this.trigger_refresh(); }, 400));
       }
      });
+  }
+
+  private getTileTitle(id: number): string {
+    const tile = this.updateContent.newTile.find(el => el.ID === id);
+    return tile ? tile.titleName : '';
   }
 
 }

@@ -38,6 +38,36 @@ export class Tile {
   }
 }
 
+export class TileOrder {
+  ID: number;
+  seqNum: number;
+  fk_tile: number;
+  changed: boolean = false;
+  deleteEntry: boolean = false;
+  constructor(
+    ID: number = null,
+    seqNum: number,
+    fk_tile: number,
+    deleteEntry: boolean = false,
+    changed: boolean = false) {
+    this.ID = ID;
+    this.seqNum = seqNum;
+    this.fk_tile = fk_tile;
+    this.changed = changed;
+    this.deleteEntry = deleteEntry;
+  }
+  setDelete(): TileOrder {
+    this.deleteEntry = true;
+    return this;
+  }
+
+  setChanged(): TileOrder {
+    this.changed = true;
+    return this;
+  }
+}
+
+
 export enum KachelSize {
   small = 20,
   normal = 35,

@@ -1,3 +1,4 @@
+import { TileOrder } from './../../model/tile';
 import {
   ApartmentDescription,
   DetailsToApartment,
@@ -10,7 +11,6 @@ import { Injectable } from '@angular/core';
 import { Tile } from 'src/app/model/tile';
 import { InfoText, InfoTextToTile } from 'src/app/model/infoText';
 import { Image } from 'src/app/model/image';
-import { platform } from 'os';
 
 @Injectable({
   providedIn: 'root'
@@ -25,11 +25,12 @@ export class LoadContentService {
   apartmentDetails: ApartmentDetails[];
   apartmentPrice: ApartmentPrice[];
   imageObject: Image[];
+  tileOrder: TileOrder[];
   imageCache: Map<number, string>;
 
   imageCounter = 0;
   finishCounter = 0;
-  maxCounter = 9;
+  maxCounter = 10;
   apartmentCounter = 0;
 
   constructor(private backend: BackendRequestService) {}
@@ -44,6 +45,7 @@ export class LoadContentService {
     this.apartmentDetails = null;
     this.apartmentPrice = null;
     this.imageObject = null;
+    this.tileOrder = null;
     this.imageCache = new Map();
     this.imageCounter = 0;
     this.apartmentCounter = 0;
@@ -61,6 +63,7 @@ export class LoadContentService {
     this.loadApartmentDetails();
     this.loadApartmentPrice();
     this.loadImage();
+    this.loadTileOrder();
   }
 
   private incrementCounter() {
@@ -215,12 +218,22 @@ export class LoadContentService {
     return this.imageObject;
   }
 
+  async loadTileOrder() {
+    this.backend.getFromBackend('tile_order').subscribe((payload: TileOrder[]) => {
+      console.log("ha");
+      this.tileOrder = payload;
+      this.incrementCounter();
+    });
+  }
+
+  getTileOrder(): TileOrder[] {
+    return this.tileOrder;
+  }
+
   public fetchImageFromCache(desc: number) {
     return new Promise((resolve, reject) => {
       if (!this.imageCache.has(desc)) {
-        setTimeout(() => {
-          resolve(null);
-        }, 1000);
+        setTimeout(() => { resolve(null); }, 1000);
       } else {
         resolve(this.imageCache.get(desc));
       }

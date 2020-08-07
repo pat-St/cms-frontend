@@ -34,7 +34,6 @@ export class UpdateContentService {
     if (this.loadContent.isFinished()) {
       const tileContent = this.loadContent.getTile();
       this.addTileEntry(tileContent);
-
     } else {
       console.log('await for tile');
       setTimeout( () => this.loadNewContent(count - 1), count * 1000 );
@@ -58,10 +57,11 @@ export class UpdateContentService {
     });
   }
 
-  public getNextNewTile(tileType: number = null, tileSize: number = null, modalType: number = 0): boolean {
+  public getNextNewTile(tileType: number = null, tileSize: number = null, modalType: number = 0): Tile {
     const nextID = this.newTile.length > 2 ? this.nextIdOf(this.newTile.map(el => el.ID)) : this.newTile.length;
-    this.newTile.push(new Tile(nextID, '', '', tileType, modalType, tileSize));
-    return true;
+    const newTile = new Tile(nextID, '', '', tileType, modalType, tileSize);
+    this.newTile.push(newTile);
+    return newTile;
   }
 
   public updateNewTile(obj: Tile): boolean {

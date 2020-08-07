@@ -19,7 +19,8 @@ export class InfoTextService {
     if (itemColl.length < 2) {
       return itemColl.length;
     }
-    return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1; }
+    return itemColl.reduce((currN, nextN) => currN > nextN ? currN : nextN) + 1; 
+  }
 
   async loadNewContent(count= 5) {
     if (count < 0) {

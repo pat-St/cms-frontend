@@ -1,0 +1,20 @@
+<mat-expansion-panel>
+    <mat-expansion-panel-header>
+        <mat-panel-title>
+        Kachel Anordnung
+        </mat-panel-title>
+        <mat-panel-description>
+        Verändere und die Reihenfolge der Kacheln
+        </mat-panel-description>
+    </mat-expansion-panel-header>
+    <mat-divider class="tile-div"></mat-divider>
+    <div cdkDropList class="tile-order" (cdkDropListDropped)="drop($event)">
+        <div class="tile-box" *ngFor="let tile of tileOrderExpansionList" cdkDrag>
+            <div *ngIf="!tile.deleteEntry">
+                <div class="tile-placeholder" *cdkDragPlaceholder></div>
+                {{getTileTitle(tile.fk_tile)}}  | {{tile.seqNum}} | {{tile.changed}}
+            </div>
+        </div>
+    </div>
+</mat-expansion-panel>
+    
