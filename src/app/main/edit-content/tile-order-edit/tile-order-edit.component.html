@@ -12,9 +12,10 @@
         <div class="tile-box" *ngFor="let tile of tileOrderExpansionList" cdkDrag>
             <div *ngIf="!tile.deleteEntry">
                 <div class="tile-placeholder" *cdkDragPlaceholder></div>
-                {{getTileTitle(tile.fk_tile)}}  | {{tile.seqNum}} | {{tile.changed}}
+                {{getTileTitle(tile.fk_tile)}}
             </div>
         </div>
     </div>
+    <mat-divider class="tile-div"></mat-divider>
 </mat-expansion-panel>
     
