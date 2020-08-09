@@ -1,8 +1,11 @@
 import { Router } from '@angular/router';
 import { LoginServiceService } from './../../service/login-service/login-service.service';
-import { Component, OnInit } from '@angular/core';
-import {MatDialog} from '@angular/material/dialog'
+import { Component, OnInit,HostListener } from '@angular/core';
 import { User } from 'src/app/model/user';
+
+export enum KEY_CODE {
+    ENTER = 13
+}
 @Component({
   selector: 'app-login-page',
   templateUrl: './login-page.component.html',
@@ -41,6 +44,13 @@ export class LoginPageComponent implements OnInit {
     }).finally(() => {
       this.showSpinner = false;
     });
+  }
+
+  @HostListener('window:keyup', ['$event'])
+  keyEvent(event: KeyboardEvent) {
+    if (event.keyCode === KEY_CODE.ENTER) {
+      this.login();
+    }
   }
 
 }
