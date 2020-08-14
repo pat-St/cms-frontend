@@ -12,8 +12,8 @@ export class Token {
 }
 
 export class Register {
-    constructor(private username: string, private password: string, private mail: string) {}
+    constructor(private name: string, private pw: string, private mail: string) {}
     get self (): Array<string> {
-        return [this.username, this.password, this.mail];
+        return [this.name, this.pw, this.mail];
     }
 }

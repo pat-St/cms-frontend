@@ -91,12 +91,11 @@ export class RegisterPageComponent implements OnInit {
       if (res){
         this.router.navigate([""]);
       } else {
-        alert("Wrong Username or Password or Mail");
+        alert("Something went wrong during register");
       }
     })
     .catch((err) => {
-      console.log("Error while login: " + JSON.stringify(err));
-      alert("Wrong Username or Password");
+      alert("Wrong Username or Password or Mail");
     }).finally(() => {
       this.showSpinner = false;
     });
