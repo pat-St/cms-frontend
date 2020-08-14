@@ -1,0 +1,90 @@
+<div class="mat-toolbar mat-primary login-page">
+    <div class="header"></div>
+    <mat-card class="login-card">
+        <mat-card-header>
+            <mat-card-title>Registrierung</mat-card-title>
+        </mat-card-header>
+        <mat-card-content [style.display]="showSpinner ? 'none': 'block'">
+            <form class="example-form" [formGroup]="form" (ngSubmit)="register()">
+                <mat-form-field >
+                    <mat-label>Username</mat-label>
+                    <input matInput 
+                    formControlName="username" 
+                    name="username" 
+                    autofilled="true" 
+                    autocomplete="username" 
+                    [errorStateMatcher]="matcher">
+                    <mat-hint>Benutzername ohne Zahlen oder Sonderzeichen</mat-hint>
+                    <mat-error *ngIf="!userNameContr.hasError('required', 'username')">
+                        Bitte ein validen Name eingeben
+                    </mat-error>
+                    <mat-error *ngIf="userNameContr.hasError('required', 'username')">
+                        Name ist <strong>zwingen</strong>
+                    </mat-error>
+                </mat-form-field>
+                <div class="tile-div"></div>
+                <mat-form-field>
+                    <mat-label>Password</mat-label>
+                    <input matInput 
+                    type="password"
+                    placeholder="Password"                    
+                    name="password"
+                    autofilled="true"
+                    autocomplete="current-password"
+                    formControlName="firstPass"
+                    [errorStateMatcher]="matcher">
+                    <mat-hint>Errors appear instantly!</mat-hint>
+                    <mat-error *ngIf="!firstPassContr.hasError('required','firstPass')">
+                        Bitte ein valides Password eingeben
+                      </mat-error>
+                      <mat-error *ngIf="firstPassContr.hasError('required', 'firstPass')">
+                        Password ist <strong>zwingen</strong>
+                      </mat-error>
+                </mat-form-field>
+                <div class="tile-div"></div>
+                <mat-form-field>
+                    <mat-label>Password wiederholt</mat-label>
+                    <input matInput 
+                    type="password"
+                    placeholder="Password"
+                    name="password"
+                    autofilled="true"
+                    autocomplete="current-password"
+                    formControlName="secPass"
+                    [errorStateMatcher]="matcher">
+                    <mat-hint>Errors appear instantly!</mat-hint>
+                    <mat-error *ngIf="form.hasError('notSame')">
+                        Password stimmt nicht über ein
+                    </mat-error>
+                    <mat-error *ngIf="!form.hasError('required', 'secPass')">
+                        Bitte ein valides Password eingeben
+                    </mat-error>                  
+                    <mat-error *ngIf="form.hasError('required', 'secPass')">
+                        Password ist <strong>zwingen</strong>
+                    </mat-error>
+                </mat-form-field>
+                <div class="tile-div"></div>
+                <mat-form-field class="example-full-width">
+                    <mat-label>Email</mat-label>
+                    <input matInput 
+                    type="mail"
+                    formControlName="email" 
+                    [errorStateMatcher]="matcher"  
+                    placeholder="Ex. pat@example.com">
+                    <mat-hint>Errors appear instantly!</mat-hint>
+                    <mat-error *ngIf="form.hasError('email','email') && !form.hasError('required','email')">
+                      Bitte eine korrekte Mail-Adresse eingeben
+                    </mat-error>
+                    <mat-error *ngIf="form.hasError('required','email')">
+                      Email ist <strong>zwingen</strong>
+                    </mat-error>
+                  </mat-form-field>
+            </form>            
+        </mat-card-content>
+        <mat-card-actions>
+            <button mat-raised-button (click)="reset()" color="secondary" mat-button>Abbrechen</button>
+            <button mat-raised-button type="submit" (click)="register()" [disabled]="!form.valid" color="primary" mat-button>Register</button>
+        </mat-card-actions>
+        <mat-spinner [style.display]="showSpinner ? 'block' : 'none'"></mat-spinner>
+    </mat-card>
+</div>

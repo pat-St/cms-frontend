@@ -1,4 +1,4 @@
-import { User, Token } from './../../model/user';
+import { User, Token, Register } from './../../model/user';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BackendRequestService } from './../backend-request/backend-request.service';
@@ -71,12 +71,20 @@ export class LoginServiceService {
     });
   }
 
+  register(user: Register): Promise<boolean> {
+      return this.sendRegisterToBackend(user).toPromise().then(resolve => true, reject => false);
+  }
+
   private sendLoginToBackend(path: string, authheader: HttpHeaders): Observable<any> {
     return this.httpClient.get<any>(this.hostUrl + 'user/' + path, {headers: authheader});
   }
 
   private sendLogoutToBackend(path: string): Observable<boolean> {
     return this.httpClient.get<boolean>(this.hostUrl + 'user/' + path, {headers: this.header});
+  }
+
+  private sendRegisterToBackend(body: Register): Observable<any> {
+    return this.httpClient.post<any>(this.hostUrl +  'user/signin', body);
   }
 
   public testToken(): Observable<any> {
